@@ -1,7 +1,11 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import (require_http_methods,
         require_POST, require_GET)
+from hashids import Hashids
+import jwt
 
+from . import mailing
 from . import mollie
 from .forms import SignupForm, CompletionForm
 from .models import Registration
@@ -14,6 +18,8 @@ def signup(request):
         if form.is_valid():
             registration = form.save(commit=False)
             registration.save()
+            mailing.send_thanks_mail(registration)
+            mailing.send_completion_mail(registration)
             return redirect('thanks')
     else:
         form = SignupForm()
@@ -27,33 +33,43 @@ def thanks(request):
 
 
 @require_http_methods(["GET", "POST"])
-def complete(request, ref):
-    registration_id = ref
+def complete(request, token):
+    try:
+        claims = jwt.decode(token, settings.SECRET_KEY)
+    except jwt.ExpiredSignatureError:
+        raise # Signature has expired
+    else:
+        registration_ref = claims.get('registration_ref', None)
+        if registration_ref is not None:
+            hashids = Hashids()
+            registration_id, = hashids.decode(registration_ref)
+        else:
+            registration_id = None
+
     registration = get_object_or_404(Registration.objects, pk=registration_id)
 
     if request.method == 'POST':
         form = CompletionForm(request.POST, instance=registration)
         if form.is_valid():
-            questionare = form.save(commit=False)
             registration.save()
-            mollie.make_payment(registration)
-            return redirect('thanks')
+            payment = mollie.make_payment(request, registration)
+            return redirect(payment.getPaymentUrl())
     else:
         form = CompletionForm(instance=registration)
 
     return render(request, 'complete.html', {'form': form})
 
 
-@require_http_methods(["GET", "POST"])
+@require_GET
 def done(request, ref):
     pass
 
 
 @require_POST
 def mollie_notif(request):
-    """Mollie will notify us when a payment status
-    changes. Only the payment id is passed and we
-    are responsible for retieving the payment
+    """Mollie will notify us when a payment status changes. Only
+    the payment id is passed and we are responsible for retrieving
+    the payment.
     """
     # Pull out the payment id from the notification
     payment_id = request.POST.get("id", None)

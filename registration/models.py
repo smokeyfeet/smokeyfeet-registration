@@ -4,27 +4,31 @@ from django.utils import timezone
 from hashids import Hashids
 
 
-WORKSHOP_LEVELS = [
-        ('drums', 'Drums'),
-        ('saxophone', 'Saxophone'),
-        ('bass', 'Bass'),
-        ('trumpet', 'Trumpet'),
-        ('piano', 'Piano')]
+DANCE_ROLES = [
+        ('leader', 'Leader'),
+        ('follower', 'Follower')]
+
+PASS_TYPES = [
+        ('party', 'Party'),
+        ('ws_drums', 'Workshop: Drums'),
+        ('ws_saxophone', 'Workshop: Saxophone'),
+        ('ws_bass', 'Workshop: Bass'),
+        ('ws_trumpet_piano', 'Workshop: Trumpet/Piano')]
 
 
 class Registration(models.Model):
-    first_names = models.CharField(max_length=64)
+    first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
-    is_lead = models.BooleanField()
+    dance_role = models.CharField(max_length=32, choices=DANCE_ROLES)
 
     telephone = models.CharField(max_length=32, blank=True)
-    country = models.CharField(max_length=128, blank=True)
+    country_of_residence = models.CharField(max_length=128, blank=True)
 
-    workshop_level = models.CharField(max_length=32,
-            choices=WORKSHOP_LEVELS, blank=True)
+    pass_type = models.CharField(max_length=32, choices=PASS_TYPES)
     workshop_partner = models.CharField(max_length=128, blank=True)
 
+    wants_volunteer = models.BooleanField(default=False)
     wants_lunch = models.BooleanField(default=False)
 
     # Mollie
@@ -38,7 +42,8 @@ class Registration(models.Model):
 
     @property
     def ref(self):
-        return Hashids.encode(self.id) if self.id is not None else ''
+        hashids = Hashids()
+        return hashids.encode(self.id) if self.id is not None else ''
 
     @property
     def amount_due(self):
