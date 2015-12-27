@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Registration
+
+
+class RegistrationAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Registration, RegistrationAdmin)
