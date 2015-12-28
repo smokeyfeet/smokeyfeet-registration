@@ -52,7 +52,7 @@ def complete(request, token):
         form = CompletionForm(request.POST, instance=registration)
         if form.is_valid():
             registration.save()
-            payment = mollie.make_payment(request, registration)
+            payment = mollie.create_payment(request, registration)
             return redirect(payment.getPaymentUrl())
     else:
         form = CompletionForm(instance=registration)
