@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
-import jwt
+
+from .utils import make_token
 
 
 def send_thanks_mail(registration):
@@ -15,14 +17,13 @@ def send_thanks_mail(registration):
 
 
 def send_completion_mail(registration):
-    claims = {'registration_ref': registration.ref}
-    encoded = jwt.encode(claims, settings.SECRET_KEY, algorithm='HS256')
-    url = "http://localhost:8000/complete/{}/".format(str(encoded, 'ascii'))
+    token = make_token(registration)
+    path = reverse('complete', args=[token])
+    url = "{}{}".format(settings.MAIL_BASE_URI, path)
 
     context = {'url': url}
     text_msg = render_to_string('mail/complete.text', context=context)
     html_msg = render_to_string('mail/complete.html', context=context)
-    #reverse("complete")
 
     subject = "A spot has opened; complete registration"
     send_mail(subject, text_msg, 'registration@smokeyfeet.com',

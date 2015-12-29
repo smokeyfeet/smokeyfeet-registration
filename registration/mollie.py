@@ -1,7 +1,11 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from Mollie.API import Payment
 import Mollie
+
+from .models import MolliePayment
+from .utils import make_token
 
 
 def _make_mollie_client():
@@ -11,13 +15,14 @@ def _make_mollie_client():
 
 
 def create_payment(request, registration):
-    webhook_url = request.build_absolute_uri((reverse('mollie_notif')))
-    redirect_url = request.build_absolute_uri((reverse('done', registration.ref)))
+    token = make_token(registration)
+
+    redirect_url = request.build_absolute_uri(
+            (reverse('status', args=[token])))
 
     p = {
         'amount': registration.amount_due,
         'description': 'Smokey Feet 2016 Registration',
-        # 'webhookUrl':  webhook_url,
         'redirectUrl': redirect_url,
         'metadata': {'registration_ref': registration.ref}
     }
@@ -26,10 +31,11 @@ def create_payment(request, registration):
 
     try:
         payment = client.payments.create(p)
-    except Mollie.API.Error as err:
+    except Mollie.API.Error:
         raise
     else:
-        # registration.payments.add()
-        registration.save()
+        assert 'id' in payment
+        MolliePayment.objects.create(registration=registration,
+                mollie_id=payment['id'])
 
     return payment

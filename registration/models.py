@@ -1,7 +1,8 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from hashids import Hashids
+
+from Mollie.API import Payment
 
 
 class PassType(models.Model):
@@ -49,8 +50,9 @@ class Registration(models.Model):
 
     @property
     def ref(self):
+        assert self.id is not None
         hashids = Hashids()
-        return hashids.encode(self.id) if self.id is not None else ''
+        return hashids.encode(self.id)
 
     @property
     def amount_due(self):
@@ -58,5 +60,11 @@ class Registration(models.Model):
 
 
 class MolliePayment(models.Model):
-    registration_id = models.ForeignKey(Registration)
-    mollie_id = models.CharField(max_length=64)
+    registration = models.ForeignKey(Registration)
+
+    mollie_id = models.CharField(max_length=64, unique=True)
+    mollie_status = models.CharField(max_length=32,
+            default=Payment.STATUS_OPEN)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)

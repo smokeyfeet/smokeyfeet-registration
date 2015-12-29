@@ -1,4 +1,4 @@
-Yo {{ registration.firstname }}!
+Hi {{ registration.first_name }},
 
 Thanks for signing up for SF2016.
 

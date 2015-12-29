@@ -1,0 +1,19 @@
+<h1>Registration Status</h1>
+
+<p>Refresh page to get the latest status.</p>
+
+<h2>Details</h2>
+<ul>
+  <li>Name: {{ registration.first_name }}</li>
+  <li>Last name: {{ registration.last_name }}</li>
+  <li>Dance role: {{ registration.dance_role }}</li>
+  <li>Pass type: {{ registration.pass_type.name }}</li>
+</ul>
+
+<h2>Payments</h2>
+
+<ul>
+{% for payment in registration.molliepayment_set.all %}
+  <li>Status: {{ payment.mollie_status }}</li>
+{% endfor %}
+</ul>
