@@ -9,8 +9,8 @@ class SignupForm(forms.ModelForm):
         model = Registration
         fields = (
                 'first_name', 'last_name', 'email', 'dance_role',
-                'telephone', 'country_of_residence', 'wants_volunteer',
-                'pass_type', 'workshop_partner')
+                'telephone', 'residing_country', 'pass_type',
+                'workshop_partner')
         widgets = {
                 'dance_role': forms.widgets.RadioSelect(),
                 'pass_type': forms.widgets.RadioSelect()}
@@ -20,4 +20,5 @@ class CompletionForm(forms.ModelForm):
 
     class Meta:
         model = Registration
-        fields = ('wants_lunch',)
+        fields = ('include_lunch', 'diet_requirements', 'volunteering_for',
+                'competitions', 'strictly_partner')
