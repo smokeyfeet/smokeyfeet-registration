@@ -1,0 +1,42 @@
+[
+  {
+    "model": "registration.volunteertype",
+    "pk": 1,
+    "fields": {
+      "name": "Driver",
+      "description": "Note: you’ll have to bring your own car",
+      "num_offered": 5,
+      "refund_amount": 50
+    }
+  },
+  {
+    "model": "registration.volunteertype",
+    "pk": 2,
+    "fields": {
+      "name": "Registration Hero",
+      "description": "Help us register everybody, sell tickets/merchandise and answer super difficult questions :)",
+      "num_offered": 5,
+      "refund_amount": 50
+    }
+  },
+  {
+    "model": "registration.volunteertype",
+    "pk": 3,
+    "fields": {
+      "name": "Builder",
+      "description": "Getting the venues ready for some smokey dancing and/or leaving them spotless when we leave.",
+      "num_offered": 5,
+      "refund_amount": 50
+    }
+  },
+  {
+    "model": "registration.volunteertype",
+    "pk": 4,
+    "fields": {
+      "name": "Techy",
+      "description": "Technical hero: do you know something about lights/music and do you want to make yourself useful on Thursday, Friday and Monday evening before the party starts? Then this is you!",
+      "num_offered": 5,
+      "refund_amount": 50
+    }
+  }
+]

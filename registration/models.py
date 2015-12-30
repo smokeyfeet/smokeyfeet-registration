@@ -17,6 +17,30 @@ class PassType(models.Model):
         return "{}".format(self.name)
 
 
+class CompetitionType(models.Model):
+    name = models.CharField(max_length=64)
+    num_offered = models.PositiveIntegerField()
+
+    def __repr__(self):
+        return "<{}:{}>".format(type(self).__name__, self.id)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
+class VolunteerType(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.TextField(max_length=2048)
+    num_offered = models.PositiveIntegerField()
+    refund_amount = models.FloatField()
+
+    def __repr__(self):
+        return "<{}:{}>".format(type(self).__name__, self.id)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
 class Registration(models.Model):
     ROLE_LEADER = 'leader'
     ROLE_FOLLOWER = 'follower'
@@ -31,13 +55,20 @@ class Registration(models.Model):
             default=ROLE_LEADER)
 
     telephone = models.CharField(max_length=32, blank=True)
-    country_of_residence = models.CharField(max_length=128, blank=True)
+    residing_country = models.CharField(max_length=128, blank=True)
 
     pass_type = models.ForeignKey(PassType)
     workshop_partner = models.CharField(max_length=128, blank=True)
 
-    wants_volunteer = models.BooleanField(default=False)
-    wants_lunch = models.BooleanField(default=False)
+    competitions = models.ManyToManyField(CompetitionType)
+    strictly_partner = models.CharField(max_length=128, blank=True)
+
+    volunteering_for = models.ManyToManyField(VolunteerType)
+
+    include_lunch = models.BooleanField(default=False)
+    diet_requirements = models.TextField(max_length=140, blank=True)
+
+    crew_remarks = models.TextField(max_length=4096, blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)

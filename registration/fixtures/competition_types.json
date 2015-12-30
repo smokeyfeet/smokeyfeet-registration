@@ -1,0 +1,26 @@
+[
+  {
+    "model": "registration.competitiontype",
+    "pk": 1,
+    "fields": {
+      "name": "Jack and Jill",
+      "num_offered": 20
+    }
+  },
+  {
+    "model": "registration.competitiontype",
+    "pk": 2,
+    "fields": {
+      "name": "Strictly",
+      "num_offered": 20
+    }
+  },
+  {
+    "model": "registration.competitiontype",
+    "pk": 3,
+    "fields": {
+      "name": "Solo Jazz/Charleston",
+      "num_offered": 20
+    }
+  }
+]
