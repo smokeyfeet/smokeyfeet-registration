@@ -19,7 +19,7 @@ def send_thanks_mail(registration):
 def send_completion_mail(registration):
     token = make_token(registration)
     path = reverse('complete', args=[token])
-    url = "{}{}".format(settings.MAIL_BASE_URI, path)
+    url = "{}{}".format(settings.EMAIL_BASE_URI, path)
 
     context = {'url': url}
     text_msg = render_to_string('mail/complete.text', context=context)
