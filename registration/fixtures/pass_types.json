@@ -1,47 +1,52 @@
 [
-{
-  "model": "registration.passtype",
-  "pk": 1,
-  "fields": {
-    "name": "Party",
-    "num_offered": 250,
-    "price": 75.0
+  {
+    "model": "registration.passtype",
+    "pk": 1,
+    "fields": {
+      "type": "party",
+      "name": "Party",
+      "num_offered": 250,
+      "price": 75
+    }
+  },
+  {
+    "model": "registration.passtype",
+    "pk": 2,
+    "fields": {
+      "type": "full",
+      "name": "Workshop: Drums",
+      "num_offered": 250,
+      "price": 200
+    }
+  },
+  {
+    "model": "registration.passtype",
+    "pk": 3,
+    "fields": {
+      "type": "full",
+      "name": "Workshop: Saxophone",
+      "num_offered": 250,
+      "price": 200
+    }
+  },
+  {
+    "model": "registration.passtype",
+    "pk": 4,
+    "fields": {
+      "type": "full",
+      "name": "Workshop: Bass",
+      "num_offered": 250,
+      "price": 200
+    }
+  },
+  {
+    "model": "registration.passtype",
+    "pk": 5,
+    "fields": {
+      "type": "full",
+      "name": "Workshop: Trumpet/Piano",
+      "num_offered": 250,
+      "price": 200
+    }
   }
-},
-{
-  "model": "registration.passtype",
-  "pk": 2,
-  "fields": {
-    "name": "Workshop: Drums",
-    "num_offered": 250,
-    "price": 200.0
-  }
-},
-{
-  "model": "registration.passtype",
-  "pk": 3,
-  "fields": {
-    "name": "Workshop: Saxophone",
-    "num_offered": 250,
-    "price": 200.0
-  }
-},
-{
-  "model": "registration.passtype",
-  "pk": 4,
-  "fields": {
-    "name": "Workshop: Bass",
-    "num_offered": 250,
-    "price": 200.0
-  }
-},
-{
-  "model": "registration.passtype",
-  "pk": 5,
-  "fields": {
-    "name": "Workshop: Trumpet/Piano",
-    "num_offered": 250,
-    "price": 200.0
-  }
-}
 ]

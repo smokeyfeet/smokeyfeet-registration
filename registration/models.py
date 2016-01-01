@@ -6,6 +6,13 @@ from Mollie.API import Payment
 
 
 class PassType(models.Model):
+    PASS_PARTY = 'party'
+    PASS_FULL = 'full'
+    PASS_TYPES = [
+            (PASS_PARTY, 'Party Pass'),
+            (PASS_FULL, 'Full Pass')]
+
+    type = models.CharField(max_length=32, choices=PASS_TYPES)
     name = models.CharField(max_length=64)
     num_offered = models.PositiveIntegerField()
     price = models.FloatField()
@@ -38,10 +45,11 @@ class VolunteerType(models.Model):
         return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
-        return "{}".format(self.name)
-
+        return "{}".format(self.name) 
 
 class Registration(models.Model):
+    LUNCH_PRICE = 15.00
+
     ROLE_LEADER = 'leader'
     ROLE_FOLLOWER = 'follower'
     DANCE_ROLES = [
@@ -87,7 +95,18 @@ class Registration(models.Model):
 
     @property
     def amount_due(self):
-        return self.pass_type.price
+        if self.include_lunch:
+            return self.pass_type.price + self.LUNCH_PRICE
+        else:
+            return self.pass_type.price
+
+    @property
+    def is_party_pass(self):
+        return self.pass_type.type == PassType.PASS_PARTY
+
+    @property
+    def is_full_pass(self):
+        return self.pass_type.type == PassType.PASS_FULL
 
 
 class MolliePayment(models.Model):

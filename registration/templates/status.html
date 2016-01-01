@@ -10,7 +10,23 @@
   <li>Pass type: {{ registration.pass_type.name }}</li>
 </ul>
 
+<h2>Pff</h2>
+
+{% if registration.include_lunch %}
+Lunch included
+{% else %}
+Lunch not included
+{% endif %}
+
+{% for comp in registration.competitions.all %}
+{{ comp.name }}
+{% empty %}
+No competitions
+{% endfor %}
+
 <h2>Payments</h2>
+
+Amount due: {{ registration.amount_due }}
 
 <ul>
 {% for payment in registration.molliepayment_set.all %}
