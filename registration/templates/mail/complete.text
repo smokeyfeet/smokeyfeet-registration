@@ -1,1 +1,18 @@
+This is an automatically generated message.
+
+Great news {{ registration.first_name }}!
+
+A spot has opened up for you at Smokey Feet 2016. You
+have <b>14 days</b> to secure your spot. All we need is a little
+more info... Oh and payment.
+
 {{ url }}
+
+{% if registration.pass_type.video_audition_required %}
+  Reminder for the PIANO level:
+
+  Remember to mail us a link to your video audition before
+  the 29th of January. If you do not send in a video, you
+  will be placed automatically in the TRUMPET level. You'll
+  be informed of your level placement before the 14th of February.
+{% endif %}

@@ -1,7 +1,31 @@
-<html>
+<!DOCTYPE html PUBLIC
+  "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
 <body>
-  <h1>Complete registration</h1>
+  <p><i>This is an automatically generated message.</i></p>
 
-  <p><a href="{{ url }}">Complete registration</a></p>
+  <p>Great news {{ registration.first_name }}!
+
+  <p>A spot has opened up for you at Smokey Feet 2016. You
+  have <b>14 days</b> to secure your spot. All we need is a little
+  more info... Oh and payment.</p>
+
+  <center><a href="{{ url }}">Complete Registration</a></center>
+
+{% if registration.pass_type.video_audition_required %}
+  <p>Reminder for the PIANO level:</p>
+  <blockquote>Remember to <a href="mailto:info@smokeyfeet.com">mail</a>
+  us a link to your video audition before the <b>29th of January</b>.
+  If you do not send in a video, you will be placed automatically in the
+  TRUMPET level. You'll be informed of your level placement before the
+  <b>14th of February</b>.
+  </blockquote>
+{% endif %}
+
 </body>
 </html>

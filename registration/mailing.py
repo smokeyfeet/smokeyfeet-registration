@@ -7,11 +7,11 @@ from .utils import make_token
 
 
 def send_thanks_mail(registration):
-    subject = "Thanks!"
+    subject = "[SF2016] Signup received"
     context = {'registration': registration}
     text_msg = render_to_string('mail/thanks.text', context=context)
     html_msg = render_to_string('mail/thanks.html', context=context)
-    send_mail(subject, text_msg, 'info@smokeyfeet.com',
+    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
             [registration.email], fail_silently=False,
             html_message=html_msg)
 
@@ -21,11 +21,11 @@ def send_completion_mail(registration):
     path = reverse('complete', args=[token])
     url = "{}{}".format(settings.EMAIL_BASE_URI, path)
 
-    context = {'url': url}
+    context = {'registration': registration, 'url': url}
     text_msg = render_to_string('mail/complete.text', context=context)
     html_msg = render_to_string('mail/complete.html', context=context)
 
-    subject = "A spot has opened; complete registration"
-    send_mail(subject, text_msg, 'info@smokeyfeet.com',
+    subject = "[SF2016] Complete registration"
+    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
            [registration.email], fail_silently=False,
            html_message=html_msg)

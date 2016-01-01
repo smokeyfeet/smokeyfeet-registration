@@ -14,7 +14,9 @@ class PassType(models.Model):
 
     type = models.CharField(max_length=32, choices=PASS_TYPES)
     name = models.CharField(max_length=64)
+    order = models.PositiveIntegerField()
     num_offered = models.PositiveIntegerField()
+    video_audition_required = models.BooleanField(default=False)
     price = models.FloatField()
 
     def __repr__(self):
@@ -22,6 +24,9 @@ class PassType(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+
+    class Meta:
+        ordering = ['order']
 
 
 class CompetitionType(models.Model):
@@ -33,6 +38,9 @@ class CompetitionType(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+
+    class Meta:
+        ordering = ['name']
 
 
 class VolunteerType(models.Model):
@@ -46,6 +54,10 @@ class VolunteerType(models.Model):
 
     def __str__(self):
         return "{}".format(self.name) 
+
+    class Meta:
+        ordering = ['name']
+
 
 class Registration(models.Model):
     LUNCH_PRICE = 15.00
