@@ -10,13 +10,19 @@
   <li>Pass type: {{ registration.pass_type.name }}</li>
 </ul>
 
-<h2>Pff</h2>
+{% if registration.pass_type.is_full_pass %}
+
+<h2>Workshop Lunch</h2>
 
 {% if registration.include_lunch %}
 Lunch included
 {% else %}
 Lunch not included
 {% endif %}
+
+{% endif %}
+
+<h2>Competitions</h2>
 
 {% for comp in registration.competitions.all %}
 {{ comp.name }}

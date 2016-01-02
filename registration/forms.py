@@ -20,5 +20,9 @@ class CompletionForm(forms.ModelForm):
 
     class Meta:
         model = Registration
-        fields = ('include_lunch', 'diet_requirements', 'volunteering_for',
-                'competitions', 'strictly_partner')
+        fields = ('include_lunch', 'diet_requirements', 'competitions',
+                'strictly_partner', 'volunteering_for')
+
+        widgets = {
+                'competitions': forms.widgets.CheckboxSelectMultiple(),
+                'volunteering_for': forms.widgets.CheckboxSelectMultiple()}

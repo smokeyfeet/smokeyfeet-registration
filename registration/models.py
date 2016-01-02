@@ -25,6 +25,14 @@ class PassType(models.Model):
     def __str__(self):
         return "{}".format(self.name)
 
+    @property
+    def is_full_pass(self):
+        return self.type == self.PASS_FULL
+
+    @property
+    def is_party_pass(self):
+        return self.type == self.PASS_PARTY
+
     class Meta:
         ordering = ['order']
 

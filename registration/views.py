@@ -24,10 +24,8 @@ def signup(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            registration = form.save(commit=False)
-            registration.save()
+            registration = form.save()
             mailing.send_thanks_mail(registration)
-            mailing.send_completion_mail(registration)
             return redirect('thanks')
     else:
         form = SignupForm()
@@ -60,7 +58,7 @@ def complete(request, token):
     if request.method == 'POST':
         form = CompletionForm(request.POST, instance=registration)
         if form.is_valid():
-            registration.save()
+            form.save()
             payment = mollie.create_payment(request, registration)
             return redirect(payment.getPaymentUrl())
     else:
@@ -126,4 +124,4 @@ def mollie_notif(request):
             mpay.mollie_status = payment['status']
             mpay.save()
 
-    return HttpResponse(status=201)
+    return HttpResponse(status=200)
