@@ -1,7 +1,10 @@
 import logging
 
 from django.conf import settings
+from django.http import (HttpResponse, HttpResponseBadRequest,
+        HttpResponseServerError)
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import (require_http_methods,
         require_POST, require_GET)
 from hashids import Hashids
@@ -89,6 +92,7 @@ def status(request, token):
     return render(request, 'status.html', {'registration': registration})
 
 
+@csrf_exempt
 @require_POST
 def mollie_notif(request):
     """Mollie will notify us when a payment status changes. Only
@@ -99,20 +103,19 @@ def mollie_notif(request):
     payment_id = request.POST.get("id", None)
     if payment_id is None:
         logger.error("Missing payment id in Mollie notification")
-        return http.HttpResponseBadRequest()
+        return HttpResponseBadRequest()
 
     # Retrieve the payment
-    try:
-        payment = mollie.payments.get(payment_id)
-    except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
-        return http.HttpResponseServerError()
+    payment = mollie.retrieve_payment(payment_id)
+    if payment is None:
+        return HttpResponseServerError()
     else:
         registration_ref = payment["metadata"]["registration_ref"]
-        registration_id = hashids.decode(registration_ref)
+        hashids = Hashids()
+        registration_id, = hashids.decode(registration_ref)
 
         logger.info("Payment (%s) status changed for registration %d => %s",
-                payment_id, registration_id, status)
+                payment_id, registration_id, payment['status'])
 
         try:
             mpay = MolliePayment.objects.get(mollie_id=payment_id)

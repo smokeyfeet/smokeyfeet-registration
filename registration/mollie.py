@@ -1,11 +1,15 @@
+import logging
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from Mollie.API import Payment
 import Mollie
 
 from .models import MolliePayment
 from .utils import make_token
+
+
+logger = logging.getLogger(__name__)
 
 
 def _make_mollie_client():
@@ -31,7 +35,8 @@ def create_payment(request, registration):
 
     try:
         payment = client.payments.create(p)
-    except Mollie.API.Error:
+    except Mollie.API.Error as err:
+        logger.error("Mollie API call failed: %s", err.message)
         raise
     else:
         assert 'id' in payment
@@ -39,3 +44,15 @@ def create_payment(request, registration):
                 mollie_id=payment['id'])
 
     return payment
+
+
+def retrieve_payment(payment_id):
+    client = _make_mollie_client()
+
+    try:
+        payment = client.payments.get(payment_id)
+    except Mollie.API.Error as err:
+        logger.error("Mollie API call failed: %s", err.message)
+        return None
+    else:
+        return payment

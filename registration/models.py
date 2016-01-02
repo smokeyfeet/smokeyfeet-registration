@@ -53,7 +53,7 @@ class VolunteerType(models.Model):
         return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
-        return "{}".format(self.name) 
+        return "{}".format(self.name)
 
     class Meta:
         ordering = ['name']
@@ -97,7 +97,8 @@ class Registration(models.Model):
         return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
-        return "{}, {} ({})".format(self.last_name, self.first_name, self.email)
+        return "{}, {} ({})".format(self.last_name, self.first_name,
+                self.email)
 
     @property
     def ref(self):
