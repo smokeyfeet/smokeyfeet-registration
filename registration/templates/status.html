@@ -2,11 +2,11 @@
 
 {% block content %}
 <div class="row columns">
-  <h1>Registration Status</h1>
+  <h2>Registration Status</h2>
 
   <p>Refresh page to get the latest status.</p>
 
-  <h2>Details</h2>
+  <h3>Details</h3>
   <ul>
     <li>Name: {{ registration.first_name }}</li>
     <li>Last name: {{ registration.last_name }}</li>
@@ -15,7 +15,7 @@
   </ul>
 
 {% if registration.is_full_pass %}
-  <h2>Workshop Lunch</h2>
+  <h3>Workshop Lunch</h3>
 
 {% if registration.include_lunch %}
   Lunch included
@@ -25,7 +25,7 @@
 
 {% endif %}
 
-  <h2>Competitions</h2>
+  <h3>Competitions</h3>
 
 {% for comp in registration.competitions.all %}
   {{ comp.name }}
@@ -33,7 +33,7 @@
   No competitions
 {% endfor %}
 
-  <h2>Payments</h2>
+  <h3>Payments</h3>
 
   Amount due: {{ registration.amount_due }}
 

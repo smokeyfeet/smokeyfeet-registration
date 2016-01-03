@@ -17,6 +17,10 @@ class SignupForm(forms.ModelForm):
 
     email_repeat = forms.EmailField()
 
+    def __init__(self, *args, **kwargs):
+        super(SignupForm, self).__init__(*args, **kwargs)
+        self.fields['pass_type'].empty_label = None
+
     def clean(self):
         cleaned_data = super(SignupForm, self).clean()
         email = cleaned_data.get("email")

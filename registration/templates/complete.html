@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row columns">
-  <h1>Smokey Feet 2016 Complete Registration</h1>
+  <h2>Complete Registration</h2>
 </div>
 
 <form action="." method="post">
@@ -14,7 +14,7 @@
 
 {% if registration.is_full_pass %}
   <div class="row columns">
-    <h2>Lunch</h2>
+    <h3>Lunch</h3>
   </div>
 
   <div class="row columns">
@@ -26,8 +26,8 @@
 
   <div class="row columns">
     {{ form.include_lunch.errors }}
-    <label for="{{ form.include_lunch.id_for_label }}">Include lunch:</label>
     {{ form.include_lunch }}
+    <label for="{{ form.include_lunch.id_for_label }}">Include lunch:</label>
   </div>
 
   <div class="row columns">
@@ -38,14 +38,15 @@
 {% endif %}
 
   <div class="row columns">
-    <h2>Competitions</h2>
+    <h3>Competitions</h3>
     <p>Do you want to join our competitions? Note: limited spots available</p>
   </div>
 
   <div class="row columns">
     {{ form.competitions.errors }}
-    <label for="{{ form.competitions.id_for_label }}">Competitions:</label>
-    {{ form.competitions }}
+{% for cb in form.competitions %}
+    {{ cb }}
+{% endfor %}
   </div>
 
   <div class="row columns">
@@ -55,7 +56,7 @@
   </div>
 
   <div class="row columns">
-    <h2>Volunteering</h2>
+    <h3>Volunteering</h3>
     <p>Would you like to be a volunteer at Smokey Feet 2016?</p>
 
     <p>We will try our best to make sure you don't miss anything you
@@ -66,17 +67,22 @@
 
   <div class="row columns">
     {{ form.volunteering_for.errors }}
-    <label for="{{ form.volunteering_for.id_for_label }}">Volunteering for:</label>
-    {{ form.volunteering_for }}
+{% for cb in form.volunteering_for %}
+    {{ cb }}
+{% endfor %}
   </div>
 
   <div class="row columns">
+    <h3>Terms and Conditions</h3>
     {{ form.agree_to_terms.errors }}
-    <label for="{{ form.agree_to_terms.id_for_label }}">Agree to terms:</label>
     {{ form.agree_to_terms }}
+    <label for="{{ form.agree_to_terms.id_for_label }}">
+      I have read, understand, and agree to the Smokey Feet
+      <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>
+    </label>
   </div>
 
-  <div class="row columns">
+  <div class="row columns text-center">
     <input type="submit" class="success large button" value="Submit and Pay" />
   </div>
 </form>
