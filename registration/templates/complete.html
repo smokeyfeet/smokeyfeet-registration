@@ -1,41 +1,83 @@
-<h1>Complete</h1>
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="row columns">
+  <h1>Smokey Feet 2016 Complete Registration</h1>
+</div>
 
 <form action="." method="post">
   {% csrf_token %}
 
-  {{ form.non_field_errors }}
+  <div class="row columns">
+    {{ form.non_field_errors }}
+  </div>
 
-  <div class="fieldWrapper">
+{% if registration.is_full_pass %}
+  <div class="row columns">
+    <h2>Lunch</h2>
+  </div>
+
+  <div class="row columns">
+    <p>Would you like to add lunch on Saturday and Sunday to your full-package?
+    For lunch you will get two tasty sandwiches and fruit for an
+    additional €15,-.
+    </p>
+  </div>
+
+  <div class="row columns">
     {{ form.include_lunch.errors }}
     <label for="{{ form.include_lunch.id_for_label }}">Include lunch:</label>
     {{ form.include_lunch }}
   </div>
 
-  <div class="fieldWrapper">
+  <div class="row columns">
     {{ form.diet_requirements.errors }}
     <label for="{{ form.include_lunch.id_for_label }}">Diet requirements:</label>
     {{ form.diet_requirements }}
   </div>
+{% endif %}
 
-  <div class="fieldWrapper">
+  <div class="row columns">
+    <h2>Competitions</h2>
+    <p>Do you want to join our competitions? Note: limited spots available</p>
+  </div>
+
+  <div class="row columns">
     {{ form.competitions.errors }}
     <label for="{{ form.competitions.id_for_label }}">Competitions:</label>
     {{ form.competitions }}
   </div>
 
-  <div class="fieldWrapper">
+  <div class="row columns">
     {{ form.strictly_partner.errors }}
     <label for="{{ form.strictly_partner.id_for_label }}">Strictly Partner:</label>
     {{ form.strictly_partner }}
   </div>
 
-  <p>I'd like to volunteer</p>
+  <div class="row columns">
+    <h2>Volunteering</h2>
+    <p>Would you like to be a volunteer at Smokey Feet 2016?</p>
 
-  <div class="fieldWrapper">
+    <p>We will try our best to make sure you don't miss anything you
+    don't want to miss :) All volunteer positions are part time. Which
+    role(s) suits you?
+    </p>
+  </div>
+
+  <div class="row columns">
     {{ form.volunteering_for.errors }}
     <label for="{{ form.volunteering_for.id_for_label }}">Volunteering for:</label>
     {{ form.volunteering_for }}
   </div>
 
-  <input type="submit" value="Submit and Pay" />
+  <div class="row columns">
+    {{ form.agree_to_terms.errors }}
+    <label for="{{ form.agree_to_terms.id_for_label }}">Agree to terms:</label>
+    {{ form.agree_to_terms }}
+  </div>
+
+  <div class="row columns">
+    <input type="submit" class="success large button" value="Submit and Pay" />
+  </div>
 </form>
+{% endblock %}

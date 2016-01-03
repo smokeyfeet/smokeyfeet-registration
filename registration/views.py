@@ -19,6 +19,11 @@ from .models import Registration, MolliePayment
 logger = logging.getLogger(__name__)
 
 
+@require_GET
+def landing(request):
+    return render(request, 'landing.html')
+
+
 @require_http_methods(["GET", "POST"])
 def signup(request):
     if request.method == 'POST':
@@ -64,7 +69,8 @@ def complete(request, token):
     else:
         form = CompletionForm(instance=registration)
 
-    return render(request, 'complete.html', {'form': form})
+    return render(request, 'complete.html', {'form': form,
+            'registration': registration})
 
 
 @require_GET

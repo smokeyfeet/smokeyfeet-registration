@@ -1,7 +1,11 @@
-<h1>You've got mail!</h1>
+{% extends '_base.html' %}
 
-<p>Check your email inbox - we just sent you a message
-with your registration details.
-</p>
+{% block content %}
+  <h1>You've got mail!</h1>
 
-<b>Help: <a href="#">I haven't received the email yet</a>
+  <p>Check your email inbox - we just sent you a message
+  with your registration details.
+  </p>
+
+  <b>Help: <a href="#">I haven't received the email yet</a>
+{% endblock %}

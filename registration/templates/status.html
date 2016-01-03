@@ -1,41 +1,46 @@
-<h1>Registration Status</h1>
+{% extends '_base.html' %}
 
-<p>Refresh page to get the latest status.</p>
+{% block content %}
+<div class="row columns">
+  <h1>Registration Status</h1>
 
-<h2>Details</h2>
-<ul>
-  <li>Name: {{ registration.first_name }}</li>
-  <li>Last name: {{ registration.last_name }}</li>
-  <li>Dance role: {{ registration.dance_role }}</li>
-  <li>Pass type: {{ registration.pass_type.name }}</li>
-</ul>
+  <p>Refresh page to get the latest status.</p>
 
-{% if registration.pass_type.is_full_pass %}
+  <h2>Details</h2>
+  <ul>
+    <li>Name: {{ registration.first_name }}</li>
+    <li>Last name: {{ registration.last_name }}</li>
+    <li>Dance role: {{ registration.dance_role }}</li>
+    <li>Pass type: {{ registration.pass_type.name }}</li>
+  </ul>
 
-<h2>Workshop Lunch</h2>
+{% if registration.is_full_pass %}
+  <h2>Workshop Lunch</h2>
 
 {% if registration.include_lunch %}
-Lunch included
+  Lunch included
 {% else %}
-Lunch not included
+  Lunch not included
 {% endif %}
 
 {% endif %}
 
-<h2>Competitions</h2>
+  <h2>Competitions</h2>
 
 {% for comp in registration.competitions.all %}
-{{ comp.name }}
+  {{ comp.name }}
 {% empty %}
-No competitions
+  No competitions
 {% endfor %}
 
-<h2>Payments</h2>
+  <h2>Payments</h2>
 
-Amount due: {{ registration.amount_due }}
+  Amount due: {{ registration.amount_due }}
 
-<ul>
+  <ul>
 {% for payment in registration.molliepayment_set.all %}
-  <li>Status: {{ payment.mollie_status }}</li>
+    <li>Status: {{ payment.mollie_status }}</li>
 {% endfor %}
-</ul>
+  </ul>
+</div>
+{% endblock %}

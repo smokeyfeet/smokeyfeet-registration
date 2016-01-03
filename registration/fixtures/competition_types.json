@@ -4,7 +4,8 @@
     "pk": 1,
     "fields": {
       "name": "Jack and Jill",
-      "num_offered": 20
+      "num_offered": 20,
+      "require_partner": false
     }
   },
   {
@@ -12,7 +13,8 @@
     "pk": 2,
     "fields": {
       "name": "Strictly",
-      "num_offered": 20
+      "num_offered": 20,
+      "require_partner": true
     }
   },
   {
@@ -20,7 +22,8 @@
     "pk": 3,
     "fields": {
       "name": "Solo Jazz/Charleston",
-      "num_offered": 20
+      "num_offered": 20,
+      "require_partner": false
     }
   }
 ]

@@ -25,14 +25,6 @@ class PassType(models.Model):
     def __str__(self):
         return "{}".format(self.name)
 
-    @property
-    def is_full_pass(self):
-        return self.type == self.PASS_FULL
-
-    @property
-    def is_party_pass(self):
-        return self.type == self.PASS_PARTY
-
     class Meta:
         ordering = ['order']
 
@@ -40,6 +32,7 @@ class PassType(models.Model):
 class CompetitionType(models.Model):
     name = models.CharField(max_length=64)
     num_offered = models.PositiveIntegerField()
+    require_partner = models.BooleanField(default=False)
 
     def __repr__(self):
         return "<{}:{}>".format(type(self).__name__, self.id)
@@ -96,7 +89,11 @@ class Registration(models.Model):
     include_lunch = models.BooleanField(default=False)
     diet_requirements = models.TextField(max_length=140, blank=True)
 
+    agree_to_terms = models.BooleanField(default=False)
+
     crew_remarks = models.TextField(max_length=4096, blank=True)
+
+    accepted_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -128,6 +125,10 @@ class Registration(models.Model):
     @property
     def is_full_pass(self):
         return self.pass_type.type == PassType.PASS_FULL
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        super(Registration, self).save(*args, **kwargs)
 
 
 class MolliePayment(models.Model):

@@ -1,7 +1,83 @@
-<h1>Sign up</h1>
+{% extends '_base.html' %}
+
+{% block content %}
+
+<div class="row columns">
+  <h1>Smokey Feet 2016 Signup</h1>
+</div>
 
 <form action="." method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit" />
+  {% csrf_token %}
+
+  <div class="row columns">
+    {{ form.non_field_errors }}
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.first_name.errors }}
+      <label for="{{ form.first_name.id_for_label }}">First name</label>
+      {{ form.first_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.last_name.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Last name</label>
+      {{ form.last_name }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.email.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Email</label>
+      {{ form.email }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.email_repeat.errors }}
+      <label for="{{ form.email_repeat.id_for_label }}">Email verification</label>
+      {{ form.email_repeat }}
+    </div>
+  </div>
+
+  <div class="row columns">
+    {{ form.dance_role.errors }}
+
+    <fieldset class="fieldset">
+      <legend>Dance role</legend>
+{% for radio in form.dance_role %}
+        {{ radio.tag }}<label for="{{ radio.id_for_label}}">{{ radio.choice_label }}</label>
+{% endfor %}
+    </fieldset>
+  </div>
+
+  <div class="row columns">
+    {{ form.telephone.errors }}
+    <label for="{{ form.telephone.id_for_label }}">Telephone (optional)</label>
+    {{ form.telephone }}
+  </div>
+
+  <div class="row columns">
+    {{ form.residing_country.errors }}
+    <label for="{{ form.residing_country.id_for_label }}">Residing country (optional)</label>
+    {{ form.residing_country }}
+  </div>
+
+  <div class="row columns">
+    <fieldset class="fieldset">
+      <legend>Pass Type</legend>
+      {{ form.pass_type.errors }}
+      {{ form.pass_type }}
+    </fieldset>
+  </div>
+
+  <div class="row columns">
+    {{ form.workshop_partner.errors }}
+    <label for="{{ form.workshop_partner.id_for_label }}">Workshop partner (optional)</label>
+    {{ form.workshop_partner }}
+  </div>
+
+  <div class="row colums text-center">
+    <input type="submit" class="success large button text-center" value="Sign me up!" />
+  </div>
 </form>
+{% endblock %}
