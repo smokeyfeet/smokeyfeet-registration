@@ -12,27 +12,37 @@
     {{ form.non_field_errors }}
   </div>
 
+  <div class="row columns">
+    {{ form.residing_country.errors }}
+    <label for="{{ form.residing_country.id_for_label }}">
+      Residing country</label>
+    {{ form.residing_country }}
+  </div>
+
 {% if registration.is_full_pass %}
   <div class="row columns">
     <h3>Lunch</h3>
   </div>
 
   <div class="row columns">
-    <p>Would you like to add lunch on Saturday and Sunday to your full-package?
-    For lunch you will get two tasty sandwiches and fruit for an
-    additional €15,-.
+    <p>Would you like to add lunch on <b>Saturday and Sunday</b> to your
+    full-package? For lunch you will get two tasty sandwiches and fruit.
     </p>
   </div>
 
   <div class="row columns">
     {{ form.include_lunch.errors }}
     {{ form.include_lunch }}
-    <label for="{{ form.include_lunch.id_for_label }}">Include lunch:</label>
+    <label for="{{ form.include_lunch.id_for_label }}">
+      Include Saturay &amp; Sunday lunch
+      <b>(+ &euro;{{ registration.LUNCH_PRICE|floatformat:2 }})</b>
+    </label>
   </div>
 
   <div class="row columns">
     {{ form.diet_requirements.errors }}
-    <label for="{{ form.include_lunch.id_for_label }}">Diet requirements:</label>
+    <label for="{{ form.include_lunch.id_for_label }}">
+      Dietary requirements <i>(optional)</i></label>
     {{ form.diet_requirements }}
   </div>
 {% endif %}
@@ -51,7 +61,7 @@
 
   <div class="row columns">
     {{ form.strictly_partner.errors }}
-    <label for="{{ form.strictly_partner.id_for_label }}">Strictly Partner:</label>
+    <label for="{{ form.strictly_partner.id_for_label }}">Strictly Partner</label>
     {{ form.strictly_partner }}
   </div>
 
@@ -63,6 +73,12 @@
     don't want to miss :) All volunteer positions are part time. Which
     role(s) suits you?
     </p>
+
+    <dl>
+{% for vt in volunteer_types %}
+      <dt>{{ vt.name }}</dt><dd>{{ vt.description }}</dd>
+{% endfor %}
+    </dl>
   </div>
 
   <div class="row columns">

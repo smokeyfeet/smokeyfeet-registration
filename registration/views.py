@@ -13,7 +13,7 @@ import jwt
 from . import mailing
 from . import mollie
 from .forms import SignupForm, CompletionForm
-from .models import Registration, MolliePayment
+from .models import Registration, MolliePayment, VolunteerType
 
 
 logger = logging.getLogger(__name__)
@@ -69,8 +69,13 @@ def complete(request, token):
     else:
         form = CompletionForm(instance=registration)
 
+    volunteer_types = VolunteerType.objects.values(
+            'name', 'description').order_by('name')
+
+    print(volunteer_types)
+
     return render(request, 'complete.html', {'form': form,
-            'registration': registration})
+            'registration': registration, 'volunteer_types': volunteer_types})
 
 
 @require_GET

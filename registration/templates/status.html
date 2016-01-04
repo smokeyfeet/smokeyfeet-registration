@@ -10,37 +10,42 @@
   <ul>
     <li>Name: {{ registration.first_name }}</li>
     <li>Last name: {{ registration.last_name }}</li>
-    <li>Dance role: {{ registration.dance_role }}</li>
+    <li>Dance role: {{ registration.dance_role|capfirst }}</li>
     <li>Pass type: {{ registration.pass_type.name }}</li>
   </ul>
 
+{% if registration.is_accepted %}
+
+  <ul>
 {% if registration.is_full_pass %}
-  <h3>Workshop Lunch</h3>
-
-{% if registration.include_lunch %}
-  Lunch included
-{% else %}
-  Lunch not included
+  {% if registration.include_lunch %}
+    <li>Workshop lunch included</li>
+  {% else %}
+    <li>Workshop Lunch <b>not</b> included</li>
+  {% endif %}
 {% endif %}
 
-{% endif %}
-
-  <h3>Competitions</h3>
-
+    <li>
 {% for comp in registration.competitions.all %}
-  {{ comp.name }}
+  {{ comp.name }}{% if not forloop.last %}, {% endif %}
 {% empty %}
   No competitions
 {% endfor %}
+    </li>
+
+    <li>Strictly partner: {{ registration.strictly_partner }}</li>
+  </ul>
 
   <h3>Payments</h3>
 
-  Amount due: {{ registration.amount_due }}
+  <p>Amount due: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></p>
 
   <ul>
 {% for payment in registration.molliepayment_set.all %}
     <li>Status: {{ payment.mollie_status }}</li>
 {% endfor %}
   </ul>
+
+{% endif %}
 </div>
 {% endblock %}

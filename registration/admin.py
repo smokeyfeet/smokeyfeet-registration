@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from .models import PassType, CompetitionType, VolunteerType, Registration
 from . import mailing
@@ -17,8 +18,27 @@ class VolunteerTypeAdmin(admin.ModelAdmin):
     pass
 
 
+class RegistrationStatusFilter(admin.SimpleListFilter):
+    title = _('status')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('pending', _('Signup pending')),
+            ('accepted', _('Signup accepted')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'pending':
+            return queryset.filter(accepted_at__isnull=True)
+        if self.value() == 'accepted':
+            return queryset.filter(accepted_at__isnull=False)
+
+
 class RegistrationAdmin(admin.ModelAdmin):
-    list_filter = ('pass_type',)
+    list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role')
     list_display = ('first_name', 'last_name', 'pass_type', 'created_at')
 
     ordering = ('created_at',)

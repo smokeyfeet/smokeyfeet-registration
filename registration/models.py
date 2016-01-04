@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django_countries.fields import CountryField
 from hashids import Hashids
 
 from Mollie.API import Payment
@@ -75,8 +76,7 @@ class Registration(models.Model):
     dance_role = models.CharField(max_length=32, choices=DANCE_ROLES,
             default=ROLE_LEADER)
 
-    telephone = models.CharField(max_length=32, blank=True)
-    residing_country = models.CharField(max_length=128, blank=True)
+    residing_country = CountryField()
 
     pass_type = models.ForeignKey(PassType)
     workshop_partner = models.CharField(max_length=128, blank=True)
@@ -125,6 +125,10 @@ class Registration(models.Model):
     @property
     def is_full_pass(self):
         return self.pass_type.type == PassType.PASS_FULL
+
+    @property
+    def is_accepted(self):
+        return self.accepted_at is not None
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
