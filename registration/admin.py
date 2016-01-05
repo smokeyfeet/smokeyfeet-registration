@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import PassType, CompetitionType, VolunteerType, Registration
+from .models import (PassType, CompetitionType, MolliePayment,
+        VolunteerType, Registration)
 from . import mailing
 
 
@@ -37,6 +38,13 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
             return queryset.filter(accepted_at__isnull=False)
 
 
+class MolliePaymentInline(admin.TabularInline):
+    model = MolliePayment
+    extra = 0
+    readonly_fields = ('mollie_id', 'mollie_status', 'created_at')
+    exclude = ('updated_at',)
+
+
 class RegistrationAdmin(admin.ModelAdmin):
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role')
     list_display = ('first_name', 'last_name', 'pass_type', 'created_at')
@@ -44,6 +52,8 @@ class RegistrationAdmin(admin.ModelAdmin):
     ordering = ('created_at',)
 
     actions = ['action_complete']
+
+    inlines = [MolliePaymentInline]
 
     def action_complete(self, request, queryset):
         for registration in queryset:

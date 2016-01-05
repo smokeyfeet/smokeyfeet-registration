@@ -1,9 +1,12 @@
 import logging
 
+from Mollie.API import Payment
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import (HttpResponse, HttpResponseBadRequest,
         HttpResponseServerError)
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import (require_http_methods,
         require_POST, require_GET)
@@ -60,10 +63,26 @@ def complete(request, token):
 
     registration = get_object_or_404(Registration.objects, pk=registration_id)
 
+    # Don't allow updates after completion
+    if registration.is_completed:
+        # If there is an open payment, redirect for payment
+        # Don't rely on our payment status here...
+        qs = registration.molliepayment_set.order_by('-created_at')
+        for payment in qs:
+            mpay = mollie.retrieve_payment(payment.mollie_id)
+            import pprint
+            pprint.pprint(mpay)
+            if mpay['status'] == Payment.STATUS_OPEN:
+                return redirect(mpay.getPaymentUrl())
+        else:
+            return redirect(reverse('status', args=[token]))
+
     if request.method == 'POST':
         form = CompletionForm(request.POST, instance=registration)
         if form.is_valid():
-            form.save()
+            registration = form.save(commit=False)
+            registration.completed_at = timezone.now()
+            registration.save()
             payment = mollie.create_payment(request, registration)
             return redirect(payment.getPaymentUrl())
     else:
@@ -71,8 +90,6 @@ def complete(request, token):
 
     volunteer_types = VolunteerType.objects.values(
             'name', 'description').order_by('name')
-
-    print(volunteer_types)
 
     return render(request, 'complete.html', {'form': form,
             'registration': registration, 'volunteer_types': volunteer_types})

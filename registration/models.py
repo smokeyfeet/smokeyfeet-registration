@@ -94,6 +94,7 @@ class Registration(models.Model):
     crew_remarks = models.TextField(max_length=4096, blank=True)
 
     accepted_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -129,6 +130,10 @@ class Registration(models.Model):
     @property
     def is_accepted(self):
         return self.accepted_at is not None
+
+    @property
+    def is_completed(self):
+        return self.completed_at is not None
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
