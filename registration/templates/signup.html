@@ -9,9 +9,15 @@
 <form action="." method="post">
   {% csrf_token %}
 
+  {{ form.media }}
+
+{% if form.non_field_errors %}
   <div class="row columns">
-    {{ form.non_field_errors }}
+    <div class="alert callout">
+      {{ form.non_field_errors }}
+    </div>
   </div>
+{% endif %}
 
   <div class="row columns">
     <h3>Your basic info</h3>
@@ -70,10 +76,23 @@
   </div>
 
   <div class="row columns">
-    {{ form.workshop_partner.errors }}
-    <label for="{{ form.workshop_partner.id_for_label }}">
-      Workshop partner <i>(optional)</i></label>
-    {{ form.workshop_partner }}
+    <h3>Your workshop partner</h3>
+    <p><b>Leave fields blank if signing up solo</b></p>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.workshop_partner_email.errors }}
+      <label for="{{ form.workshop_partner_email.id_for_label }}">
+      Partner email</label>
+      {{ form.workshop_partner_email }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.workshop_partner_name.errors }}
+      <label for="{{ form.workshop_partner_name.id_for_label }}">
+      Partner full name</label>
+      {{ form.workshop_partner_name }}
+    </div>
   </div>
 
   <div class="row columns text-center">

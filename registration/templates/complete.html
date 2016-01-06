@@ -8,9 +8,15 @@
 <form action="." method="post">
   {% csrf_token %}
 
+  {{ form.media }}
+
+{% if form.non_field_errors %}
   <div class="row columns">
-    {{ form.non_field_errors }}
+    <div class="alert callout">
+      {{ form.non_field_errors }}
+    </div>
   </div>
+{% endif %}
 
   <div class="row columns">
     {{ form.residing_country.errors }}
@@ -91,8 +97,8 @@
   <div class="row columns">
     <h3>Terms and Conditions</h3>
     {{ form.agree_to_terms.errors }}
-    {{ form.agree_to_terms }}
     <label for="{{ form.agree_to_terms.id_for_label }}">
+      {{ form.agree_to_terms }}
       I have read, understand, and agree to the Smokey Feet
       <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>
     </label>

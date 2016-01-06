@@ -79,7 +79,8 @@ class Registration(models.Model):
     residing_country = CountryField()
 
     pass_type = models.ForeignKey(PassType)
-    workshop_partner = models.CharField(max_length=128, blank=True)
+    workshop_partner_name = models.CharField(max_length=128, blank=True)
+    workshop_partner_email = models.EmailField(blank=True)
 
     competitions = models.ManyToManyField(CompetitionType, blank=True)
     strictly_partner = models.CharField(max_length=128, blank=True)
@@ -88,8 +89,6 @@ class Registration(models.Model):
 
     include_lunch = models.BooleanField(default=False)
     diet_requirements = models.TextField(max_length=140, blank=True)
-
-    agree_to_terms = models.BooleanField(default=False)
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
 

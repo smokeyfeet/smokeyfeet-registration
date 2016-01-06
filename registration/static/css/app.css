@@ -1,0 +1,25 @@
+body {
+  font-family: Georgia, serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Georgia, serif;
+}
+
+.site-header {
+  background-color: #b44c31;
+  color: #fefefe;
+}
+
+ul {
+  padding-left: 2em;
+}
+
+.button.success {
+  background-color: #3c878e;
+}
