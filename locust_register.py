@@ -20,7 +20,7 @@ class UserBehaviour(TaskSet):
         data = {
             'email': email,
             'email_repeat': email,
-            'first_name': emial,
+            'first_name': email,
             'last_name': 'Balboa',
             'dance_role': 'leader',
             'pass_type': (x % 4)

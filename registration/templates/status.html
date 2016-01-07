@@ -20,6 +20,7 @@
 {% if registration.is_full_pass %}
   {% if registration.include_lunch %}
     <li>Workshop lunch included</li>
+    <li>Dietary requirements: {{ registration.diet_requirements }}</li>
   {% else %}
     <li>Workshop Lunch <b>not</b> included</li>
   {% endif %}

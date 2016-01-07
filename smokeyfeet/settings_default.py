@@ -90,13 +90,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Amsterdam'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+from django.conf.locale.en import formats as en_formats
+en_formats.DATETIME_FORMAT = "c"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/

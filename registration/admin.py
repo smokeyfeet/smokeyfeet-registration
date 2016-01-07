@@ -22,20 +22,39 @@ class VolunteerTypeAdmin(admin.ModelAdmin):
 class RegistrationStatusFilter(admin.SimpleListFilter):
     title = _('status')
 
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = 'status'
 
     def lookups(self, request, model_admin):
         return (
             ('pending', _('Signup pending')),
             ('accepted', _('Signup accepted')),
-        )
+            )
 
     def queryset(self, request, queryset):
         if self.value() == 'pending':
             return queryset.filter(accepted_at__isnull=True)
         if self.value() == 'accepted':
             return queryset.filter(accepted_at__isnull=False)
+
+
+class RegistrationPartnerFilter(admin.SimpleListFilter):
+    title = _('has partner')
+
+    parameter_name = 'has_partner'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', _('Yes')),
+            ('no', _('No')),
+            )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.exclude(workshop_partner_email__exact=''
+                    ).exclude(workshop_partner_name__exact='')
+        if self.value() == 'no':
+            return queryset.filter(workshop_partner_email__exact='',
+                    workshop_partner_name__exact='')
 
 
 class MolliePaymentInline(admin.TabularInline):
@@ -45,9 +64,16 @@ class MolliePaymentInline(admin.TabularInline):
     exclude = ('updated_at',)
 
 
+def _workshop_partner(obj):
+    return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
+_workshop_partner.short_description = 'Workshop partner'
+
+
 class RegistrationAdmin(admin.ModelAdmin):
-    list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role')
-    list_display = ('first_name', 'last_name', 'pass_type', 'created_at')
+    list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
+            RegistrationPartnerFilter, 'include_lunch')
+    list_display = ('first_name', 'last_name', 'email', 'pass_type',
+            _workshop_partner, 'created_at')
 
     ordering = ('created_at',)
 
