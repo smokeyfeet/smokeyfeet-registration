@@ -70,8 +70,6 @@ def complete(request, token):
         qs = registration.molliepayment_set.order_by('-created_at')
         for payment in qs:
             mpay = mollie.retrieve_payment(payment.mollie_id)
-            import pprint
-            pprint.pprint(mpay)
             if mpay['status'] == Payment.STATUS_OPEN:
                 return redirect(mpay.getPaymentUrl())
         else:
@@ -126,10 +124,10 @@ def mollie_notif(request):
     the payment.
     """
     # Pull out the payment id from the notification
-    payment_id = request.POST.get("id", None)
-    if payment_id is None:
-        logger.error("Missing payment id in Mollie notification")
-        return HttpResponseBadRequest()
+    payment_id = request.POST.get("id", "")
+    if not payment_id:
+        logger.error("Missing payment id in Mollie notif (probably test)")
+        return HttpResponse(status=200)
 
     # Retrieve the payment
     payment = mollie.retrieve_payment(payment_id)
