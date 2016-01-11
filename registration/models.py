@@ -143,6 +143,7 @@ class MolliePayment(models.Model):
     registration = models.ForeignKey(Registration)
 
     mollie_id = models.CharField(max_length=64, unique=True)
+    mollie_amount = models.FloatField()
     mollie_status = models.CharField(max_length=32,
             default=Payment.STATUS_OPEN)
 

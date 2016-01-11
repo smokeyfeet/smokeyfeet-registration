@@ -126,7 +126,7 @@ def mollie_notif(request):
     # Pull out the payment id from the notification
     payment_id = request.POST.get("id", "")
     if not payment_id:
-        logger.error("Missing payment id in Mollie notif (probably test)")
+        logger.warning("Missing payment id in Mollie notif (probably test)")
         return HttpResponse(status=200)
 
     # Retrieve the payment

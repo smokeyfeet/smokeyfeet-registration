@@ -34,7 +34,7 @@
 {% endfor %}
     </li>
 
-    <li>Strictly partner: {{ registration.strictly_partner }}</li>
+    <li>Strictly partner: {{ registration.strictly_partner|default:"None" }}</li>
   </ul>
 
   <h3>Payments</h3>
@@ -43,7 +43,7 @@
 
   <ul>
 {% for payment in registration.molliepayment_set.all %}
-    <li>Status: {{ payment.mollie_status }}</li>
+    <li>{{ payment.created_at }}: {{ payment.mollie_amount }} => {{ payment.mollie_status }}</li>
 {% endfor %}
   </ul>
 
