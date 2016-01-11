@@ -3,8 +3,7 @@ import logging
 from Mollie.API import Payment
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponse, HttpResponseBadRequest,
-        HttpResponseServerError)
+from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -149,5 +148,14 @@ def mollie_notif(request):
         else:
             mpay.mollie_status = payment['status']
             mpay.save()
+
+            if payment.isPaid():
+                try:
+                    registration = Registration.objects.get(pk=registration_id)
+                except Registration.DoesNotExist:
+                    logger.warning("Registration (%d) missing; pay mail dropped",
+                            registration_id)
+                else:
+                    mailing.send_payment_mail(registration)
 
     return HttpResponse(status=200)

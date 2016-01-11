@@ -29,3 +29,13 @@ def send_completion_mail(registration):
     send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
            [registration.email], fail_silently=False,
            html_message=html_msg)
+
+
+def send_payment_mail(registration):
+    subject = "[SF2016] Payment received"
+    context = {'registration': registration}
+    text_msg = render_to_string('mail/payment.text', context=context)
+    html_msg = render_to_string('mail/payment.html', context=context)
+    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
+            [registration.email], fail_silently=False,
+            html_message=html_msg)
