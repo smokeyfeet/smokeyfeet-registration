@@ -1,0 +1,12 @@
+Hello {{ registration.first_name }},
+
+We have received your payment and your spot for Smokey Feet 2016
+is now confirmed! We will keep you up to date on any news via the
+http://www.smokeyfeet.com and facebook page.
+
+If you want to join our Piano level don't forget to send us a link
+to your video audition before the 29th of January.
+
+All the best,
+
+Smokey Feet Crew
