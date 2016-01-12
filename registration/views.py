@@ -80,6 +80,7 @@ def complete(request, token):
             registration = form.save(commit=False)
             registration.completed_at = timezone.now()
             registration.save()
+            form.save_m2m()
             payment = mollie.create_payment(request, registration)
             return redirect(payment.getPaymentUrl())
     else:
