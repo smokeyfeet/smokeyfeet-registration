@@ -34,16 +34,21 @@
 {% endfor %}
     </li>
 
-    <li>Strictly partner: {{ registration.strictly_partner }}</li>
+    <li>Strictly partner: {{ registration.strictly_partner|default:"None" }}</li>
   </ul>
+
+  <p>Total amount: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></p>
 
   <h3>Payments</h3>
 
-  <p>Amount due: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></p>
-
-  <ul>
 {% for payment in registration.molliepayment_set.all %}
-    <li>Status: {{ payment.mollie_status }}</li>
+  <div class="payment">
+    <ul>
+      <li>Created at: {{ payment.created_at }}</li>
+      <li>Amount: &euro;{{ payment.mollie_amount|floatformat:2 }}</li>
+      <li>Status: {{ payment.mollie_status }}</li>
+    </ul>
+  </div>
 {% endfor %}
   </ul>
 

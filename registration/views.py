@@ -3,8 +3,7 @@ import logging
 from Mollie.API import Payment
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import (HttpResponse, HttpResponseBadRequest,
-        HttpResponseServerError)
+from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -70,8 +69,6 @@ def complete(request, token):
         qs = registration.molliepayment_set.order_by('-created_at')
         for payment in qs:
             mpay = mollie.retrieve_payment(payment.mollie_id)
-            import pprint
-            pprint.pprint(mpay)
             if mpay['status'] == Payment.STATUS_OPEN:
                 return redirect(mpay.getPaymentUrl())
         else:
@@ -83,6 +80,7 @@ def complete(request, token):
             registration = form.save(commit=False)
             registration.completed_at = timezone.now()
             registration.save()
+            form.save_m2m()
             payment = mollie.create_payment(request, registration)
             return redirect(payment.getPaymentUrl())
     else:
@@ -126,10 +124,10 @@ def mollie_notif(request):
     the payment.
     """
     # Pull out the payment id from the notification
-    payment_id = request.POST.get("id", None)
-    if payment_id is None:
-        logger.error("Missing payment id in Mollie notification")
-        return HttpResponseBadRequest()
+    payment_id = request.POST.get("id", "")
+    if not payment_id:
+        logger.warning("Missing payment id in Mollie notif (probably test)")
+        return HttpResponse(status=200)
 
     # Retrieve the payment
     payment = mollie.retrieve_payment(payment_id)
@@ -151,5 +149,14 @@ def mollie_notif(request):
         else:
             mpay.mollie_status = payment['status']
             mpay.save()
+
+            if payment.isPaid():
+                try:
+                    registration = Registration.objects.get(pk=registration_id)
+                except Registration.DoesNotExist:
+                    logger.warning("Registration (%d) missing; pay mail dropped",
+                            registration_id)
+                else:
+                    mailing.send_payment_mail(registration)
 
     return HttpResponse(status=200)

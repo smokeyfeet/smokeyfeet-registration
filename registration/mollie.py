@@ -26,7 +26,7 @@ def create_payment(request, registration):
 
     p = {
         'amount': registration.amount_due,
-        'description': 'Smokey Feet 2016 Registration',
+        'description': 'Smokey Feet 2016',
         'redirectUrl': redirect_url,
         'metadata': {'registration_ref': registration.ref}
     }
@@ -41,7 +41,7 @@ def create_payment(request, registration):
     else:
         assert 'id' in payment
         MolliePayment.objects.create(registration=registration,
-                mollie_id=payment['id'])
+                mollie_id=payment['id'], mollie_amount=registration.amount_due)
 
     return payment
 

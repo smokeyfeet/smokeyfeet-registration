@@ -32,7 +32,8 @@
 
   <div class="row columns">
     <p>Would you like to add lunch on <b>Saturday and Sunday</b> to your
-    full-package? For lunch you will get two tasty sandwiches and fruit.
+    full-package? For lunch you will get two tasty sandwiches (pistolet)
+    and one piece of fruit.
     </p>
   </div>
 
@@ -40,7 +41,7 @@
     {{ form.include_lunch.errors }}
     {{ form.include_lunch }}
     <label for="{{ form.include_lunch.id_for_label }}">
-      Include Saturay &amp; Sunday lunch
+      Include Saturday &amp; Sunday lunch
       <b>(+ &euro;{{ registration.LUNCH_PRICE|floatformat:2 }})</b>
     </label>
   </div>
@@ -48,7 +49,7 @@
   <div class="row columns">
     {{ form.diet_requirements.errors }}
     <label for="{{ form.include_lunch.id_for_label }}">
-      Dietary requirements <i>(optional)</i></label>
+      Dietary requirements, e.g. lactose intolerant <i>(optional)</i></label>
     {{ form.diet_requirements }}
   </div>
 {% endif %}
