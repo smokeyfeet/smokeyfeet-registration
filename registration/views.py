@@ -73,7 +73,7 @@ def complete(request, token):
         mpay = mollie.retrieve_payment(last_pmt.mollie_id)
         if mpay.isOpen():
             return redirect(mpay.getPaymentUrl())
-        elif mpay.isPaid() or mpay.IsPending():
+        elif mpay.isPaid() or mpay.isPending():
             return redirect(reverse('status', args=[token]))
         else:
             # Cancelled or Expired
