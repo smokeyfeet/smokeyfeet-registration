@@ -1,6 +1,5 @@
 import logging
 
-from Mollie.API import Payment
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError
@@ -64,15 +63,22 @@ def complete(request, token):
 
     # Don't allow updates after completion
     if registration.is_completed:
-        # If there is an open payment, redirect for payment
-        # Don't rely on our payment status here...
-        qs = registration.molliepayment_set.order_by('-created_at')
-        for payment in qs:
-            mpay = mollie.retrieve_payment(payment.mollie_id)
-            if mpay['status'] == Payment.STATUS_OPEN:
-                return redirect(mpay.getPaymentUrl())
-        else:
+        # Retrieve last payment
+        last_pmt = registration.molliepayment_set.order_by('-created_at').first()
+        if last_pmt is None:
+            # Create payment if there are none
+            payment = mollie.create_payment(request, registration)
+            return redirect(payment.getPaymentUrl())
+
+        mpay = mollie.retrieve_payment(last_pmt.mollie_id)
+        if mpay.isOpen():
+            return redirect(mpay.getPaymentUrl())
+        elif mpay.isPaid() or mpay.isPending():
             return redirect(reverse('status', args=[token]))
+        else:
+            # Cancelled or Expired
+            payment = mollie.create_payment(request, registration)
+            return redirect(payment.getPaymentUrl())
 
     if request.method == 'POST':
         form = CompletionForm(request.POST, instance=registration)
