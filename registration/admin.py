@@ -1,3 +1,6 @@
+import datetime as dt
+
+from Mollie.API import Payment
 from django import forms
 from django.contrib import admin
 from django.utils import timezone
@@ -30,6 +33,10 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
         return (
             ('pending', _('Signup pending')),
             ('accepted', _('Signup accepted')),
+            ('paid', _('Paid')),
+            ('accepted_unpaid_07d', _('Accepted & unpaid 7d')),
+            ('accepted_unpaid_10d', _('Accepted & unpaid 10d')),
+            ('accepted_unpaid_14d', _('Accepted & unpaid 14d')),
             )
 
     def queryset(self, request, queryset):
@@ -37,6 +44,17 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
             return queryset.filter(accepted_at__isnull=True)
         if self.value() == 'accepted':
             return queryset.filter(accepted_at__isnull=False)
+        if self.value() == 'paid':
+            return queryset.filter(molliepayment__mollie_status=Payment.STATUS_PAID)
+        if self.value() == 'accepted_unpaid_07d':
+            return queryset.filter(accepted_at__lte=timezone.now() -
+                    dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        if self.value() == 'accepted_unpaid_10d':
+            return queryset.filter(accepted_at__lte=timezone.now() -
+                    dt.timedelta(days=10)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        if self.value() == 'accepted_unpaid_14d':
+            return queryset.filter(accepted_at__lte=timezone.now() -
+                    dt.timedelta(days=14)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
@@ -87,11 +105,11 @@ class RegistrationAdmin(admin.ModelAdmin):
             RegistrationPartnerFilter, 'include_lunch')
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
-            _workshop_partner, 'created_at')
+            _workshop_partner, 'amount_paid', 'created_at')
 
     ordering = ('created_at',)
 
-    actions = ['action_complete']
+    actions = ['action_complete', 'action_payment_reminder']
 
     inlines = [MolliePaymentInline]
 
@@ -103,9 +121,18 @@ class RegistrationAdmin(admin.ModelAdmin):
 
     action_complete.short_description = "Accept and send completion mail"
 
+    def action_payment_reminder(self, request, queryset):
+        for registration in queryset:
+            registration.payment_reminder_at = timezone.now()
+            registration.save()
+            mailing.send_payment_reminder_mail(registration)
+
+    action_payment_reminder.short_description = "Send payment reminder mail"
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(RegistrationAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['token'].initial = make_token(obj)
+        if obj is not None:
+            form.base_fields['token'].initial = make_token(obj)
         return form
 
 

@@ -1,0 +1,13 @@
+Hello {{ registration.first_name }},
+
+We noticed that you've not completed your registration or made payment.
+This means your spot for Smokey Feet 2016 is in grave danger!
+
+You still have until {{ registration.due_date }} to finalize your registration
+or spot may be given to someone else.
+
+{{ url }}
+
+All the best,
+
+Smokey Feet Crew

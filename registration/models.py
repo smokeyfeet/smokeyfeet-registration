@@ -1,4 +1,7 @@
+import datetime as dt
+
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django_countries.fields import CountryField
 from hashids import Hashids
@@ -94,6 +97,7 @@ class Registration(models.Model):
 
     accepted_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    payment_reminder_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -133,6 +137,15 @@ class Registration(models.Model):
     @property
     def is_completed(self):
         return self.completed_at is not None
+
+    @property
+    def amount_paid(self):
+        return self.molliepayment_set.filter(
+            mollie_status=Payment.STATUS_PAID).aggregate(amount_paid=Sum('mollie_amount'))['amount_paid']
+
+    @property
+    def due_date(self):
+        return self.accepted_at + dt.timedelta(days=14)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
