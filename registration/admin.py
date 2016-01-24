@@ -80,8 +80,8 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
 class MolliePaymentInline(admin.TabularInline):
     model = MolliePayment
     extra = 0
-    readonly_fields = ('mollie_id', 'mollie_amount', 'mollie_status',
-            'created_at')
+    #readonly_fields = ('mollie_id', 'mollie_amount', 'mollie_status',
+    #        'created_at')
     exclude = ('updated_at',)
 
 
