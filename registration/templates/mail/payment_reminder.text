@@ -1,12 +1,14 @@
-Hello {{ registration.first_name }},
-
-We noticed that you've not completed your registration or made payment.
+We noticed that you've not completed your registration.
 This means your spot for Smokey Feet 2016 is in grave danger!
 
-You still have until {{ registration.due_date }} to finalize your registration
-or spot may be given to someone else.
+You still have until {{ registration.due_date|date:"SHORT_DATE_FORMAT" }}
+to finalize your registration or your spot may be given to someone else.
 
-{{ url }}
+Complete registration and payment: {{ url }}
+
+In case you've already completed your payment within the last two days
+please ignore this reminder. If you're unsure about your payment status
+feel free to contact us.
 
 All the best,
 
