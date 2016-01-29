@@ -77,6 +77,32 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
                     workshop_partner_name__exact='')
 
 
+class CompetitionsFilter(admin.SimpleListFilter):
+    title = _('competing in')
+
+    parameter_name = 'competing_in'
+
+    def lookups(self, request, model_admin):
+        qs = CompetitionType.objects.values_list('id', 'name').order_by('name')
+        return tuple(qs)
+
+    def queryset(self, request, queryset):
+        return queryset.filter(competitions__exact=self.value())
+
+
+class VolunteeringForFilter(admin.SimpleListFilter):
+    title = _('volunteering for')
+
+    parameter_name = 'volunteering_for'
+
+    def lookups(self, request, model_admin):
+        qs = VolunteerType.objects.values_list('id', 'name').order_by('name')
+        return tuple(qs)
+
+    def queryset(self, request, queryset):
+        return queryset.filter(volunteering_for__exact=self.value())
+
+
 class MolliePaymentInline(admin.TabularInline):
     model = MolliePayment
     extra = 0
@@ -102,7 +128,8 @@ class RegistrationAdmin(admin.ModelAdmin):
     form = RegistrationForm
 
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, 'include_lunch')
+            RegistrationPartnerFilter, VolunteeringForFilter,
+            CompetitionsFilter, 'include_lunch')
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
             _workshop_partner, 'amount_paid', 'created_at')
