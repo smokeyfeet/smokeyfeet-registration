@@ -87,7 +87,9 @@ class CompetitionsFilter(admin.SimpleListFilter):
         return tuple(qs)
 
     def queryset(self, request, queryset):
-        return queryset.filter(competitions__exact=self.value())
+        val = self.value()
+        if val is not None:
+            return queryset.filter(competitions__exact=val)
 
 
 class VolunteeringForFilter(admin.SimpleListFilter):
@@ -100,7 +102,9 @@ class VolunteeringForFilter(admin.SimpleListFilter):
         return tuple(qs)
 
     def queryset(self, request, queryset):
-        return queryset.filter(volunteering_for__exact=self.value())
+        val = self.value()
+        if val is not None:
+            return queryset.filter(volunteering_for__exact=val)
 
 
 class MolliePaymentInline(admin.TabularInline):
