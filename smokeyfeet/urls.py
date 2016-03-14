@@ -17,9 +17,9 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from registration import urls as registration_urls
 
 urlpatterns = [
     url(r'^', include('registration.urls')),
+    url(r'^shop/', include('minishop.urls')),
     url(r'^admin/', admin.site.urls),
 ]

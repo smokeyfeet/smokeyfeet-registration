@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'django_countries',
     'registration',
+    'minishop',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -105,3 +106,5 @@ en_formats.DATETIME_FORMAT = "c"
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+SESSION_COOKIE_AGE = 15 * 60  # 15 minutes in seconds

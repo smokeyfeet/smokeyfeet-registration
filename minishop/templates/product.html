@@ -1,0 +1,17 @@
+{% extends '_minishop.html' %}
+
+{% block content %}
+<div class="row columns">
+  <h2>{{ product.name }}</h2>
+  <p>{{ product.description }}</p>
+  <p>{{ product.unit_price }}</p>
+</div>
+
+<div class="row columns">
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" name="add_to_cart" value="Add to cart" />
+  </form>
+</div>
+{% endblock %}
