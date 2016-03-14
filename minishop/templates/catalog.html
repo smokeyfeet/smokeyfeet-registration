@@ -1,0 +1,28 @@
+{% extends '_minishop.html' %}
+
+{% block content %}
+<div class="row columns">
+  <h2>Catalog</h2>
+</div>
+
+<div class="row columns">
+  <table>
+  {% for product in products %}
+    {% if product.num_available > 0 %}
+    <tr>
+      <td><a href="{% url 'product' product.id %}">{{ product.name }}</a></td>
+      <td>{{ product.price }}</td>
+      <td>{{ product.num_available }}</td>
+      <td>
+        <form action="" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="submit" name="add_to_cart" value="Buy now" />
+        </form>
+      </td>
+    </tr>
+    {% endif %}
+  {%endfor %}
+  </table>
+</div>
+{% endblock %}

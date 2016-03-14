@@ -1,0 +1,35 @@
+{% extends '_minishop.html' %}
+
+{% block content %}
+<div class="row columns">
+  <h1>Complete order</h2>
+<!--
+  <p>Created at: {{ cart.created_at }}</p>
+  <p>Updated at: {{ cart.updated_at }}</p>
+-->
+</div>
+
+<div class="row columns">
+  <h2>Cart</h2>
+  <table>
+  {% for item in cart.items.all %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td>{{ item.price }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+
+  <p>Amount due: {{ cart.amount_due }}</p>
+</div>
+
+<div class="row columns">
+  <h2>Personal details</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Pay" />
+  </form>
+</div>
+
+{% endblock %}
