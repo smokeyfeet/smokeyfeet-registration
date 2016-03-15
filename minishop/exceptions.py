@@ -1,10 +1,10 @@
-class MinishopException(IOError):
+class MinishopException(Exception):
     pass
 
 
-class ProductError(MinishopException):
+class CartFullError(MinishopException):
     pass
 
 
-class CartError(MinishopException):
+class StockOutError(MinishopException):
     pass
