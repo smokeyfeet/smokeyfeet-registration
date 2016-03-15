@@ -2,22 +2,25 @@
 
 {% block content %}
 <div class="row columns">
-  <h1>Complete order</h2>
-<!--
-  <p>Created at: {{ cart.created_at }}</p>
-  <p>Updated at: {{ cart.updated_at }}</p>
--->
+  <h1 class="text-center">Complete order</h2>
 </div>
 
 <div class="row columns">
-  <h2>Cart</h2>
-  <table>
-  {% for item in cart.items.all %}
+  <h2>Cart items</h2>
+
+  <table width="100%">
+    <tr>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Price</th>
+    </tr>
+{% for item in cart.items.all %}
     <tr>
       <td>{{ item.product.name }}</td>
+      <td>{{ item.quantity }}</td>
       <td>{{ item.price }}</td>
     </tr>
-  {% endfor %}
+{% endfor %}
   </table>
 
   <p>Amount due: {{ cart.amount_due }}</p>
@@ -25,11 +28,51 @@
 
 <div class="row columns">
   <h2>Personal details</h2>
-  <form action="" method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Pay" />
-  </form>
 </div>
+
+<form action="." method="post">
+  {% csrf_token %}
+
+  {{ form.media }}
+
+{% if form.non_field_errors %}
+  <div class="row columns">
+    <div class="alert callout">
+      {{ form.non_field_errors }}
+    </div>
+  </div>
+{% endif %}
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.email.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Email</label>
+      {{ form.email }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.email_repeat.errors }}
+      <label for="{{ form.email_repeat.id_for_label }}">Confirm email</label>
+      {{ form.email_repeat }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.first_name.errors }}
+      <label for="{{ form.first_name.id_for_label }}">First name</label>
+      {{ form.first_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.last_name.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Last name</label>
+      {{ form.last_name }}
+    </div>
+  </div>
+
+  <div class="row columns text-center">
+    <input type="submit" class="success large button" value="Pay!" />
+  </div>
+
+</form>
 
 {% endblock %}

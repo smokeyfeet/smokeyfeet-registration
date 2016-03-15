@@ -2,17 +2,16 @@
 
 {% block content %}
 <div class="row columns">
-  <h2>Catalog</h2>
+  <h1 class="text-center">Catalog</h1>
 </div>
 
 <div class="row columns">
-  <table>
+  <table width="100%">
   {% for product in products %}
-    {% if product.num_available > 0 %}
     <tr>
       <td><a href="{% url 'product' product.id %}">{{ product.name }}</a></td>
       <td>{{ product.price }}</td>
-      <td>{{ product.num_available }}</td>
+      <td>{{ product.num_in_stock }}</td>
       <td>
         <form action="" method="post">
           {% csrf_token %}
@@ -21,7 +20,6 @@
         </form>
       </td>
     </tr>
-    {% endif %}
   {%endfor %}
   </table>
 </div>
