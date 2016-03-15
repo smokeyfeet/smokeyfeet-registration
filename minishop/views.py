@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -88,6 +89,7 @@ def _make_payment_then_redirect(request, order):
 
 
 @require_http_methods(["GET", "POST"])
+@transaction.atomic
 def cart(request):
     cart = Cart.objects.from_request(request)
 
@@ -102,9 +104,8 @@ def cart(request):
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.amount = cart.amount_due
-            order.save()
+            order = form.save()
+            order.add_items_from_cart(cart)
             _make_payment_then_redirect(request, order)
     else:
         form = OrderForm()

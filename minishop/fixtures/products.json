@@ -6,7 +6,7 @@
       "name": "Party Pass (lead)",
       "description": "Party pass for leader",
       "num_in_stock": 15,
-      "unit_price": 75
+      "unit_price": 85
     }
   },
   {
@@ -16,7 +16,7 @@
       "name": "Party Pass (follow)",
       "description": "Party pass for follow",
       "num_in_stock": 15,
-      "unit_price": 75
+      "unit_price": 85
     }
   }
 ]

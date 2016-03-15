@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from Mollie.API import Payment
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 
@@ -35,22 +36,6 @@ class Product(models.Model):
 
         if self.num_in_stock < quantity:
             raise StockOutError()
-
-
-class Order(models.Model):
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    email = models.EmailField(unique=True)
-    amount = models.FloatField(blank=True, default=0.0)
-
-    mollie_status = models.CharField(
-            max_length=32, default=Payment.STATUS_OPEN)
-
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return "%s %s <%s>" % (self.first_name, self.last_name, self.email)
 
 
 class CartManager(models.Manager):
@@ -116,7 +101,7 @@ class Cart(models.Model):
         if verify_quantity:
             product.verify_stock(quantity)  # raises StockOutError
 
-        LineItem.objects.create(
+        CartItem.objects.create(
                 cart=self, product_id=product.id,
                 price=product.unit_price, quantity=quantity)
 
@@ -140,17 +125,75 @@ class Cart(models.Model):
                 item.delete()
 
     def remove_from_cart(self, product):
-        LineItem.objects.filter(cart=self, product=product).delete()
+        CartItem.objects.filter(cart=self, product=product).delete()
 
     def clear(self):
-        LineItem.objects.filter(cart=self).delete()
+        CartItem.objects.filter(cart=self).delete()
 
 
-class LineItem(models.Model):
-    product = models.ForeignKey(Product)
+class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name="items")
+    product = models.ForeignKey(Product)
+
     quantity = models.PositiveIntegerField()
     price = models.FloatField()
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    @property
+    def total_price(self):
+        return self.quantity * self.price
+
+
+class Order(models.Model):
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    email = models.EmailField(unique=True)
+
+    mollie_status = models.CharField(
+            max_length=32, default=Payment.STATUS_OPEN)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return "%s %s <%s>" % (self.first_name, self.last_name, self.email)
+
+    def get_absolute_url(self):
+        return reverse('order', args=[str(self.id)])
+
+    @property
+    def subtotal(self):
+        total = 0.0
+        for item in self.items.all():
+            total += item.total_price
+        return total
+
+    def add_items_from_cart(self, cart, verify_stock=True):
+        for cart_item in cart.items.all():
+            if verify_stock:
+                cart_item.product.verify_stock(cart_item.quantity)
+            order_item = self.items.create(
+                    product=cart_item.product,
+                    quantity=cart_item.quantity,
+                    price=cart_item.price)
+
+            # Reduce product stock
+            order_item.product.num_in_stock -= order_item.quantity
+            order_item.product.save()
+
+            # clear out cart on successful order; perhaps delete
+            cart.clear()
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name="items")
+    product = models.ForeignKey(Product)
+
+    quantity = models.PositiveIntegerField()
+    price = models.FloatField()
+
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
