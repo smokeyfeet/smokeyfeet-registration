@@ -140,12 +140,16 @@ def mollie_notif(request):
     if payment is None:
         return HttpResponseServerError()
     else:
-        registration_ref = payment["metadata"]["registration_ref"]
-        hashids = Hashids()
-        registration_id, = hashids.decode(registration_ref)
+        registration_ref = payment.get("metadata", {}).get("registration_ref", None)
+        if registration_ref is not None:
+            hashids = Hashids()
+            registration_id, = hashids.decode(registration_ref)
 
-        logger.info("Payment (%s) status changed for registration %d => %s",
-                payment_id, registration_id, payment['status'])
+            logger.info("Payment (%s) status changed for registration %d => %s",
+                    payment_id, registration_id, payment['status'])
+        else:
+            logger.info("Payment (%s) status changed => %s",
+                    payment_id, payment['status'])
 
         try:
             mpay = MolliePayment.objects.get(mollie_id=payment_id)
@@ -156,7 +160,7 @@ def mollie_notif(request):
             mpay.mollie_status = payment['status']
             mpay.save()
 
-            if payment.isPaid():
+            if payment.isPaid() and registration_ref is not None:
                 try:
                     registration = Registration.objects.get(pk=registration_id)
                 except Registration.DoesNotExist:
