@@ -1,0 +1,7 @@
+Django
+django-countries
+hashids
+mollie-api-python
+psycopg2
+pyjwt
+pytz
