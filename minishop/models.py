@@ -124,9 +124,6 @@ class Cart(models.Model):
             except StockOutError:
                 item.delete()
 
-    def remove_from_cart(self, product):
-        CartItem.objects.filter(cart=self, product=product).delete()
-
     def clear(self):
         CartItem.objects.filter(cart=self).delete()
 
