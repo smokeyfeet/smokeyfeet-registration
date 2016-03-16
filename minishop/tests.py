@@ -56,3 +56,13 @@ class TestCart(TestCase):
 
         with self.assertRaises(CartFullError):
             cart.add_product(product)
+
+    def test_clear(self):
+        product = Product.objects.create(num_in_stock=20)
+
+        cart = Cart.objects.create()
+        cart.add_product(product)
+
+        self.assertEqual(cart.items.count(), 1)
+        cart.clear()
+        self.assertEqual(cart.items.count(), 0)
