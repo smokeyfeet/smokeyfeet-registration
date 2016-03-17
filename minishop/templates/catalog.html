@@ -9,7 +9,7 @@
   <table width="100%">
   {% for product in products %}
     <tr>
-      <td><a href="{% url 'product' product.id %}">{{ product.name }}</a></td>
+      <td>{{ product.name }}</td>
       <td>{{ product.price }}</td>
       <td>{{ product.num_in_stock }}</td>
       <td>
