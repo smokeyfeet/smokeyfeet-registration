@@ -47,26 +47,6 @@ def catalog(request):
     return render(request, 'catalog.html', {'products': products})
 
 
-@require_http_methods(["GET", "POST"])
-def product(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-
-    if request.method == 'POST':
-        form = AddProductForm(request.POST)
-        if form.is_valid():
-            cart = Cart.objects.from_request(request)
-            try:
-                cart.add_product(product)
-            except MinishopException as err:
-                messages.error(request, 'Failed to add to cart: %s' % str(err))
-            else:
-                return redirect('cart')
-    else:
-        form = AddProductForm(initial={'product_id': product.id})
-
-    return render(request, 'product.html', {'product': product, 'form': form})
-
-
 def _make_payment_then_redirect(request, order):
     client = Mollie.API.Client()
     client.setApiKey(settings.MOLLIE_API_KEY)
