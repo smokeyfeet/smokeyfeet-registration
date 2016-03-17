@@ -96,7 +96,7 @@ def cart(request):
         if form.is_valid():
             order = form.save()
             order.add_items_from_cart(cart)
-            _make_payment_then_redirect(request, order)
+            return _make_payment_then_redirect(request, order)
     else:
         form = OrderForm()
 

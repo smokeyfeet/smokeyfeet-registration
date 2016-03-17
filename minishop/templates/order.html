@@ -2,7 +2,17 @@
 
 {% block content %}
 <div class="row columns">
-  {{ order }}
+  <h1>Order ID: {{ order.id }}</h1>
+  <h2>Payment status: {{ order.mollie_payment_status }}</h2>
+
+  <p>{{ order.first_name }} {{ order.last_name }}</p>
+  <ul>
+{% for item in order.items.all %}
+    <li>{{ item.price }} x {{ item.quantity }} = {{ item.total_price }}</li>
+{% endfor %}
+  </ul>
+
+  <p>Total: {{ order.total_due }}</p>
 </div>
 
 {% endblock %}
