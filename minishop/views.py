@@ -137,7 +137,7 @@ def mollie_notif(request):
             logger.warning(
                     "Order (%s) does not exist; status dropped", order_id)
         else:
-            order.mollie_status = payment['status']
+            order.mollie_payment_status = payment['status']
             order.save()
 
     return HttpResponse(status=200)
