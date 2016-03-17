@@ -175,7 +175,7 @@ class Order(models.Model):
         return reverse('order', args=[str(self.id)])
 
     @property
-    def total_tue(self):
+    def total_due(self):
         total = 0.0
         for item in self.items.all():
             total += item.total_price
