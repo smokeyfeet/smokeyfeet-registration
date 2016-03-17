@@ -1,20 +1,28 @@
 from django.contrib import admin
 
-from .models import Cart, Order, Product
+from .models import Cart, CartItem, Order, OrderItem, Product
 
 
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+
+
+@admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    pass
+    inlines = [CartItemInline]
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+
+
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    inlines = [OrderItemInline]
 
 
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     pass
-
-
-admin.site.register(Cart, CartAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(Product, ProductAdmin)
