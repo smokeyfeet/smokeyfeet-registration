@@ -19,11 +19,18 @@
       <td>{{ item.product.name }}</td>
       <td>{{ item.quantity }}</td>
       <td>{{ item.price }}</td>
+      <td>
+        <form action="." method="post">
+          {% csrf_token %}
+          <input type="hidden" name="item_id" value="{{ item.id }}">
+          <input type="submit" name="remove_item" value="Remove" />
+        </form>
+      </td>
     </tr>
 {% endfor %}
   </table>
 
-  <p>Amount due: {{ cart.amount_due }}</p>
+  <p>Total due: {{ cart.total_due }}</p>
 </div>
 
 <div class="row columns">
@@ -70,7 +77,8 @@
   </div>
 
   <div class="row columns text-center">
-    <input type="submit" class="success large button" value="Pay!" />
+    <input type="submit" name="pay" class="success large button"
+        value="Pay &euro; {{ cart.total_due|floatformat:2 }}"/>
   </div>
 
 </form>

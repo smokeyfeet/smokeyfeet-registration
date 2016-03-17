@@ -56,7 +56,7 @@ def _make_payment_then_redirect(request, order):
 
     try:
         payment = client.payments.create({
-            'amount': order.amount,
+            'amount': order.total_due,
             'description': 'Smokey Feet 2016 PP',
             'redirectUrl': redirect_url,
             'metadata': {'order_id': str(order.id)}
@@ -65,6 +65,11 @@ def _make_payment_then_redirect(request, order):
         logger.error("Mollie API call failed: %s", err.message)
         raise
     else:
+        logger.info("Order (%s) - New Mollie payment %s @ %f",
+                order.id, payment['id'], payment['amount'])
+        order.mollie_payment_id = payment['id']
+        order.mollie_payment_status = payment['status']
+        order.save()
         return redirect(payment.getPaymentUrl())
 
 
@@ -78,10 +83,15 @@ def cart(request):
         messages.warning(request, 'Out of stock items removed from cart')
         redirect('cart')
 
+    if request.method == 'POST' and 'remove_item' in request.POST:
+        item_id = request.POST.get('item_id', None)
+        if item_id is not None:
+            cart.remove_item_by_id(item_id)
+
     if cart.is_empty:
         return render(request, 'cart_empty.html')
 
-    if request.method == 'POST':
+    if request.method == 'POST' and 'pay' in request.POST:
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save()

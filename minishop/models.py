@@ -88,7 +88,7 @@ class Cart(models.Model):
         return self.items.count() >= 1
 
     @property
-    def amount_due(self):
+    def total_due(self):
         total = 0.0
         for item in self.items.all():
             total += item.total_price
@@ -124,6 +124,19 @@ class Cart(models.Model):
             except StockOutError:
                 item.delete()
 
+    def remove_item_by_id(self, item_id):
+        try:
+            item_id = int(item_id)
+        except ValueError:
+            return
+
+        try:
+            item = CartItem.objects.filter(cart=self, id=item_id)
+        except CartItem.DoesNotExist:
+            return
+        else:
+            item.delete()
+
     def clear(self):
         CartItem.objects.filter(cart=self).delete()
 
@@ -148,7 +161,8 @@ class Order(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
 
-    mollie_status = models.CharField(
+    mollie_payment_id = models.CharField(max_length=64, unique=True)
+    mollie_payment_status = models.CharField(
             max_length=32, default=Payment.STATUS_OPEN)
 
     created_at = models.DateTimeField(default=timezone.now)
@@ -161,7 +175,7 @@ class Order(models.Model):
         return reverse('order', args=[str(self.id)])
 
     @property
-    def subtotal(self):
+    def total_tue(self):
         total = 0.0
         for item in self.items.all():
             total += item.total_price
