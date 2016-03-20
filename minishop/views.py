@@ -22,16 +22,19 @@ logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET"])
+@transaction.atomic
 def order(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
 
     # Hack; cancelling payment results in deleting the order
     if order.mollie_payment_status == Payment.STATUS_CANCELLED:
         logger.info(
-                "Payment cancelled; deleting order (%s) %s %s <%s>:",
+                "Payment cancelled; restock & delete order (%s) %s %s <%s>:",
                 order.id, order.first_name, order.last_name, order.email)
+
+        order.return_to_stock()
         order.delete()
-        redirect('catalog')
+        return redirect('catalog')
 
     return render(request, 'order.html', {'order': order})
 

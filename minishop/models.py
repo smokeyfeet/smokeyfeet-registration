@@ -202,6 +202,12 @@ class Order(models.Model):
             order_item.product.num_in_stock -= order_item.quantity
             order_item.product.save()
 
+    def return_to_stock(self):
+        for order_item in self.items.all():
+            if order_item.product is not None:
+                order_item.product.num_in_stock += order_item.quantity
+                order_item.product.save()
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items")

@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client as HttpClient
 
 from .exceptions import CartFullError, StockOutError
-from .models import Cart, Product
+from .models import Cart, Order, Product
 
 
 class TestProduct(TestCase):
@@ -69,6 +69,21 @@ class TestCart(TestCase):
         self.assertEqual(cart.items.count(), 1)
         cart.clear()
         self.assertEqual(cart.items.count(), 0)
+
+
+class TestOrder(TestCase):
+
+    def setUp(self):
+        self.product = Product.objects.create(num_in_stock=10, unit_price=20)
+
+    def test_return_to_stock(self):
+        order = Order.objects.create()
+        order.items.create(product=self.product, quantity=1, price=20)
+
+        order.return_to_stock()
+
+        product = Product.objects.get(pk=self.product.id)
+        self.assertEqual(product.num_in_stock, 11)
 
 
 class TestMollieNotif(TestCase):
