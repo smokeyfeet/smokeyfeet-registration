@@ -24,9 +24,15 @@ class OrderAdmin(admin.ModelAdmin):
 
     list_filter = ('mollie_payment_status',)
 
-    list_display = ('first_name', 'last_name', 'email', 'created_at')
+    list_display = (
+            'first_name', 'last_name', 'email', 'created_at',
+            'mollie_payment_status', 'display_product')
 
     ordering = ('created_at',)
+
+    def display_product(self, obj):
+        qs = obj.items.all()
+        return qs[0].product_name if qs.count else "none"
 
 
 @admin.register(Product)
