@@ -8,6 +8,8 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+from Mollie.API import Payment
 import Mollie
 
 from .exceptions import MinishopException

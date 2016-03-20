@@ -5,7 +5,7 @@
     "fields": {
       "name": "Party Pass (leader)",
       "description": "Party pass for leader",
-      "num_in_stock": 15,
+      "num_in_stock": 17,
       "unit_price": 85
     }
   },
@@ -15,7 +15,7 @@
     "fields": {
       "name": "Party Pass (follower)",
       "description": "Party pass for follower",
-      "num_in_stock": 13,
+      "num_in_stock": 11,
       "unit_price": 85
     }
   }

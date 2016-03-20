@@ -215,6 +215,9 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return "%s" % (self.product_name,)
+
     @property
     def total_price(self):
         return self.quantity * self.price

@@ -22,6 +22,12 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
 
+    list_filter = ('mollie_payment_status',)
+
+    list_display = ('first_name', 'last_name', 'email', 'created_at')
+
+    ordering = ('created_at',)
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
