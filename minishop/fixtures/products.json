@@ -3,7 +3,7 @@
     "model": "minishop.product",
     "pk": 1,
     "fields": {
-      "name": "Party Pass (lead)",
+      "name": "Party Pass (leader)",
       "description": "Party pass for leader",
       "num_in_stock": 15,
       "unit_price": 85
@@ -13,9 +13,9 @@
     "model": "minishop.product",
     "pk": 2,
     "fields": {
-      "name": "Party Pass (follow)",
-      "description": "Party pass for follow",
-      "num_in_stock": 15,
+      "name": "Party Pass (follower)",
+      "description": "Party pass for follower",
+      "num_in_stock": 13,
       "unit_price": 85
     }
   }

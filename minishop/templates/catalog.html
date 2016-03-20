@@ -1,26 +1,23 @@
 {% extends '_minishop.html' %}
 
 {% block content %}
-<div class="row columns">
-  <h1 class="text-center">Catalog</h1>
-</div>
-
-<div class="row columns">
-  <table width="100%">
-  {% for product in products %}
-    <tr>
-      <td>{{ product.name }}</td>
-      <td>{{ product.price }}</td>
-      <td>{{ product.num_in_stock }}</td>
-      <td>
-        <form action="." method="post">
-          {% csrf_token %}
-          <input type="hidden" name="product_id" value="{{ product.id }}">
-          <input type="submit" name="add_to_cart" value="Buy now" />
-        </form>
-      </td>
-    </tr>
-  {%endfor %}
-  </table>
+<div class="row small-up-1 medium-up-2">
+{% for product in products %}
+  <div class="columns">
+    <div class="callout large">
+    <h3 class="text-center">{{ product.name }}</h3>
+    <h6 class="text-center subheader">{{ product.num_in_stock }} left</h6>
+    <hr/>
+    <div class="stat text-center">&euro;&nbsp;{{ product.unit_price|floatformat:2 }}</div>
+    <br/>
+    <form action="." method="post">
+      {% csrf_token %}
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <input type="submit" name="add_to_cart" class="success large button expanded"
+        value="Buy now"/>
+    </form>
+    </div>
+  </div>
+{%endfor %}
 </div>
 {% endblock %}

@@ -8,29 +8,30 @@
 <div class="row columns">
   <h2>Cart items</h2>
 
-  <table width="100%">
+  <table>
     <tr>
       <th>Product</th>
       <th>Quantity</th>
       <th>Price</th>
+      <th></th>
     </tr>
 {% for item in cart.items.all %}
-    <tr>
+    <tr class="text-center">
       <td>{{ item.product.name }}</td>
       <td>{{ item.quantity }}</td>
-      <td>{{ item.price }}</td>
+      <td>&euro;&nbsp;{{ item.price|floatformat:2 }}</td>
       <td>
         <form action="." method="post">
           {% csrf_token %}
           <input type="hidden" name="item_id" value="{{ item.id }}">
-          <input type="submit" name="remove_item" value="Remove" />
+          <input type="submit" name="remove_item" class="" value="Remove" />
         </form>
       </td>
     </tr>
 {% endfor %}
   </table>
 
-  <p>Total due: {{ cart.total_due }}</p>
+  <h4 class="text-center">Total due: &euro;&nbsp;{{ cart.total_due|floatformat:2 }}</h4>
 </div>
 
 <div class="row columns">
@@ -76,9 +77,15 @@
     </div>
   </div>
 
+  <br/>
+
   <div class="row columns text-center">
     <input type="submit" name="pay" class="success large button"
-        value="Pay &euro; {{ cart.total_due|floatformat:2 }}"/>
+        value="Pay &euro;&nbsp;{{ cart.total_due|floatformat:2 }}"/>
+        <i>
+    <p>By clicking on the 'Pay' button you agree to our
+      <a href="http://www.smokeyfeet.com/terms/">Terms and Conditions</a>
+    </p>
   </div>
 
 </form>

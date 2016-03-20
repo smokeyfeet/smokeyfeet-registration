@@ -2,17 +2,19 @@
 
 {% block content %}
 <div class="row columns">
-  <h1>Order ID: {{ order.id }}</h1>
+  <h1>Order</h1>
+  <h2 class="subheader">ID: {{ order.id }}</h2>
+
   <h2>Payment status: {{ order.mollie_payment_status }}</h2>
 
   <p>{{ order.first_name }} {{ order.last_name }}</p>
   <ul>
 {% for item in order.items.all %}
-    <li>{{ item.price }} x {{ item.quantity }} = {{ item.total_price }}</li>
+    <li>{{ item.product.name }} &euro;&nbsp;{{ item.price }} x {{ item.quantity }} = &euro;&nbsp;{{ item.total_price|floatformat:2 }}</li>
 {% endfor %}
   </ul>
 
-  <p>Total: {{ order.total_due }}</p>
+  <p>Total: &euro;&nbsp;{{ order.total_due|floatformat:2 }}</p>
 </div>
 
 {% endblock %}

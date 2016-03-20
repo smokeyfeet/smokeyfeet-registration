@@ -1,3 +1,4 @@
+{% load shop_extras %}
 {% load static from staticfiles %}
 <!DOCTYPE html>
 <html class="no-js" lang="en-us">
@@ -14,17 +15,15 @@
   <script src="//cdn.jsdelivr.net/foundation/6.2.0/foundation.min.js"></script>
 </head>
 <body>
-<header class="site-header">
-   <div class="row columns">
-    <h1>Smokey Feet Shop</h1>
-  </div>
-</header>
 
-<div class="menu-centered">
-  <ul class="vertical medium-horizontal menu">
-    <li><a href="{% url 'catalog' %}">Catalog</a></li>
-    <li><a href="{% url 'cart' %}">Cart</a></li>
-  </ul>
+<div class="top-bar">
+  <div class="top-bar-left">
+    <ul class="vertical medium-horizontal menu">
+      <li class="menu-text">Smokey Feet Shop</li>
+      <li class="{% nav_active request "catalog" %}"><a href="{% url 'catalog' %}">Catalog</a></li>
+      <li class="{% nav_active request "cart" %}"><a href="{% url 'cart' %}">Cart</a></li>
+    </ul>
+  </div>
 </div>
 
 {% if messages %}

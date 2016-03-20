@@ -1,4 +1,5 @@
 from datetime import timedelta
+import uuid
 
 from Mollie.API import Payment
 from django.core.urlresolvers import reverse
@@ -22,6 +23,9 @@ class Product(models.Model):
     description = models.TextField()
     num_in_stock = models.PositiveIntegerField(default=0)
     unit_price = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -157,6 +161,9 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
@@ -187,6 +194,7 @@ class Order(models.Model):
                 cart_item.product.verify_stock(cart_item.quantity)
             order_item = self.items.create(
                     product=cart_item.product,
+                    product_name=cart_item.product.name,
                     quantity=cart_item.quantity,
                     price=cart_item.price)
 
@@ -194,14 +202,13 @@ class Order(models.Model):
             order_item.product.num_in_stock -= order_item.quantity
             order_item.product.save()
 
-            # clear out cart on successful order; perhaps delete
-            cart.clear()
-
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items")
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(
+            Product, models.SET_NULL, blank=True, null=True)
 
+    product_name = models.CharField(max_length=128, default="{unknown}")
     quantity = models.PositiveIntegerField()
     price = models.FloatField()
 

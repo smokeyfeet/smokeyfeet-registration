@@ -16,6 +16,10 @@ h6 {
   color: #fefefe;
 }
 
+.top-bar {
+  margin-bottom: 2em;
+}
+
 ul {
   padding-left: 2em;
 }
