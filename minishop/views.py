@@ -9,12 +9,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from Mollie.API import Payment
 import Mollie
 
 from .exceptions import MinishopException
 from .forms import AddProductForm, OrderForm
 from .models import Cart, Order, Product
+from .mailing import send_order_paid_mail
 
 
 logger = logging.getLogger(__name__)
@@ -139,5 +139,8 @@ def mollie_notif(request):
         else:
             order.mollie_payment_status = payment['status']
             order.save()
+
+            if payment.isPaid():
+                send_order_paid_mail(order)
 
     return HttpResponse(status=200)

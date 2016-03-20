@@ -1,0 +1,15 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+  <p>Hello {{ order.first_name }},</p>
+
+  <p>We have received your payment and your spot for Smokey Feet 2016
+  is now confirmed! We will keep you up to date on any news via the
+  <a href="www.smokeyfeet.com">website</a> and facebook page.
+
+  <p>Your order id: <a href="{{ order_url }}">{{ order.id }}</a></p>
+
+  <p>All the best,</p>
+
+  <p>Smokey Feet Crew</p>
+{% endblock %}
