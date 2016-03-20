@@ -28,10 +28,7 @@ def order(request, order_id):
 
 @require_http_methods(["GET", "POST"])
 def catalog(request):
-    products = Product.objects.in_stock()
-
-    if not products.count():
-        return render(request, 'catalog_soldout.html')
+    products = Product.objects.all()
 
     if request.method == 'POST':
         form = AddProductForm(request.POST)
