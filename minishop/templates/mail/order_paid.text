@@ -1,10 +1,10 @@
-Hello {{ order.first_name }},
+Thank you for your order, {{ order.first_name }}!
 
 We have received your payment and your spot for Smokey Feet 2016
 is now confirmed! We will keep you up to date on any news via the
-www.smokeyfeet.com website and facebook page.
+website (http://www.smokeyfeet.com) and facebook page.
 
-Your order id: order.id }}
+Order #: {{ order.id }}
 
 {{ order_url }}
 
