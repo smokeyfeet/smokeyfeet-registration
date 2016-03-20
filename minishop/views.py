@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from Mollie.API import Payment
 import Mollie
 
 from .exceptions import MinishopException
@@ -23,6 +24,15 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["GET"])
 def order(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
+
+    # Hack; cancelling payment results in deleting the order
+    if order.mollie_payment_status == Payment.STATUS_CANCELLED:
+        logger.info(
+                "Payment cancelled; deleting order (%s) %s %s <%s>:",
+                order.id, order.first_name, order.last_name, order.email)
+        order.delete()
+        redirect('catalog')
+
     return render(request, 'order.html', {'order': order})
 
 
@@ -64,7 +74,8 @@ def _make_payment_then_redirect(request, order):
         logger.error("Mollie API call failed: %s", err.message)
         raise
     else:
-        logger.info("Order (%s) - New Mollie payment %s @ %f",
+        logger.info(
+                "Order (%s) - New Mollie payment %s @ %f",
                 order.id, payment['id'], payment['amount'])
         order.mollie_payment_id = payment['id']
         order.mollie_payment_status = payment['status']
