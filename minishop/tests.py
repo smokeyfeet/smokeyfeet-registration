@@ -1,4 +1,7 @@
-from django.test import TestCase
+from unittest import mock
+
+from django.core.urlresolvers import reverse
+from django.test import TestCase, Client as HttpClient
 
 from .exceptions import CartFullError, StockOutError
 from .models import Cart, Product
@@ -66,3 +69,16 @@ class TestCart(TestCase):
         self.assertEqual(cart.items.count(), 1)
         cart.clear()
         self.assertEqual(cart.items.count(), 0)
+
+
+class TestMollieNotif(TestCase):
+
+    def setUp(self):
+        self.client = HttpClient()
+
+    @mock.patch('Mollie.API.Resource.Payments.get')
+    def test_x(self, get_func):
+        get_func.side_effect = Exception('Boom!')
+        #Mollie.API.Error
+
+        self.client.post(reverse('mollie_notif'), {'payment_id': 'XXX'})
