@@ -16,6 +16,18 @@ h6 {
   color: #fefefe;
 }
 
+.top-bar .menu .active>a {
+  background-color: #b44c31;
+  color: #fff;
+}
+
+.top-bar .menu a {
+  color: #b44c31;
+}
+
+.top-bar .menu {
+}
+
 .top-bar {
   margin-bottom: 2em;
 }
