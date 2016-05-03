@@ -45,7 +45,10 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
         if self.value() == 'accepted':
             return queryset.filter(accepted_at__isnull=False)
         if self.value() == 'paid':
-            return queryset.filter(molliepayment__mollie_status=Payment.STATUS_PAID)
+            reg_ids = MolliePayment.objects.filter(
+                    mollie_status=Payment.STATUS_PAID).values_list('registration_id',
+                            flat=True)
+            return queryset.filter(pk__in=set(reg_ids))
         if self.value() == 'accepted_unpaid_07d':
             return queryset.filter(accepted_at__lte=timezone.now() -
                     dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
