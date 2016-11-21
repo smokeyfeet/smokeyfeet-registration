@@ -5,11 +5,8 @@ from django.core.urlresolvers import reverse
 
 import Mollie
 
-from .models import MolliePayment
-from .utils import make_token
 
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def _make_mollie_client():
@@ -19,29 +16,25 @@ def _make_mollie_client():
 
 
 def create_payment(request, registration):
-    token = make_token(registration)
-
     redirect_url = request.build_absolute_uri(
-            (reverse('status', args=[token])))
+            (reverse("status", args=[registration.id])))
 
-    p = {
-        'amount': registration.amount_due,
-        'description': 'Smokey Feet 2016',
-        'redirectUrl': redirect_url,
-        'metadata': {'registration_ref': registration.ref}
+    params = {
+        "amount": registration.amount_due,
+        "description": "Smokey Feet 2017",
+        "redirectUrl": redirect_url,
+        "metadata": {
+            "registration_id": str(registration.pk)
+        }
     }
 
     client = _make_mollie_client()
 
     try:
-        payment = client.payments.create(p)
+        payment = client.payments.create(params)
     except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
-        raise
-    else:
-        assert 'id' in payment
-        MolliePayment.objects.create(registration=registration,
-                mollie_id=payment['id'], mollie_amount=registration.amount_due)
+        LOGGER.error("Mollie API call failed: %s", err.message)
+        return None
 
     return payment
 
@@ -52,7 +45,7 @@ def retrieve_payment(payment_id):
     try:
         payment = client.payments.get(payment_id)
     except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
+        LOGGER.error("Mollie API call failed: %s", err.message)
         return None
     else:
         return payment

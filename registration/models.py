@@ -1,15 +1,12 @@
-import datetime as dt
+import uuid
+from decimal import Decimal
 
 from django.db import models
-from django.db.models import Sum
-from django.utils import timezone
 from django_countries.fields import CountryField
-from hashids import Hashids
-
-from Mollie.API import Payment
 
 
 class PassType(models.Model):
+
     PASS_PARTY = 'party'
     PASS_FULL = 'full'
     PASS_TYPES = [
@@ -18,10 +15,9 @@ class PassType(models.Model):
 
     type = models.CharField(max_length=32, choices=PASS_TYPES)
     name = models.CharField(max_length=64)
-    order = models.PositiveIntegerField()
-    num_offered = models.PositiveIntegerField()
-    video_audition_required = models.BooleanField(default=False)
-    price = models.FloatField()
+    sort_order = models.PositiveIntegerField()
+    quantity_in_stock = models.PositiveIntegerField(default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __repr__(self):
         return "<{}:{}>".format(type(self).__name__, self.id)
@@ -30,42 +26,16 @@ class PassType(models.Model):
         return "{}".format(self.name)
 
     class Meta:
-        ordering = ['order']
-
-
-class CompetitionType(models.Model):
-    name = models.CharField(max_length=64)
-    num_offered = models.PositiveIntegerField()
-    require_partner = models.BooleanField(default=False)
-
-    def __repr__(self):
-        return "<{}:{}>".format(type(self).__name__, self.id)
-
-    def __str__(self):
-        return "{}".format(self.name)
-
-    class Meta:
-        ordering = ['name']
-
-
-class VolunteerType(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.TextField(max_length=2048)
-    num_offered = models.PositiveIntegerField()
-    refund_amount = models.FloatField()
-
-    def __repr__(self):
-        return "<{}:{}>".format(type(self).__name__, self.id)
-
-    def __str__(self):
-        return "{}".format(self.name)
-
-    class Meta:
-        ordering = ['name']
+        ordering = ['sort_order']
 
 
 class Registration(models.Model):
-    LUNCH_PRICE = 15.00
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    email = models.EmailField(unique=True)
 
     ROLE_LEADER = 'leader'
     ROLE_FOLLOWER = 'follower'
@@ -73,9 +43,6 @@ class Registration(models.Model):
             (ROLE_LEADER, 'Leader'),
             (ROLE_FOLLOWER, 'Follower')]
 
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    email = models.EmailField(unique=True)
     dance_role = models.CharField(max_length=32, choices=DANCE_ROLES,
             default=ROLE_LEADER)
 
@@ -85,22 +52,15 @@ class Registration(models.Model):
     workshop_partner_name = models.CharField(max_length=128, blank=True)
     workshop_partner_email = models.EmailField(blank=True)
 
-    competitions = models.ManyToManyField(CompetitionType, blank=True)
-    strictly_partner = models.CharField(max_length=128, blank=True)
-
-    volunteering_for = models.ManyToManyField(VolunteerType, blank=True)
-
     include_lunch = models.BooleanField(default=False)
-    diet_requirements = models.TextField(max_length=140, blank=True)
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
 
-    accepted_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    payment_reminder_at = models.DateTimeField(null=True, blank=True)
+    payment_status = models.CharField(max_length=16)
+    payment_status_at = models.DateTimeField()
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
         return "<{}:{}>".format(type(self).__name__, self.id)
@@ -110,17 +70,14 @@ class Registration(models.Model):
                 self.email)
 
     @property
-    def ref(self):
-        assert self.id is not None
-        hashids = Hashids()
-        return hashids.encode(self.id)
-
-    @property
     def amount_due(self):
+        # Hack
+        return 34.0
+
         if self.include_lunch:
-            return self.pass_type.price + self.LUNCH_PRICE
+            return self.pass_type.unit_price + Decimal.from_float(15.0)
         else:
-            return self.pass_type.price
+            return self.pass_type.unit_price
 
     @property
     def is_party_pass(self):
@@ -132,33 +89,26 @@ class Registration(models.Model):
 
     @property
     def is_accepted(self):
+        return True # HACK
         return self.accepted_at is not None
 
-    @property
-    def is_completed(self):
-        return self.completed_at is not None
-
-    @property
-    def amount_paid(self):
-        return self.molliepayment_set.filter(
-            mollie_status=Payment.STATUS_PAID).aggregate(amount_paid=Sum('mollie_amount'))['amount_paid']
-
-    @property
-    def due_date(self):
-        return self.accepted_at + dt.timedelta(days=14)
-
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        super(Registration, self).save(*args, **kwargs)
+    def is_paid(self):
+        return self.payment_status == "paid"
 
 
-class MolliePayment(models.Model):
+class RegistrationStatus(models.Model):
+
     registration = models.ForeignKey(Registration)
 
-    mollie_id = models.CharField(max_length=64, unique=True)
-    mollie_amount = models.FloatField()
-    mollie_status = models.CharField(max_length=32,
-            default=Payment.STATUS_OPEN)
+    STATUS_QUEUED = 'queued'
+    STATUS_ACCEPTED = 'accepted'
+    STATUS_PAYMENT_CREATED = 'payment_created'
+    STATUS_PAID = 'paid'
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    STATUS_CHOICES = [
+            (STATUS_QUEUED, 'Queued'),
+            (STATUS_ACCEPTED, 'Accepted'),
+            (STATUS_PAID, 'Paid')]
+
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES)
+    status_at = models.DateTimeField(auto_now_add=True)

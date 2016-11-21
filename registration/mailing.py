@@ -3,11 +3,9 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
-from .utils import make_token
-
 
 def send_thanks_mail(registration):
-    subject = "[SF2016] Signup received"
+    subject = "[SF2017] Signup received"
 
     context = {'registration': registration, 'subject': subject}
     text_msg = render_to_string('mail/thanks.text', context=context)
@@ -19,10 +17,9 @@ def send_thanks_mail(registration):
 
 
 def send_completion_mail(registration):
-    token = make_token(registration)
-    path = reverse('complete', args=[token])
+    path = reverse('payment', args=[registration.id])
     url = "{}{}".format(settings.EMAIL_BASE_URI, path)
-    subject = "[SF2016] Complete registration"
+    subject = "[SF2017] Complete registration"
 
     context = {'registration': registration, 'subject': subject, 'url': url}
     text_msg = render_to_string('mail/complete.text', context=context)
@@ -34,7 +31,7 @@ def send_completion_mail(registration):
 
 
 def send_payment_mail(registration):
-    subject = "[SF2016] Payment received"
+    subject = "[SF2017] Payment received"
     context = {'registration': registration, 'subject': subject}
 
     text_msg = render_to_string('mail/payment.text', context=context)
@@ -46,10 +43,9 @@ def send_payment_mail(registration):
 
 
 def send_payment_reminder_mail(registration):
-    token = make_token(registration)
-    path = reverse('complete', args=[token])
+    path = reverse('complete', args=[registration.id])
     url = "{}{}".format(settings.EMAIL_BASE_URI, path)
-    subject = "[SF2016] Payment reminder"
+    subject = "[SF2017] Payment reminder"
 
     context = {'registration': registration, 'subject': subject, 'url': url}
     text_msg = render_to_string('mail/payment_reminder.text', context=context)

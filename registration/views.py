@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,16 +9,14 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import (require_http_methods,
         require_POST, require_GET)
-from hashids import Hashids
-import jwt
 
 from . import mailing
 from . import mollie
-from .forms import SignupForm, CompletionForm
-from .models import Registration, MolliePayment, VolunteerType
+from .forms import SignupForm
+from .models import Registration
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @require_GET
@@ -45,79 +44,23 @@ def thanks(request):
 
 
 @require_http_methods(["GET", "POST"])
-def complete(request, token):
-    try:
-        claims = jwt.decode(token, settings.SECRET_KEY)
-    except jwt.InvalidTokenError as err:
-        msg = "Invalid token: {}".format(type(err).__name__)
-        return render(request, 'error.html', {'err': msg})
-    else:
-        registration_ref = claims.get('registration_ref', None)
-        if registration_ref is not None:
-            hashids = Hashids()
-            registration_id, = hashids.decode(registration_ref)
-        else:
-            registration_id = None
+def status(request, registration_id):
 
     registration = get_object_or_404(Registration.objects, pk=registration_id)
 
-    # Don't allow updates after completion
-    if registration.is_completed:
-        # Retrieve last payment
-        last_pmt = registration.molliepayment_set.order_by('-created_at').first()
-        if last_pmt is None:
-            # Create payment if there are none
-            payment = mollie.create_payment(request, registration)
-            return redirect(payment.getPaymentUrl())
+    # Already payed for
+    if registration.payment_status == "paid":
+        return redirect(reverse('status', args=[registration_id]))
 
-        mpay = mollie.retrieve_payment(last_pmt.mollie_id)
-        if mpay.isOpen():
-            return redirect(mpay.getPaymentUrl())
-        elif mpay.isPaid() or mpay.isPending():
-            return redirect(reverse('status', args=[token]))
+    #elif registration.payment_status in ("cancelled", "expired"):
+
+    if request.method == 'POST' and 'make_payment' in request.POST:
+        payment = mollie.create_payment(request, registration)
+        if payment is not None:
+            return redirect(payment.getPaymentUrl())
         else:
-            # Cancelled or Expired
-            payment = mollie.create_payment(request, registration)
-            return redirect(payment.getPaymentUrl())
-
-    if request.method == 'POST':
-        form = CompletionForm(request.POST, instance=registration)
-        if form.is_valid():
-            registration = form.save(commit=False)
-            registration.completed_at = timezone.now()
-            registration.save()
-            form.save_m2m()
-            payment = mollie.create_payment(request, registration)
-            return redirect(payment.getPaymentUrl())
-    else:
-        form = CompletionForm(instance=registration)
-
-    volunteer_types = VolunteerType.objects.values(
-            'name', 'description').order_by('name')
-
-    return render(request, 'complete.html', {'form': form,
-            'registration': registration, 'volunteer_types': volunteer_types})
-
-
-@require_GET
-def status(request, token):
-    """
-    Show the current registration status
-    """
-    try:
-        claims = jwt.decode(token, settings.SECRET_KEY)
-    except jwt.InvalidTokenError as err:
-        msg = "Invalid token: {}".format(type(err).__name__)
-        return render(request, 'error.html', {'err': msg})
-    else:
-        registration_ref = claims.get('registration_ref', None)
-        if registration_ref is not None:
-            hashids = Hashids()
-            registration_id, = hashids.decode(registration_ref)
-        else:
-            registration_id = None
-
-    registration = get_object_or_404(Registration.objects, pk=registration_id)
+            messages.error(request,
+                    "Could not create payment; try again later")
 
     return render(request, 'status.html', {'registration': registration})
 
@@ -125,14 +68,14 @@ def status(request, token):
 @csrf_exempt
 @require_POST
 def mollie_notif(request):
-    """Mollie will notify us when a payment status changes. Only
-    the payment id is passed and we are responsible for retrieving
-    the payment.
+    """
+    Mollie will notify us when a payment status changes. Only the payment id is
+    passed and we are responsible for retrieving the payment.
     """
     # Pull out the payment id from the notification
     payment_id = request.POST.get("id", "")
     if not payment_id:
-        logger.warning("Missing payment id in Mollie notif (probably test)")
+        LOGGER.warning("Missing payment id in Mollie notif (probably test)")
         return HttpResponse(status=200)
 
     # Retrieve the payment
@@ -140,33 +83,26 @@ def mollie_notif(request):
     if payment is None:
         return HttpResponseServerError()
     else:
-        registration_ref = payment.get("metadata", {}).get("registration_ref", None)
-        if registration_ref is not None:
-            hashids = Hashids()
-            registration_id, = hashids.decode(registration_ref)
-
-            logger.info("Payment (%s) status changed for registration %d => %s",
+        registration_id = payment.get("metadata", {}).get("registration_id", None)
+        if registration_id is not None:
+            LOGGER.info("Payment (%s) status changed for registration %d => %s",
                     payment_id, registration_id, payment['status'])
         else:
-            logger.info("Payment (%s) status changed => %s",
+            LOGGER.info("Payment (%s) status changed => %s",
                     payment_id, payment['status'])
 
         try:
-            mpay = MolliePayment.objects.get(mollie_id=payment_id)
-        except MolliePayment.DoesNotExist:
-            logger.warning("MolliePayment (%s) does not exist; status dropped",
+            registration = Registration.objects.get(pk=registration_id)
+        except Registration.DoesNotExist:
+            LOGGER.warning("Registration (%s) does not exist; status dropped",
                     payment_id)
         else:
-            mpay.mollie_status = payment['status']
-            mpay.save()
+            # Update status
+            registration.payment_status = payment['status']
+            registration.payment_status_at = timezone.now()
+            registration.save()
 
-            if payment.isPaid() and registration_ref is not None:
-                try:
-                    registration = Registration.objects.get(pk=registration_id)
-                except Registration.DoesNotExist:
-                    logger.warning("Registration (%d) missing; pay mail dropped",
-                            registration_id)
-                else:
-                    mailing.send_payment_mail(registration)
+            if payment.isPaid():
+                mailing.send_payment_mail(registration)
 
     return HttpResponse(status=200)
