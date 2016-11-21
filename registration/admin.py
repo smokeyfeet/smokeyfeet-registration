@@ -6,21 +6,11 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import (PassType, CompetitionType, MolliePayment,
-        VolunteerType, Registration)
+from .models import PassType, Registration
 from . import mailing
-from .utils import make_token
 
 
 class PassTypeAdmin(admin.ModelAdmin):
-    pass
-
-
-class CompetitionTypeAdmin(admin.ModelAdmin):
-    pass
-
-
-class VolunteerTypeAdmin(admin.ModelAdmin):
     pass
 
 
@@ -42,22 +32,22 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'pending':
             return queryset.filter(accepted_at__isnull=True)
-        if self.value() == 'accepted':
-            return queryset.filter(accepted_at__isnull=False)
-        if self.value() == 'paid':
-            reg_ids = MolliePayment.objects.filter(
-                    mollie_status=Payment.STATUS_PAID).values_list('registration_id',
-                            flat=True)
-            return queryset.filter(pk__in=set(reg_ids))
-        if self.value() == 'accepted_unpaid_07d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        if self.value() == 'accepted_unpaid_10d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=10)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        if self.value() == 'accepted_unpaid_14d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=14)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        #if self.value() == 'accepted':
+        #    return queryset.filter(accepted_at__isnull=False)
+        #if self.value() == 'paid':
+            #reg_ids = MolliePayment.objects.filter(
+            #        mollie_status=Payment.STATUS_PAID).values_list('registration_id',
+            #                flat=True)
+            #return queryset.filter(pk__in=set(reg_ids))
+        #if self.value() == 'accepted_unpaid_07d':
+        #    return queryset.filter(accepted_at__lte=timezone.now() -
+        #            dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        #if self.value() == 'accepted_unpaid_10d':
+        #    return queryset.filter(accepted_at__lte=timezone.now() -
+        #            dt.timedelta(days=10)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        #if self.value() == 'accepted_unpaid_14d':
+        #    return queryset.filter(accepted_at__lte=timezone.now() -
+        #            dt.timedelta(days=14)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
@@ -80,72 +70,23 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
                     workshop_partner_name__exact='')
 
 
-class CompetitionsFilter(admin.SimpleListFilter):
-    title = _('competing in')
-
-    parameter_name = 'competing_in'
-
-    def lookups(self, request, model_admin):
-        qs = CompetitionType.objects.values_list('id', 'name').order_by('name')
-        return tuple(qs)
-
-    def queryset(self, request, queryset):
-        val = self.value()
-        if val is not None:
-            return queryset.filter(competitions__exact=val)
-
-
-class VolunteeringForFilter(admin.SimpleListFilter):
-    title = _('volunteering for')
-
-    parameter_name = 'volunteering_for'
-
-    def lookups(self, request, model_admin):
-        qs = VolunteerType.objects.values_list('id', 'name').order_by('name')
-        return tuple(qs)
-
-    def queryset(self, request, queryset):
-        val = self.value()
-        if val is not None:
-            return queryset.filter(volunteering_for__exact=val)
-
-
-class MolliePaymentInline(admin.TabularInline):
-    model = MolliePayment
-    extra = 0
-    #readonly_fields = ('mollie_id', 'mollie_amount', 'mollie_status',
-    #        'created_at')
-    exclude = ('updated_at',)
-
-
 def _workshop_partner(obj):
     return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
 _workshop_partner.short_description = 'Workshop partner'
 
 
-class RegistrationForm(forms.ModelForm):
-    token = forms.CharField(label='Token', required=False)
-
-    class Meta:
-        model = Registration
-        exclude = []
-
-
 class RegistrationAdmin(admin.ModelAdmin):
-    form = RegistrationForm
-
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, VolunteeringForFilter,
-            CompetitionsFilter, 'include_lunch')
+            RegistrationPartnerFilter, 'include_lunch')
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
-            _workshop_partner, 'amount_paid', 'created_at')
+            _workshop_partner, 'created_at')
 
     ordering = ('created_at',)
 
     actions = ['action_complete', 'action_payment_reminder']
 
-    inlines = [MolliePaymentInline]
+    #inlines = [MolliePaymentInline]
 
     def action_complete(self, request, queryset):
         for registration in queryset:
@@ -163,14 +104,6 @@ class RegistrationAdmin(admin.ModelAdmin):
 
     action_payment_reminder.short_description = "Send payment reminder mail"
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(RegistrationAdmin, self).get_form(request, obj, **kwargs)
-        if obj is not None:
-            form.base_fields['token'].initial = make_token(obj)
-        return form
-
 
 admin.site.register(PassType, PassTypeAdmin)
-admin.site.register(CompetitionType, CompetitionTypeAdmin)
-admin.site.register(VolunteerType, VolunteerTypeAdmin)
 admin.site.register(Registration, RegistrationAdmin)
