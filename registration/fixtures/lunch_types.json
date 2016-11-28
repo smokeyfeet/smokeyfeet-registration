@@ -1,0 +1,29 @@
+[
+  {
+    "model": "registration.lunchtype",
+    "pk": 1,
+    "fields": {
+      "name": "None",
+      "sort_order": 0,
+      "unit_price": "0.00"
+    }
+  },
+  {
+    "model": "registration.lunchtype",
+    "pk": 2,
+    "fields": {
+      "name": "Normal",
+      "sort_order": 1,
+      "unit_price": "15.00"
+    }
+  },
+  {
+    "model": "registration.lunchtype",
+    "pk": 3,
+    "fields": {
+      "name": "Vegitarian",
+      "sort_order": 2,
+      "unit_price": "15.00"
+    }
+  }
+]

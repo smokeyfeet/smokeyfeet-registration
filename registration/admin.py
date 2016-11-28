@@ -6,8 +6,12 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import PassType, Registration
+from .models import LunchType, PassType, Registration
 from . import mailing
+
+
+class LunchTypeAdmin(admin.ModelAdmin):
+    pass
 
 
 class PassTypeAdmin(admin.ModelAdmin):
@@ -77,7 +81,7 @@ _workshop_partner.short_description = 'Workshop partner'
 
 class RegistrationAdmin(admin.ModelAdmin):
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, 'include_lunch')
+            RegistrationPartnerFilter, 'lunch')
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
             _workshop_partner, 'created_at')
@@ -105,5 +109,6 @@ class RegistrationAdmin(admin.ModelAdmin):
     action_payment_reminder.short_description = "Send payment reminder mail"
 
 
+admin.site.register(LunchType, LunchTypeAdmin)
 admin.site.register(PassType, PassTypeAdmin)
 admin.site.register(Registration, RegistrationAdmin)

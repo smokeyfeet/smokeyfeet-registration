@@ -17,7 +17,25 @@ class PassType(models.Model):
     name = models.CharField(max_length=64)
     sort_order = models.PositiveIntegerField()
     quantity_in_stock = models.PositiveIntegerField(default=0)
-    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2,
+            default=0)
+
+    def __repr__(self):
+        return "<{}:{}>".format(type(self).__name__, self.id)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+    class Meta:
+        ordering = ['sort_order']
+
+
+class LunchType(models.Model):
+
+    name = models.CharField(max_length=64)
+    sort_order = models.PositiveIntegerField()
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2,
+            default=0)
 
     def __repr__(self):
         return "<{}:{}>".format(type(self).__name__, self.id)
@@ -48,16 +66,16 @@ class Registration(models.Model):
 
     residing_country = CountryField()
 
-    pass_type = models.ForeignKey(PassType)
+    pass_type = models.ForeignKey(PassType, on_delete=models.PROTECT)
     workshop_partner_name = models.CharField(max_length=128, blank=True)
     workshop_partner_email = models.EmailField(blank=True)
 
-    include_lunch = models.BooleanField(default=False)
+    lunch = models.ForeignKey(LunchType, on_delete=models.PROTECT, null=True)
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
 
     payment_status = models.CharField(max_length=16)
-    payment_status_at = models.DateTimeField()
+    payment_status_at = models.DateTimeField(null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,7 +92,7 @@ class Registration(models.Model):
         # Hack
         return 34.0
 
-        if self.include_lunch:
+        if self.lunch != LUNCH_NONE:
             return self.pass_type.unit_price + Decimal.from_float(15.0)
         else:
             return self.pass_type.unit_price
@@ -98,7 +116,7 @@ class Registration(models.Model):
 
 class RegistrationStatus(models.Model):
 
-    registration = models.ForeignKey(Registration)
+    registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
     STATUS_QUEUED = 'queued'
     STATUS_ACCEPTED = 'accepted'

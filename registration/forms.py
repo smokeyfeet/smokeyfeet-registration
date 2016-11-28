@@ -10,7 +10,7 @@ class SignupForm(forms.ModelForm):
         fields = (
                 'first_name', 'last_name', 'email', 'residing_country',
                 'dance_role', 'pass_type', 'workshop_partner_name',
-                'workshop_partner_email', 'include_lunch')
+                'workshop_partner_email', 'lunch')
         widgets = {
                 'dance_role': forms.widgets.RadioSelect(),
                 'pass_type': forms.widgets.RadioSelect()}
