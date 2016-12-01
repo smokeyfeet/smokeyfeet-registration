@@ -21,26 +21,26 @@ LOGGER = logging.getLogger(__name__)
 
 @require_GET
 def landing(request):
-    return render(request, 'landing.html')
+    return render(request, "landing.html")
 
 
 @require_http_methods(["GET", "POST"])
 def signup(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
             registration = form.save()
             mailing.send_thanks_mail(registration)
-            return redirect('thanks')
+            return redirect("thanks")
     else:
         form = SignupForm()
 
-    return render(request, 'signup.html', {'form': form})
+    return render(request, "signup.html", {"form": form})
 
 
 @require_GET
 def thanks(request):
-    return render(request, 'thanks.html')
+    return render(request, "thanks.html")
 
 
 @require_http_methods(["GET", "POST"])
@@ -48,13 +48,7 @@ def status(request, registration_id):
 
     registration = get_object_or_404(Registration.objects, pk=registration_id)
 
-    # Already payed for
-    if registration.payment_status == "paid":
-        return redirect(reverse('status', args=[registration_id]))
-
-    #elif registration.payment_status in ("cancelled", "expired"):
-
-    if request.method == 'POST' and 'make_payment' in request.POST:
+    if request.method == "POST" and "make_payment" in request.POST:
         payment = mollie.create_payment(request, registration)
         if payment is not None:
             return redirect(payment.getPaymentUrl())
@@ -62,7 +56,7 @@ def status(request, registration_id):
             messages.error(request,
                     "Could not create payment; try again later")
 
-    return render(request, 'status.html', {'registration': registration})
+    return render(request, "status.html", {"registration": registration})
 
 
 @csrf_exempt
@@ -86,10 +80,10 @@ def mollie_notif(request):
         registration_id = payment.get("metadata", {}).get("registration_id", None)
         if registration_id is not None:
             LOGGER.info("Payment (%s) status changed for registration %d => %s",
-                    payment_id, registration_id, payment['status'])
+                    payment_id, registration_id, payment["status"])
         else:
             LOGGER.info("Payment (%s) status changed => %s",
-                    payment_id, payment['status'])
+                    payment_id, payment["status"])
 
         try:
             registration = Registration.objects.get(pk=registration_id)
@@ -98,7 +92,7 @@ def mollie_notif(request):
                     payment_id)
         else:
             # Update status
-            registration.payment_status = payment['status']
+            registration.payment_status = payment["status"]
             registration.payment_status_at = timezone.now()
             registration.save()
 
