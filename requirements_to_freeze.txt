@@ -1,4 +1,5 @@
 Django
+django-anymail
 django-countries
 hashids
 mollie-api-python

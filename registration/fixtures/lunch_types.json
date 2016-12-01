@@ -21,7 +21,7 @@
     "model": "registration.lunchtype",
     "pk": 3,
     "fields": {
-      "name": "Vegitarian",
+      "name": "Vegetarian",
       "sort_order": 2,
       "unit_price": "15.00"
     }

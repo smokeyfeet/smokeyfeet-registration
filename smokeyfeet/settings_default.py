@@ -32,9 +32,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'anymail',
     'django_countries',
-    'registration',
     'minishop',
+    'registration',
 ]
 
 MIDDLEWARE_CLASSES = [
