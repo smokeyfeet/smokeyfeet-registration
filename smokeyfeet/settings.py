@@ -65,7 +65,7 @@ LOGGING = {
 # Custom
 
 ANYMAIL = {
-    'MAILGUN_API_KEY': os.environ.get('MAILGUN_API_KEY', ''),
+    'MAILGUN_API_KEY': os.environ.get('SF_MAILGUN_API_KEY', ''),
     'MAILGUN_SENDER_DOMAIN': 'mg.smokeyfeet.com',
 }
 

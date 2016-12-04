@@ -15,13 +15,11 @@ class PassType(models.Model):
 
     type = models.CharField(max_length=32, choices=PASS_TYPES)
     name = models.CharField(max_length=64)
+    active = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField()
     quantity_in_stock = models.PositiveIntegerField(default=0)
     unit_price = models.DecimalField(max_digits=12, decimal_places=2,
             default=0)
-
-    def __repr__(self):
-        return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -36,9 +34,6 @@ class LunchType(models.Model):
     sort_order = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=12, decimal_places=2,
             default=0)
-
-    def __repr__(self):
-        return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -79,9 +74,6 @@ class Registration(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __repr__(self):
-        return "<{}:{}>".format(type(self).__name__, self.id)
 
     def __str__(self):
         return "{}, {} ({})".format(self.last_name, self.first_name,

@@ -1,9 +1,13 @@
 from django import forms
 
-from .models import Registration
+from .models import PassType, Registration
 
 
 class SignupForm(forms.ModelForm):
+
+    pass_type = forms.ModelChoiceField(
+            queryset=PassType.objects.filter(active=True),
+            widget=forms.widgets.RadioSelect())
 
     class Meta:
         model = Registration
@@ -13,7 +17,7 @@ class SignupForm(forms.ModelForm):
                 'workshop_partner_email', 'lunch')
         widgets = {
                 'dance_role': forms.widgets.RadioSelect(),
-                'pass_type': forms.widgets.RadioSelect()}
+                'lunch': forms.widgets.RadioSelect()}
 
     class Media:
         css = {'all': ('css/forms.css',)}
@@ -25,6 +29,7 @@ class SignupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
         self.fields['pass_type'].empty_label = None
+        self.fields['lunch'].empty_label = None
 
     def clean_workshop_partner_email(self):
         """

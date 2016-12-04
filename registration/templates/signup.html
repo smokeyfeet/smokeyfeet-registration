@@ -77,7 +77,7 @@
       {{ form.pass_type.errors }}
 
 {% for radio in form.pass_type %}
-      {{ radio }}
+    {{ radio }}
 {% endfor %}
     </fieldset>
   </div>
@@ -103,10 +103,14 @@
   </div>
 
   <div class="row columns">
-    <h3>Include lunch during workshop</h3>
+    <fieldset class="fieldset">
+      <legend>Workshop Lunch</legend>
       {{ form.lunch.errors }}
-      <label for="{{ form.lunch.id_for_label }}"> Lunch</label>
-      {{ form.lunch }}
+
+{% for radio in form.lunch %}
+      {{ radio }}
+{% endfor %}
+    </fieldset>
   </div>
 
   <div class="row columns">

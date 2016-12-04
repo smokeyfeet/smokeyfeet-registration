@@ -5,6 +5,7 @@
     "fields": {
       "type": "full",
       "name": "Workshop: Drums",
+      "active": True,
       "sort_order": 1,
       "quantity_in_stock": 250,
       "unit_price": 200
@@ -16,6 +17,7 @@
     "fields": {
       "type": "full",
       "name": "Workshop: Saxophone",
+      "active": True,
       "sort_order": 2,
       "quantity_in_stock": 250,
       "unit_price": 200
@@ -27,6 +29,7 @@
     "fields": {
       "type": "full",
       "name": "Workshop: Bass",
+      "active": True,
       "sort_order": 3,
       "quantity_in_stock": 250,
       "unit_price": 200
@@ -38,6 +41,7 @@
     "fields": {
       "type": "full",
       "name": "Workshop: Trumpet",
+      "active": True,
       "sort_order": 4,
       "quantity_in_stock": 250,
       "unit_price": 200
@@ -49,6 +53,7 @@
     "fields": {
       "type": "full",
       "name": "Workshop: Piano",
+      "active": True,
       "sort_order": 5,
       "quantity_in_stock": 250,
       "unit_price": 200
