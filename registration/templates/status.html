@@ -12,14 +12,16 @@
     <li>Pass type: {{ registration.pass_type.name }}</li>
   </ul>
 
+{% if registration.is_accepted %}
   <h3>Payment</h3>
   <ul>
     <li>Total amount: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></li>
     <li>Status: <b>{{ registration.payment_status }}</b></li>
     <li>Last status change at: {{ registration.payment_status_at }}</li>
   </ul>
+{% endif %}
 
-{% if registration.payment_status != "paid" %}
+{% if registration.is_accepted and registration.payment_status != "paid" %}
   <form method="post">
   {% csrf_token %}
     <input type="submit" name="make_payment" class="success large button"

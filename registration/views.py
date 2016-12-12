@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -14,7 +15,7 @@ from .forms import SignupForm
 from .models import Registration
 
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @require_GET
@@ -29,7 +30,7 @@ def signup(request):
         if form.is_valid():
             registration = form.save()
             mailing.send_thanks_mail(registration)
-            return redirect("thanks")
+            return redirect("registration:thanks")
     else:
         form = SignupForm()
 
@@ -51,8 +52,8 @@ def status(request, registration_id):
         if payment is not None:
             return redirect(payment.getPaymentUrl())
         else:
-            messages.error(request,
-                    "Could not create payment; try again later")
+            messages.error(
+                    request, "Could not create payment; try again later")
 
     return render(request, "status.html", {"registration": registration})
 
@@ -67,7 +68,7 @@ def mollie_notif(request):
     # Pull out the payment id from the notification
     payment_id = request.POST.get("id", "")
     if not payment_id:
-        LOGGER.warning("Missing payment id in Mollie notif (probably test)")
+        logger.warning("Missing payment id in Mollie notif (probably test)")
         return HttpResponse(status=200)
 
     # Retrieve the payment
@@ -77,16 +78,19 @@ def mollie_notif(request):
     else:
         registration_id = payment.get("metadata", {}).get("registration_id", None)
         if registration_id is not None:
-            LOGGER.info("Payment (%s) status changed for registration %d => %s",
+            logger.info(
+                    "Mollie payment (%s) status changed for registration %d => %s",
                     payment_id, registration_id, payment["status"])
         else:
-            LOGGER.info("Payment (%s) status changed => %s",
+            logger.info(
+                    "Mollie payment (%s) status changed => %s",
                     payment_id, payment["status"])
 
         try:
             registration = Registration.objects.get(pk=registration_id)
         except Registration.DoesNotExist:
-            LOGGER.warning("Registration (%s) does not exist; status dropped",
+            logger.warning(
+                    "Registration (%s) does not exist; Mollie status dropped",
                     payment_id)
         else:
             # Update status
@@ -98,3 +102,16 @@ def mollie_notif(request):
                 mailing.send_payment_mail(registration)
 
     return HttpResponse(status=200)
+
+
+@login_required
+def registrations(request):
+    registrations = Registration.objects.all()
+    return render(request, "list.html",
+            {"registrations": registrations})
+
+
+@login_required
+def registration(request, registration_id):
+    registration = get_object_or_404(Registration.objects, pk=registration_id)
+    return render(request, "detail.html", {"registration": registration})

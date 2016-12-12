@@ -48,10 +48,12 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'yes':
-            return queryset.exclude(workshop_partner_email__exact=''
-                    ).exclude(workshop_partner_name__exact='')
+            return queryset.exclude(
+                    workshop_partner_email__exact=''
+                ).exclude(workshop_partner_name__exact='')
         if self.value() == 'no':
-            return queryset.filter(workshop_partner_email__exact='',
+            return queryset.filter(
+                    workshop_partner_email__exact='',
                     workshop_partner_name__exact='')
 
 

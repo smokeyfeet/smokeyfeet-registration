@@ -16,10 +16,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth import urls as auth_urls
+
+from registration import urls as registration_urls
+from minishop import urls as minishop_urls
 
 
 urlpatterns = [
-    url(r'^', include('registration.urls')),
-    url(r'^shop/', include('minishop.urls')),
+    url(r'^', include(registration_urls, namespace="registration")),
     url(r'^admin/', admin.site.urls),
+    url(r'^auth/', include(auth_urls)),
+    url(r'^shop/', include(minishop_urls, namespace="minishop")),
 ]
