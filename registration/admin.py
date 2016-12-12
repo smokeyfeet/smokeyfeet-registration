@@ -1,7 +1,3 @@
-import datetime as dt
-
-from Mollie.API import Payment
-from django import forms
 from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -28,30 +24,15 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
             ('pending', _('Signup pending')),
             ('accepted', _('Signup accepted')),
             ('paid', _('Paid')),
-            ('accepted_unpaid_07d', _('Accepted & unpaid 7d')),
-            ('accepted_unpaid_10d', _('Accepted & unpaid 10d')),
-            ('accepted_unpaid_14d', _('Accepted & unpaid 14d')),
             )
 
     def queryset(self, request, queryset):
         if self.value() == 'pending':
             return queryset.filter(accepted_at__isnull=True)
-        #if self.value() == 'accepted':
-        #    return queryset.filter(accepted_at__isnull=False)
-        #if self.value() == 'paid':
-            #reg_ids = MolliePayment.objects.filter(
-            #        mollie_status=Payment.STATUS_PAID).values_list('registration_id',
-            #                flat=True)
-            #return queryset.filter(pk__in=set(reg_ids))
-        #if self.value() == 'accepted_unpaid_07d':
-        #    return queryset.filter(accepted_at__lte=timezone.now() -
-        #            dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        #if self.value() == 'accepted_unpaid_10d':
-        #    return queryset.filter(accepted_at__lte=timezone.now() -
-        #            dt.timedelta(days=10)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        #if self.value() == 'accepted_unpaid_14d':
-        #    return queryset.filter(accepted_at__lte=timezone.now() -
-        #            dt.timedelta(days=14)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+        if self.value() == 'accepted':
+            return queryset.filter(accepted_at__isnull=False)
+        if self.value() == 'paid':
+            return queryset.filter(payment_status="paid")
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
@@ -76,6 +57,8 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
 
 def _workshop_partner(obj):
     return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
+
+
 _workshop_partner.short_description = 'Workshop partner'
 
 
@@ -89,8 +72,6 @@ class RegistrationAdmin(admin.ModelAdmin):
     ordering = ('created_at',)
 
     actions = ['action_complete', 'action_payment_reminder']
-
-    #inlines = [MolliePaymentInline]
 
     def action_complete(self, request, queryset):
         for registration in queryset:

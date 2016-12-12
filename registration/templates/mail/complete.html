@@ -3,29 +3,13 @@
 {% block content %}
   <p>Hi {{ registration.first_name }},</p>
 
-  <p>Congratulations, you have been admitted to Smokey Feet 2016!</p>
+  <p>Congratulations, you have been admitted to Smokey Feet 2017!</p>
 
   <p>Please follow this <a href="{{ url }}">link</a> to finalize your
   registration. Here you will find a questionnaire and payment details.
   Please complete the questionnaire and payment <b>within 14 days</b>
   or your registration will be canceled.
   </p>
-
-{% if registration.pass_type.video_audition_required %}
-  <p>If you want to join our Piano level, you need to send us a video
-  audition. It should be a video of you social dancing, no routines allowed.
-  If it's a video of a Jack and Jill or a video with more people in it,
-  please let us know who you are to prevent confusion :). As far as
-  tempo is concerned; mid- to high-tempo songs are required.
-  </p>
-
-  <p>Please upload your video audition to YouTube and mail us
-  (<a href="mailto:info@smokeyfeet.com">info@smokeyfeet.com</a>) the
-  shareable link. If you do not send in a video you will be
-  automatically placed in the Trumpet level. You'll be informed of
-  your level placement as soon as possible.
-  </p>
-{% endif %}
 
   <p>If you want to host or look for a host please see the
   <a href="https://www.facebook.com/groups/786669158122791/">Smokey Feet hosting Facebook group</a>.

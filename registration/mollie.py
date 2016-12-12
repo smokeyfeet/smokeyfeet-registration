@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 import Mollie
 
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _make_mollie_client():
@@ -20,7 +20,7 @@ def create_payment(request, registration):
             (reverse("status", args=[registration.id])))
 
     params = {
-        "amount": registration.amount_due,
+        "amount": float(registration.amount_due),
         "description": "Smokey Feet 2017",
         "redirectUrl": redirect_url,
         "metadata": {
@@ -30,10 +30,11 @@ def create_payment(request, registration):
 
     client = _make_mollie_client()
 
+    logger.info("Creating mollie payment: %s", params)
     try:
         payment = client.payments.create(params)
     except Mollie.API.Error as err:
-        LOGGER.error("Mollie API call failed: %s", err.message)
+        logger.error("Mollie API call failed: %s", err.message)
         return None
 
     return payment
@@ -45,7 +46,7 @@ def retrieve_payment(payment_id):
     try:
         payment = client.payments.get(payment_id)
     except Mollie.API.Error as err:
-        LOGGER.error("Mollie API call failed: %s", err.message)
+        logger.error("Mollie API call failed: %s", err.message)
         return None
     else:
         return payment

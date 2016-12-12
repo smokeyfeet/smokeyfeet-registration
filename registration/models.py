@@ -1,5 +1,4 @@
 import uuid
-from decimal import Decimal
 
 from django.db import models
 from django_countries.fields import CountryField
@@ -65,9 +64,11 @@ class Registration(models.Model):
     workshop_partner_name = models.CharField(max_length=128, blank=True)
     workshop_partner_email = models.EmailField(blank=True)
 
-    lunch = models.ForeignKey(LunchType, on_delete=models.PROTECT, null=True)
+    lunch = models.ForeignKey(LunchType, on_delete=models.PROTECT)
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
+
+    accepted_at = models.DateTimeField(null=True, blank=True)
 
     payment_status = models.CharField(max_length=16)
     payment_status_at = models.DateTimeField(null=True)
@@ -80,30 +81,12 @@ class Registration(models.Model):
                 self.email)
 
     @property
-    def amount_due(self):
-        # Hack
-        return 34.0
-
-        if self.lunch != LUNCH_NONE:
-            return self.pass_type.unit_price + Decimal.from_float(15.0)
-        else:
-            return self.pass_type.unit_price
-
-    @property
-    def is_party_pass(self):
-        return self.pass_type.type == PassType.PASS_PARTY
-
-    @property
-    def is_full_pass(self):
-        return self.pass_type.type == PassType.PASS_FULL
-
-    @property
     def is_accepted(self):
-        return True # HACK
         return self.accepted_at is not None
 
-    def is_paid(self):
-        return self.payment_status == "paid"
+    @property
+    def amount_due(self):
+        return self.pass_type.unit_price + self.lunch.unit_price
 
 
 class RegistrationStatus(models.Model):
