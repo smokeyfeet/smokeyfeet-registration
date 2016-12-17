@@ -1,8 +1,7 @@
 Django
 django-anymail
 django-countries
-hashids
+html2text
 mollie-api-python
 psycopg2
-pyjwt
 pytz
