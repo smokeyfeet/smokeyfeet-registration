@@ -21,7 +21,7 @@ class PassType(models.Model):
             default=0)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return "{} - €{}".format(self.name, self.unit_price)
 
     class Meta:
         ordering = ['sort_order']
@@ -35,7 +35,7 @@ class LunchType(models.Model):
             default=0)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return "{} - €{}".format(self.name, self.unit_price)
 
     class Meta:
         ordering = ['sort_order']

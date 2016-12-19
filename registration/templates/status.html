@@ -2,31 +2,50 @@
 
 {% block content %}
 <div class="row columns">
-  <h2>Registration Status</h2>
+  <h2>Registration Details</h2>
 
-  <h3>Details</h3>
-  <ul>
-    <li>Name: {{ registration.first_name }}</li>
-    <li>Last name: {{ registration.last_name }}</li>
-    <li>Dance role: {{ registration.dance_role|capfirst }}</li>
-    <li>Pass type: {{ registration.pass_type.name }}</li>
-  </ul>
+  <p><i>Registered on: {{ registration.created_at|date:"r" }}</i></p>
+
+  <section>
+    Name: {{ registration.last_name }}, {{ registration.first_name }}<br/>
+    Dance role: {{ registration.dance_role|capfirst }}<br/>
+    Pass type: {{ registration.pass_type.name }}<br/>
+  </section>
+
+  <hr/>
 
 {% if registration.is_accepted %}
-  <h3>Payment</h3>
-  <ul>
-    <li>Total amount: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></li>
-    <li>Status: <b>{{ registration.payment_status }}</b></li>
-    <li>Last status change at: {{ registration.payment_status_at }}</li>
-  </ul>
-{% endif %}
+  <section>
+    <h2> Registration Accepted</h2>
+    <p><i>Accepted on: {{ registration.accepted_at|date:"r" }}</i></p>
 
-{% if registration.is_accepted and registration.payment_status != "paid" %}
-  <form method="post">
-  {% csrf_token %}
-    <input type="submit" name="make_payment" class="success large button"
-        value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}"/>
-  </form>
+    <h3>Invoice</h3>
+    <p>
+    Pass: {{ registration.pass_type.name }} &euro; {{ registration.pass_type.unit_price }}<br/>
+    Lunch: {{ registration.lunch.name }} &euro; {{ registration.lunch.unit_price }}<br/>
+    Grand total: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
+    </p>
+
+    <h3>Payment</h3>
+    Status: <b>{{ registration.payment_status|default:"not paid" }}</b><br/>
+    {% if registration.payment_status_at %}
+    Status at: {{ registration.payment_status_at|date:"r" }}
+    {% endif %}
+
+    {% if registration.payment_status != "paid" %}
+    <form method="post">
+    {% csrf_token %}
+      <input type="submit" name="make_payment" class="success large button"
+          value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}"/>
+    </form>
+    {% endif %}
+  </section>
+{% else %}
+  <section>
+    <p>Please be patient while we process your registration.</p>
+
+    <p>Keep an eye on your inbox.</p>
+  </section>
 {% endif %}
 
 </div>
