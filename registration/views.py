@@ -18,11 +18,6 @@ from .models import Registration
 logger = logging.getLogger(__name__)
 
 
-@require_GET
-def landing(request):
-    return render(request, "landing.html")
-
-
 @require_http_methods(["GET", "POST"])
 def signup(request):
     if request.method == "POST":
