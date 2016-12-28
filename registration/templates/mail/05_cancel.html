@@ -1,0 +1,17 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hi there {{ registration.first_name }},</p>
+
+<p>Unfortunately we did not receive your payment so we canceled your
+registration. If you are still interested in joining Smokey Feet 2017 you might
+want to register for a Party Pass. The registration for Party Passes opens on
+{{ party_pass_date }}.</p>
+
+<p>Keep an eye on our website and follow our Facebook page for updates on
+this.</p>
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}

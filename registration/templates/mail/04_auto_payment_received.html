@@ -1,0 +1,21 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hello there {{ registration.first_name }},</p>
+
+<p>We have received your payment and your spot for Smokey Feet 2017
+is now confirmed! We will keep you up to date on any news via the
+<a href="www.smokeyfeet.com">website</a> and <link>Facebook page</link>.
+</p>
+
+<p><b><a href="{{ status_url }}">View registration status</a></b></p>
+
+{% if registration.pass_type.video_audition_required %}
+<p><b>Don’t forget to send us a link to your video audition before
+{{ video_audition_due_date|date:"SHORT_DATE_FORMAT" }}</b></p>
+{% endif %}
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}

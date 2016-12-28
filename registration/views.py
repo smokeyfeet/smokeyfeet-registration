@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -24,7 +25,7 @@ def signup(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             registration = form.save()
-            mailing.send_thanks_mail(registration)
+            mailing.send_signup_received(registration)
             return redirect("registration:thanks")
     else:
         form = SignupForm()
@@ -94,7 +95,7 @@ def mollie_notif(request):
             registration.save()
 
             if payment.isPaid():
-                mailing.send_payment_mail(registration)
+                mailing.send_payment_received(registration)
 
     return HttpResponse(status=200)
 
@@ -102,8 +103,8 @@ def mollie_notif(request):
 @login_required
 def registrations(request):
     registrations = Registration.objects.all()
-    return render(request, "list.html",
-            {"registrations": registrations})
+    return render(
+            request, "list.html", {"registrations": registrations})
 
 
 @login_required

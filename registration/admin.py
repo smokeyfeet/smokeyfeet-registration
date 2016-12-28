@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import LunchType, PassType, Registration
+from .models import Interaction, LunchType, PassType, Registration
 from . import mailing
 
 
@@ -64,6 +64,12 @@ def _workshop_partner(obj):
 _workshop_partner.short_description = 'Workshop partner'
 
 
+class InteractionInline(admin.TabularInline):
+    model = Interaction
+    extra = 1
+    can_delete = False
+
+
 class RegistrationAdmin(admin.ModelAdmin):
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
             RegistrationPartnerFilter, 'lunch')
@@ -71,25 +77,68 @@ class RegistrationAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
             _workshop_partner, 'created_at')
 
+    inlines = [InteractionInline]
+
     ordering = ('created_at',)
 
-    actions = ['action_complete', 'action_payment_reminder']
+    actions = [
+            'action_accept',
+            'action_payment_reminder',
+            'action_cancel',
+            'action_video_received',
+            'action_video_accepted',
+            ]
 
-    def action_complete(self, request, queryset):
+    def action_accept(self, request, queryset):
         for registration in queryset:
-            registration.accepted_at = timezone.now()
-            registration.save()
-            mailing.send_completion_mail(registration)
 
-    action_complete.short_description = "Accept and send completion mail"
+            if registration.accepted_at is None:
+                registration.accepted_at = timezone.now()
+                registration.save()
+
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Payment instructions",
+                    template_name="mail/02_payment_instructions.html",
+                    registration=registration)
+
+    action_accept.short_description = "Accept and mail payment instructions"
 
     def action_payment_reminder(self, request, queryset):
         for registration in queryset:
-            registration.payment_reminder_at = timezone.now()
-            registration.save()
-            mailing.send_payment_reminder_mail(registration)
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Payment reminder",
+                    template_name="mail/03_payment_reminder.html",
+                    registration=registration)
 
-    action_payment_reminder.short_description = "Send payment reminder mail"
+    action_payment_reminder.short_description = "Mail payment reminder"
+
+    def action_cancel(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Registration cancelled",
+                    template_name="mail/05_cancel.html",
+                    registration=registration)
+
+    action_cancel.short_description = "Cancel registration"
+
+    def action_video_received(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Video audition received",
+                    template_name="mail/06a_video_audition_received.html",
+                    registration=registration)
+
+    action_video_received.short_description = "Mail video received notification"
+
+    def action_video_accepted(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Video audition accepted",
+                    template_name="mail/06b_video_audition_accepted.html",
+                    registration=registration)
+
+
+    action_video_accepted.short_description = "Mail video accepted notification"
 
 
 admin.site.register(LunchType, LunchTypeAdmin)

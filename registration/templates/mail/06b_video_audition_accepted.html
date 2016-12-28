@@ -1,0 +1,19 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hi there {{ registration.first_name }},</p>
+
+{% if level == "trumpet" %}
+We have reviewed your video. You have been admitted to the <i>Trumpet</i>
+level. Please let us know if you have any questions.
+{% endif %}
+
+{% if level == "piano" %}
+We have reviewed your video. Congratulations! You have danced yourself into the
+highest level of Smokey Feet 2017. You have been admitted to in level Piano.
+{% endif %}
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}
