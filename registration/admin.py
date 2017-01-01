@@ -104,7 +104,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                 registration.save()
 
             mailing.send_registration_mail(
-                    subject="[SF2017] Payment instructions",
+                    subject="[SF2017] Registration accepted",
                     template_name="mail/02_payment_instructions.html",
                     registration=registration)
 
