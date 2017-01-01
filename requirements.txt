@@ -1,5 +1,5 @@
 Django==1.10.4
-django-anymail==0.6.1
+django-anymail==0.7
 django-countries==4.0
 html2text==2016.9.19
 mollie-api-python==1.1.3
