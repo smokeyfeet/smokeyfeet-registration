@@ -69,7 +69,6 @@ class StatusTestCase(TestCase):
 
     @mock.patch("Mollie.API.Resource.Payments.create")
     def test_status_post_fail(self, mock_create):
-        mollie_payment_id = "tr_XXX"
         mock_create.return_value = None
         path = reverse("registration:status", args=[self.registration.id])
         response = self.client.post(path, data={"make_payment": ""})

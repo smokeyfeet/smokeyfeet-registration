@@ -26,7 +26,10 @@ class PassType(models.Model):
     data = JSONField()
 
     def __str__(self):
-        return "{} - €{}".format(self.name, self.unit_price)
+        s  = "{} - €{}".format(self.name, self.unit_price)
+        if self.video_audition_required:
+            s += " - video audition"
+        return s
 
     @property
     def video_audition_required(self):
@@ -135,27 +138,9 @@ class Payment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class RegistrationStatus(models.Model):
-
-    registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
-
-    STATUS_QUEUED = 'queued'
-    STATUS_ACCEPTED = 'accepted'
-    STATUS_PAYMENT_CREATED = 'payment_created'
-    STATUS_PAID = 'paid'
-
-    STATUS_CHOICES = [
-            (STATUS_QUEUED, 'Queued'),
-            (STATUS_ACCEPTED, 'Accepted'),
-            (STATUS_PAID, 'Paid')]
-
-    status = models.CharField(max_length=32, choices=STATUS_CHOICES)
-    status_at = models.DateTimeField(auto_now_add=True)
-
-
 class Interaction(models.Model):
 
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
-    description = models.CharField(max_length=4096, blank=True)
+    description = models.TextField(max_length=4096, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

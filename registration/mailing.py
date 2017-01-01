@@ -13,7 +13,6 @@ def send_registration_mail(subject, template_name, registration):
             reverse("registration:status", args=[registration.id]))
 
     context = dict(
-        subject=subject,
         registration=registration,
         status_url=status_url)
 
@@ -46,7 +45,13 @@ def send_signup_received(registration):
 
 def send_payment_received(registration):
     subject = "[SF2017] Payment received"
-    context = dict(registration=registration)
+    status_url = urljoin(
+            settings.EMAIL_BASE_URI,
+            reverse("registration:status", args=[registration.id]))
+
+    context = dict(
+        registration=registration,
+        status_url=status_url)
 
     html_msg = render_to_string(
             "mail/04_auto_payment_received.html", context=context)

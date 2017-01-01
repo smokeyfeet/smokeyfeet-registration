@@ -104,7 +104,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                 registration.save()
 
             mailing.send_registration_mail(
-                    subject="[SF 2017] Payment instructions",
+                    subject="[SF2017] Payment instructions",
                     template_name="mail/02_payment_instructions.html",
                     registration=registration)
 
@@ -113,7 +113,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def action_payment_reminder(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
-                    subject="[SF 2017] Payment reminder",
+                    subject="[SF2017] Payment reminder",
                     template_name="mail/03_payment_reminder.html",
                     registration=registration)
 
@@ -122,7 +122,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def action_cancel(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
-                    subject="[SF 2017] Registration cancelled",
+                    subject="[SF2017] Registration cancelled",
                     template_name="mail/05_cancel.html",
                     registration=registration)
 
@@ -131,7 +131,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def action_audition_received(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
-                    subject="[SF 2017] Video audition received",
+                    subject="[SF2017] Video audition received",
                     template_name="mail/06a_audition_received.html",
                     registration=registration)
 
@@ -140,7 +140,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def action_audition_reminder(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
-                    subject="[SF 2017] Video audition reminder",
+                    subject="[SF2017] Video audition reminder",
                     template_name="mail/09_audition_reminder.html",
                     registration=registration)
 
@@ -149,7 +149,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def action_audition_accepted(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
-                    subject="[SF 2017] Video audition accepted",
+                    subject="[SF2017] Video audition accepted",
                     template_name="mail/06b_audition_accepted.html",
                     registration=registration)
 

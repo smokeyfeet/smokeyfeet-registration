@@ -3,15 +3,12 @@
 {% block content %}
 <p>Hello {{ registration.first_name }},</p>
 
-{% if level == "trumpet" %}
-We have reviewed your video. You have been admitted to the <i>Trumpet</i>
-level. Please let us know if you have any questions.
-{% endif %}
+<p>We have reviewed your audition video. Your Smokey Feet 2017 pass type will
+be:</p>
 
-{% if level == "piano" %}
-We have reviewed your video. Congratulations! You have danced yourself into the
-highest level of Smokey Feet 2017. You have been admitted to in level Piano.
-{% endif %}
+<p><strong>{{ registration.pass_type.name }}</strong></p>
+
+<p>If you have any questions please don't hesitate to contact us.</p>
 
 <p>All the best,</p>
 

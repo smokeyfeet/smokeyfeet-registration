@@ -9,12 +9,12 @@ Smokey Feet <a href="http://smokeyfeet.com">website</a> and
 <a href="https://www.facebook.com/Smokey-Feet-181498711899234/">Facebook community</a>.
 </p>
 
-<p><b><a href="{{ status_url }}">View registration status</a></b></p>
-
 {% if registration.pass_type.video_audition_required %}
-<p><b>Don’t forget to send us a link to your video audition before
-{{ video_audition_due_date|date:"SHORT_DATE_FORMAT" }}</b></p>
+<p><strong>Don't forget to send us a link to your video audition before
+{{ registration.video_audition_due_date|date:"SHORT_DATE_FORMAT" }}</strong></p>
 {% endif %}
+
+<p><strong><a href="{{ status_url }}">View registration status</a></strong></p>
 
 <p>All the best,</p>
 
