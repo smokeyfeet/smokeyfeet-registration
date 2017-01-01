@@ -6,14 +6,14 @@
 <p>Congratulations, you're one step closer to Smokey Feet 2017!</p>
 
 <p>To secure your spot you must
-<strong><a href="{{ status_url }}">make payment within 7 days</a></strong>.
+<strong><a href="{{ status_url }}">pay within 7 days</a></strong>.
 Failing to do so means we're free to give your spot to someone else.
 So please take care of this quickly. ;)
 </p>
 
 <p><i>Note: A bank transfer may take a couple of days.</i></p>
 
-<p><strong><a href="{{ status_url }}">Make payment now!</a></strong></p>
+<p><strong><a href="{{ status_url }}">Pay now!</a></strong></p>
 
 {% if registration.pass_type.video_audition_required %}
 <p>You've signed up for the <strong>Trumpet</strong> or <strong>Piano</strong>
@@ -30,7 +30,7 @@ video in a weird location or add your best Halloween outfit.</p>
 <a href="https://www.youtube.com">YouTube</a> and mail us
 (<a href="mailto:info@smokeyfeet.com">info@smokeyfeet.com</a>) the shareable
 link. Make sure we receive your video before
-{{ video_audition_due_date|date:"SHORT_DATE_FORMAT" }}.
+{{ registration.video_audition_due_date|date:"SHORT_DATE_FORMAT" }}.
 We will respond as soon as possible to let you know in which level you are.
 </p>
 {% endif %}
