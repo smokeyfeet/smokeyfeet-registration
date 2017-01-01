@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="row columns">
-  <h2>Registration Details</h2>
+  <h2>Registration Status</h2>
 
-  <p><i>Registered on: {{ registration.created_at|date:"r" }}</i></p>
+  <p><i>You registered on {{ registration.created_at|date:"r" }} as:</i></p>
 
   <section>
     Name: {{ registration.last_name }}, {{ registration.first_name }}<br/>
@@ -16,20 +16,19 @@
 
 {% if registration.is_accepted %}
   <section>
-    <h2> Registration Accepted</h2>
-    <p><i>Accepted on: {{ registration.accepted_at|date:"r" }}</i></p>
+    <p><i>Your registration was accepted on {{ registration.accepted_at|date:"r" }}.</i></p>
 
-    <h3>Invoice</h3>
+    <h4>Invoice</h4>
     <p>
-    Pass: {{ registration.pass_type.name }} &euro; {{ registration.pass_type.unit_price }}<br/>
-    Lunch: {{ registration.lunch.name }} &euro; {{ registration.lunch.unit_price }}<br/>
+    Pass type: {{ registration.pass_type.name }} - &euro; {{ registration.pass_type.unit_price }}<br/>
+    Lunch: {{ registration.lunch.name }} - &euro; {{ registration.lunch.unit_price }}<br/>
     Grand total: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
     </p>
 
-    <h3>Payments Received</h3>
+    <hr/>
     <ul>
     {% for payment in registration.payment_set.all %}
-      <li>&euro; {{ payment.amount }} on {{ payment.created_at|date:"r" }}</li>
+      <li>Received payment (&euro; {{ payment.amount }}) on {{ payment.created_at|date:"r" }}</li>
     {% endfor %}
     </ul>
 
@@ -39,12 +38,13 @@
       <input type="submit" name="make_payment" class="success large button"
           value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}"/>
     </form>
+    {% else %}
+    <p><i>Your registration is fully paid!</i></p>
     {% endif %}
   </section>
 {% else %}
   <section>
     <p>Please be patient while we process your registration.</p>
-
     <p>Keep an eye on your inbox.</p>
   </section>
 {% endif %}
