@@ -26,13 +26,14 @@
     Grand total: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
     </p>
 
-    <h3>Payment</h3>
-    Status: <b>{{ registration.payment_status|default:"not paid" }}</b><br/>
-    {% if registration.payment_status_at %}
-    Status at: {{ registration.payment_status_at|date:"r" }}
-    {% endif %}
+    <h3>Payments Received</h3>
+    <ul>
+    {% for payment in registration.payment_set.all %}
+      <li>&euro; {{ payment.amount }} on {{ payment.created_at|date:"r" }}</li>
+    {% endfor %}
+    </ul>
 
-    {% if registration.payment_status != "paid" %}
+    {% if not registration.paid_in_full %}
     <form method="post">
     {% csrf_token %}
       <input type="submit" name="make_payment" class="success large button"

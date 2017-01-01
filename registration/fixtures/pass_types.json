@@ -8,7 +8,8 @@
       "active": true,
       "sort_order": 1,
       "quantity_in_stock": 250,
-      "unit_price": 200
+      "unit_price": 200,
+      "data": {}
     }
   },
   {
@@ -20,7 +21,8 @@
       "active": true,
       "sort_order": 2,
       "quantity_in_stock": 250,
-      "unit_price": 200
+      "unit_price": 200,
+      "data": {}
     }
   },
   {
@@ -32,7 +34,8 @@
       "active": true,
       "sort_order": 3,
       "quantity_in_stock": 250,
-      "unit_price": 200
+      "unit_price": 200,
+      "data": {}
     }
   },
   {
@@ -44,7 +47,10 @@
       "active": true,
       "sort_order": 4,
       "quantity_in_stock": 250,
-      "unit_price": 200
+      "unit_price": 200,
+      "data": {
+        "video_audition_required": true
+      }
     }
   },
   {
@@ -56,8 +62,10 @@
       "active": true,
       "sort_order": 5,
       "quantity_in_stock": 250,
-      "unit_price": 200
+      "unit_price": 200,
+      "data": {
+        "video_audition_required": true
+      }
     }
   }
 ]
-

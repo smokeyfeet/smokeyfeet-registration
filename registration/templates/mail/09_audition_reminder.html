@@ -1,12 +1,12 @@
 {% extends 'mail/_base.html' %}
 
 {% block content %}
-<p>Hi there {{ registration.first_name }},</p>
+<p>Hello {{ registration.first_name }},</p>
 
-<p>We have yet to receive your video audition. Therefore you can't be assigned
-to a group. Send us a video of your social dancing before
-{{ registration.video_audition_due_date }} to make sure you can participate in
-the classes of Smokey Feet 2017.</p>
+<p>We have yet to receive your video audition. Therefore we cannot assign you
+to a level. Send us a video of you social dancing before
+{{ registration.video_audition_due_date|date:"SHORT_DATE_FORMAT" }}
+to make sure you can participate in the classes of Smokey Feet 2017.</p>
 
 <p>All the best,</p>
 

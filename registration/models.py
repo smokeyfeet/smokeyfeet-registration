@@ -3,6 +3,7 @@ import uuid
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models import Sum
 from django_countries.fields import CountryField
 
 
@@ -76,10 +77,10 @@ class Registration(models.Model):
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
 
-    accepted_at = models.DateTimeField(null=True, blank=True)
+    total_price = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
 
-    payment_status = models.CharField(max_length=16)
-    payment_status_at = models.DateTimeField(null=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -93,10 +94,6 @@ class Registration(models.Model):
         return self.accepted_at is not None
 
     @property
-    def amount_due(self):
-        return self.pass_type.unit_price + self.lunch.unit_price
-
-    @property
     def payment_due_date(self):
         return self.accepted_at + datetime.timedelta(days=14)
 
@@ -104,11 +101,42 @@ class Registration(models.Model):
     def video_audition_due_date(self):
         return self.accepted_at + datetime.timedelta(days=21)
 
+    @property
+    def amount_due(self):
+        return self.total_price
+
+    @property
+    def amount_paid(self):
+        result = self.payment_set.aggregate(amount_paid=Sum("amount"))
+        return result.get("amount_paid") or 0.0
+
+    @property
+    def paid_in_full(self):
+        return self.amount_paid >= self.amount_due
+
+    def fixate_price(self):
+        self.total_price = self.pass_type.unit_price + self.lunch.unit_price
+
     def log_interaction(self, description):
         Interaction.objects.create(registration=self, description=description)
 
 
+class Payment(models.Model):
+
+    registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
+
+    mollie_payment_id = models.CharField(
+            max_length=64, unique=True, null=True, blank=True)
+
+    amount = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class RegistrationStatus(models.Model):
+
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
     STATUS_QUEUED = 'queued'
@@ -126,6 +154,7 @@ class RegistrationStatus(models.Model):
 
 
 class Interaction(models.Model):
+
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
     description = models.CharField(max_length=4096, blank=True)

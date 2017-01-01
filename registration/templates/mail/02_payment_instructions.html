@@ -1,8 +1,9 @@
 {% extends 'mail/_base.html' %}
 
 {% block content %}
-<p>Congratulations {{ registration.first_name }}, you're one step closer to
-Smokey Feet 2017!</p>
+<p>Hello {{ registration.first_name }},</p>
+
+<p>Congratulations, you're one step closer to Smokey Feet 2017!</p>
 
 <p>To secure your spot you must
 <b><a href="{{ status_url }}">make payment within 7 days</a></b>.
@@ -28,13 +29,15 @@ video in a weird location or add your best Halloween outfit.</p>
 <p>Please upload your video audition to
 <a href="https://www.youtube.com">YouTube</a> and mail us
 (<a href="mailto:info@smokeyfeet.com">info@smokeyfeet.com</a>) the shareable
-link. Make sure we receive your video before {{ video_audition_due_date }}.
+link. Make sure we receive your video before
+{{ video_audition_due_date|date:"SHORT_DATE_FORMAT" }}.
 We will respond as soon as possible to let you know in which level you are.
 </p>
 {% endif %}
 
-<p>Interested in a volunteer position? Visit the volunteer page on the
-website to find out more.</p>
+<p>Interested in a volunteer position? Check out the
+<a href="http://smokeyfeet.com/volunteers/">Smokey Feet volunteer page</a>
+to find out more.</p>
 
 <p>If you want to host or look for a host please see the
 <a href="https://www.facebook.com/groups/786669158122791/">Smokey Feet hosting Facebook group</a>.

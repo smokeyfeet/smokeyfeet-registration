@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Interaction, LunchType, PassType, Registration
+from .models import (
+        Interaction, LunchType, PassType, Payment, Registration)
 from . import mailing
 
 
@@ -32,7 +33,7 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
         if self.value() == 'accepted':
             return queryset.filter(accepted_at__isnull=False)
         if self.value() == 'paid':
-            return queryset.filter(payment_status="paid")
+            return queryset.none()
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
@@ -64,6 +65,11 @@ def _workshop_partner(obj):
 _workshop_partner.short_description = 'Workshop partner'
 
 
+class PaymentInline(admin.TabularInline):
+    model = Payment
+    extra = 1
+
+
 class InteractionInline(admin.TabularInline):
     model = Interaction
     extra = 1
@@ -75,9 +81,9 @@ class RegistrationAdmin(admin.ModelAdmin):
             RegistrationPartnerFilter, 'lunch')
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
-            _workshop_partner, 'created_at')
+            _workshop_partner, 'created_at', 'amount_paid')
 
-    inlines = [InteractionInline]
+    inlines = [PaymentInline, InteractionInline]
 
     ordering = ('created_at',)
 
@@ -85,8 +91,9 @@ class RegistrationAdmin(admin.ModelAdmin):
             'action_accept',
             'action_payment_reminder',
             'action_cancel',
-            'action_video_received',
-            'action_video_accepted',
+            'action_audition_received',
+            'action_audition_reminder',
+            'action_audition_accepted',
             ]
 
     def action_accept(self, request, queryset):
@@ -121,24 +128,32 @@ class RegistrationAdmin(admin.ModelAdmin):
 
     action_cancel.short_description = "Cancel registration"
 
-    def action_video_received(self, request, queryset):
+    def action_audition_received(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
                     subject="[SF 2017] Video audition received",
-                    template_name="mail/06a_video_audition_received.html",
+                    template_name="mail/06a_audition_received.html",
                     registration=registration)
 
-    action_video_received.short_description = "Mail video received notification"
+    action_audition_received.short_description = "Mail audition received notification"
 
-    def action_video_accepted(self, request, queryset):
+    def action_audition_reminder(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF 2017] Video audition reminder",
+                    template_name="mail/09_audition_reminder.html",
+                    registration=registration)
+
+    action_audition_reminder.short_description = "Mail audition reminder"
+
+    def action_audition_accepted(self, request, queryset):
         for registration in queryset:
             mailing.send_registration_mail(
                     subject="[SF 2017] Video audition accepted",
-                    template_name="mail/06b_video_audition_accepted.html",
+                    template_name="mail/06b_audition_accepted.html",
                     registration=registration)
 
-
-    action_video_accepted.short_description = "Mail video accepted notification"
+    action_audition_accepted.short_description = "Mail audition accepted notification"
 
 
 admin.site.register(LunchType, LunchTypeAdmin)

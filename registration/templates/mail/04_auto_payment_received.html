@@ -1,11 +1,12 @@
 {% extends 'mail/_base.html' %}
 
 {% block content %}
-<p>Hello there {{ registration.first_name }},</p>
+<p>Hello {{ registration.first_name }},</p>
 
 <p>We have received your payment and your spot for Smokey Feet 2017
 is now confirmed! We will keep you up to date on any news via the
-<a href="www.smokeyfeet.com">website</a> and <link>Facebook page</link>.
+Smokey Feet <a href="http://smokeyfeet.com">website</a> and
+<a href="https://www.facebook.com/Smokey-Feet-181498711899234/">Facebook community</a>.
 </p>
 
 <p><b><a href="{{ status_url }}">View registration status</a></b></p>
