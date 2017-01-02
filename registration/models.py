@@ -98,7 +98,7 @@ class Registration(models.Model):
 
     @property
     def payment_due_date(self):
-        return self.accepted_at + datetime.timedelta(days=14)
+        return self.accepted_at + datetime.timedelta(days=7)
 
     @property
     def video_audition_due_date(self):

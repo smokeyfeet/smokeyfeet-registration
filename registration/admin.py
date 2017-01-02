@@ -126,7 +126,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                     template_name="mail/05_cancel.html",
                     registration=registration)
 
-    action_cancel.short_description = "Cancel registration"
+    action_cancel.short_description = "Mail cancel notification"
 
     def action_audition_received(self, request, queryset):
         for registration in queryset:
