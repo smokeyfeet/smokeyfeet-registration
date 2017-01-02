@@ -26,7 +26,7 @@ class PassType(models.Model):
     data = JSONField()
 
     def __str__(self):
-        s  = "{} - €{}".format(self.name, self.unit_price)
+        s = "{} - €{}".format(self.name, self.unit_price)
         if self.video_audition_required:
             s += " - video audition"
         return s
@@ -82,6 +82,8 @@ class Registration(models.Model):
 
     total_price = models.DecimalField(
             max_digits=12, decimal_places=2, default=0)
+
+    audition_url = models.URLField(blank=True)
 
     accepted_at = models.DateTimeField(null=True, blank=True)
 

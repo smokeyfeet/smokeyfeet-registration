@@ -58,6 +58,24 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
                     workshop_partner_name__exact='')
 
 
+class RegistrationAuditionFilter(admin.SimpleListFilter):
+    title = _("has audition")
+
+    parameter_name = "has_audition"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+            )
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.exclude(audition_url__exact='')
+        if self.value() == "no":
+            return queryset.filter(audition_url__exact='')
+
+
 def _workshop_partner(obj):
     return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
 
@@ -78,7 +96,7 @@ class InteractionInline(admin.TabularInline):
 
 class RegistrationAdmin(admin.ModelAdmin):
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, 'lunch')
+            RegistrationPartnerFilter, 'lunch', RegistrationAuditionFilter)
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
             _workshop_partner, 'created_at', 'amount_paid')
