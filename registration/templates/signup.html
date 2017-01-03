@@ -4,6 +4,9 @@
 
 <div class="row columns">
   <h2>Signup</h2>
+  <p>Please ensure you are familiar with the
+  <a href="http://smokeyfeet.com/registration/" target="_blank">registration process</a>
+  before signing up.</p>
 </div>
 
 <form action="." method="post">
@@ -25,19 +28,6 @@
 
   <div class="row">
     <div class="medium-6 columns">
-      {{ form.email.errors }}
-      <label for="{{ form.last_name.id_for_label }}">Email</label>
-      {{ form.email }}
-    </div>
-    <div class="medium-6 columns">
-      {{ form.email_repeat.errors }}
-      <label for="{{ form.email_repeat.id_for_label }}">Confirm email</label>
-      {{ form.email_repeat }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="medium-6 columns">
       {{ form.first_name.errors }}
       <label for="{{ form.first_name.id_for_label }}">First name</label>
       {{ form.first_name }}
@@ -46,6 +36,19 @@
       {{ form.last_name.errors }}
       <label for="{{ form.last_name.id_for_label }}">Last name</label>
       {{ form.last_name }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.email.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Email</label>
+      {{ form.email }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.email_repeat.errors }}
+      <label for="{{ form.email_repeat.id_for_label }}">Confirm email</label>
+      {{ form.email_repeat }}
     </div>
   </div>
 
@@ -72,13 +75,15 @@
   </div>
 
   <div class="row columns">
-    <p><i>Make sure you have read the <a href="http://smokeyfeet.com/level-descriptions/"
-    target="_blank">workshop level descriptions</a> before choosing your
-    pass type.</i></p>
-
     <fieldset class="fieldset">
       <legend>Pass Type</legend>
       {{ form.pass_type.errors }}
+
+      <p><i>Note: Party passes go on sale on February 11th, 2017.</i></p>
+
+      <p>Make sure you have read the <a href="http://smokeyfeet.com/level-descriptions/"
+      target="_blank">workshop level descriptions</a> before choosing your
+      pass type.</p>
 
 {% for radio in form.pass_type %}
     {{ radio }}
@@ -93,16 +98,16 @@
 
   <div class="row">
     <div class="medium-6 columns">
-      {{ form.workshop_partner_email.errors }}
-      <label for="{{ form.workshop_partner_email.id_for_label }}">
-      Partner email</label>
-      {{ form.workshop_partner_email }}
-    </div>
-    <div class="medium-6 columns">
       {{ form.workshop_partner_name.errors }}
       <label for="{{ form.workshop_partner_name.id_for_label }}">
       Partner full name</label>
       {{ form.workshop_partner_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.workshop_partner_email.errors }}
+      <label for="{{ form.workshop_partner_email.id_for_label }}">
+      Partner email</label>
+      {{ form.workshop_partner_email }}
     </div>
   </div>
 
@@ -114,6 +119,9 @@
 {% for radio in form.lunch %}
       {{ radio }}
 {% endfor %}
+
+      <p>In case of special dietary requirements feel free to
+      <a href="http://smokeyfeet.com/contact/" target="_blank">contact us</a>.</p>
     </fieldset>
   </div>
 
@@ -128,6 +136,7 @@
   </div>
 
   <div class="row columns text-center">
+    <br/>
     <input type="submit" class="success large button" value="Sign me up!" />
   </div>
 </form>
