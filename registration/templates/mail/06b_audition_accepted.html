@@ -1,0 +1,16 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hello {{ registration.first_name }},</p>
+
+<p>We have reviewed your audition video. Your Smokey Feet 2017 pass type will
+be:</p>
+
+<p><strong>{{ registration.pass_type.name }}</strong></p>
+
+<p>If you have any questions please don't hesitate to contact us.</p>
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hello {{ registration.first_name }},</p>
+
+<p>Your spot for Smokey Feet 2017 is in grave danger!</p>
+
+<p>If you find this email in your inbox it means we have not received your
+payment yet. Make sure you secure your spot by paying before
+<strong>{{ registration.payment_due_date|date:"SHORT_DATE_FORMAT" }}</strong>.
+
+<p><strong><a href="{{ status_url }}">Pay now!</a></strong></p>
+
+<p>If you have paid but still receive this email make sure you check your
+payment details and see if everything went well. You can send us a copy/print
+screen if you are in doubt. Please note that an international bank transfer can
+take a couple of days.</p>
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}

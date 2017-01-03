@@ -1,0 +1,7 @@
+[run]
+branch = True
+source =
+	dashboard
+	ministhop
+	registration
+	smokeyfeet

@@ -19,14 +19,8 @@ DATABASES = {
     }
 }
 
-EMAIL_HOST = os.environ.get('SF_EMAIL_HOST', '')
-EMAIL_PORT = os.environ.get('SF_EMAIL_PORT', '587')
-EMAIL_HOST_USER = os.environ.get('SF_EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('SF_EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = True
-EMAIL_TIMEOUT = 30  # In seconds
-
 DEFAULT_FROM_EMAIL = 'Smokey Feet <info@smokeyfeet.com>'
+EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 
 LOGGING = {
     'version': 1,
@@ -69,6 +63,11 @@ LOGGING = {
 }
 
 # Custom
+
+ANYMAIL = {
+    'MAILGUN_API_KEY': os.environ.get('SF_MAILGUN_API_KEY', ''),
+    'MAILGUN_SENDER_DOMAIN': 'mg.smokeyfeet.com',
+}
 
 EMAIL_BASE_URI = 'http://localhost:8000'
 

@@ -1,26 +1,17 @@
-import datetime as dt
-
-from Mollie.API import Payment
-from django import forms
 from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import (PassType, CompetitionType, MolliePayment,
-        VolunteerType, Registration)
+from .models import (
+        Interaction, LunchType, PassType, Payment, Registration)
 from . import mailing
-from .utils import make_token
+
+
+class LunchTypeAdmin(admin.ModelAdmin):
+    pass
 
 
 class PassTypeAdmin(admin.ModelAdmin):
-    pass
-
-
-class CompetitionTypeAdmin(admin.ModelAdmin):
-    pass
-
-
-class VolunteerTypeAdmin(admin.ModelAdmin):
     pass
 
 
@@ -34,9 +25,6 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
             ('pending', _('Signup pending')),
             ('accepted', _('Signup accepted')),
             ('paid', _('Paid')),
-            ('accepted_unpaid_07d', _('Accepted & unpaid 7d')),
-            ('accepted_unpaid_10d', _('Accepted & unpaid 10d')),
-            ('accepted_unpaid_14d', _('Accepted & unpaid 14d')),
             )
 
     def queryset(self, request, queryset):
@@ -45,19 +33,7 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
         if self.value() == 'accepted':
             return queryset.filter(accepted_at__isnull=False)
         if self.value() == 'paid':
-            reg_ids = MolliePayment.objects.filter(
-                    mollie_status=Payment.STATUS_PAID).values_list('registration_id',
-                            flat=True)
-            return queryset.filter(pk__in=set(reg_ids))
-        if self.value() == 'accepted_unpaid_07d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=7)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        if self.value() == 'accepted_unpaid_10d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=10)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
-        if self.value() == 'accepted_unpaid_14d':
-            return queryset.filter(accepted_at__lte=timezone.now() -
-                    dt.timedelta(days=14)).exclude(molliepayment__mollie_status=Payment.STATUS_PAID)
+            return queryset.none()
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
@@ -73,104 +49,131 @@ class RegistrationPartnerFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'yes':
-            return queryset.exclude(workshop_partner_email__exact=''
-                    ).exclude(workshop_partner_name__exact='')
+            return queryset.exclude(
+                    workshop_partner_email__exact=''
+                ).exclude(workshop_partner_name__exact='')
         if self.value() == 'no':
-            return queryset.filter(workshop_partner_email__exact='',
+            return queryset.filter(
+                    workshop_partner_email__exact='',
                     workshop_partner_name__exact='')
 
 
-class CompetitionsFilter(admin.SimpleListFilter):
-    title = _('competing in')
+class RegistrationAuditionFilter(admin.SimpleListFilter):
+    title = _("has audition")
 
-    parameter_name = 'competing_in'
-
-    def lookups(self, request, model_admin):
-        qs = CompetitionType.objects.values_list('id', 'name').order_by('name')
-        return tuple(qs)
-
-    def queryset(self, request, queryset):
-        val = self.value()
-        if val is not None:
-            return queryset.filter(competitions__exact=val)
-
-
-class VolunteeringForFilter(admin.SimpleListFilter):
-    title = _('volunteering for')
-
-    parameter_name = 'volunteering_for'
+    parameter_name = "has_audition"
 
     def lookups(self, request, model_admin):
-        qs = VolunteerType.objects.values_list('id', 'name').order_by('name')
-        return tuple(qs)
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+            )
 
     def queryset(self, request, queryset):
-        val = self.value()
-        if val is not None:
-            return queryset.filter(volunteering_for__exact=val)
-
-
-class MolliePaymentInline(admin.TabularInline):
-    model = MolliePayment
-    extra = 0
-    #readonly_fields = ('mollie_id', 'mollie_amount', 'mollie_status',
-    #        'created_at')
-    exclude = ('updated_at',)
+        if self.value() == "yes":
+            return queryset.exclude(audition_url__exact='')
+        if self.value() == "no":
+            return queryset.filter(audition_url__exact='')
 
 
 def _workshop_partner(obj):
     return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
+
+
 _workshop_partner.short_description = 'Workshop partner'
 
 
-class RegistrationForm(forms.ModelForm):
-    token = forms.CharField(label='Token', required=False)
+class PaymentInline(admin.TabularInline):
+    model = Payment
+    extra = 1
 
-    class Meta:
-        model = Registration
-        exclude = []
+
+class InteractionInline(admin.TabularInline):
+    model = Interaction
+    extra = 1
+    can_delete = False
 
 
 class RegistrationAdmin(admin.ModelAdmin):
-    form = RegistrationForm
-
     list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, VolunteeringForFilter,
-            CompetitionsFilter, 'include_lunch')
+            RegistrationPartnerFilter, 'lunch', RegistrationAuditionFilter)
 
     list_display = ('first_name', 'last_name', 'email', 'pass_type',
-            _workshop_partner, 'amount_paid', 'created_at')
+            _workshop_partner, 'created_at', 'amount_paid')
+
+    inlines = [PaymentInline, InteractionInline]
 
     ordering = ('created_at',)
 
-    actions = ['action_complete', 'action_payment_reminder']
+    actions = [
+            'action_accept',
+            'action_payment_reminder',
+            'action_cancel',
+            'action_audition_received',
+            'action_audition_reminder',
+            'action_audition_accepted',
+            ]
 
-    inlines = [MolliePaymentInline]
-
-    def action_complete(self, request, queryset):
+    def action_accept(self, request, queryset):
         for registration in queryset:
-            registration.accepted_at = timezone.now()
-            registration.save()
-            mailing.send_completion_mail(registration)
 
-    action_complete.short_description = "Accept and send completion mail"
+            if registration.accepted_at is None:
+                registration.accepted_at = timezone.now()
+                registration.save()
+
+            mailing.send_registration_mail(
+                    subject="[SF2017] Registration accepted",
+                    template_name="mail/02_payment_instructions.html",
+                    registration=registration)
+
+    action_accept.short_description = "Accept and mail payment instructions"
 
     def action_payment_reminder(self, request, queryset):
         for registration in queryset:
-            registration.payment_reminder_at = timezone.now()
-            registration.save()
-            mailing.send_payment_reminder_mail(registration)
+            mailing.send_registration_mail(
+                    subject="[SF2017] Payment reminder",
+                    template_name="mail/03_payment_reminder.html",
+                    registration=registration)
 
-    action_payment_reminder.short_description = "Send payment reminder mail"
+    action_payment_reminder.short_description = "Mail payment reminder"
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(RegistrationAdmin, self).get_form(request, obj, **kwargs)
-        if obj is not None:
-            form.base_fields['token'].initial = make_token(obj)
-        return form
+    def action_cancel(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF2017] Registration cancelled",
+                    template_name="mail/05_cancel.html",
+                    registration=registration)
+
+    action_cancel.short_description = "Mail cancel notification"
+
+    def action_audition_received(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF2017] Video audition received",
+                    template_name="mail/06a_audition_received.html",
+                    registration=registration)
+
+    action_audition_received.short_description = "Mail audition received notification"
+
+    def action_audition_reminder(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF2017] Video audition reminder",
+                    template_name="mail/09_audition_reminder.html",
+                    registration=registration)
+
+    action_audition_reminder.short_description = "Mail audition reminder"
+
+    def action_audition_accepted(self, request, queryset):
+        for registration in queryset:
+            mailing.send_registration_mail(
+                    subject="[SF2017] Video audition accepted",
+                    template_name="mail/06b_audition_accepted.html",
+                    registration=registration)
+
+    action_audition_accepted.short_description = "Mail audition accepted notification"
 
 
+admin.site.register(LunchType, LunchTypeAdmin)
 admin.site.register(PassType, PassTypeAdmin)
-admin.site.register(CompetitionType, CompetitionTypeAdmin)
-admin.site.register(VolunteerType, VolunteerTypeAdmin)
 admin.site.register(Registration, RegistrationAdmin)

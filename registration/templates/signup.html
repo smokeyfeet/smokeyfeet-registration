@@ -4,6 +4,9 @@
 
 <div class="row columns">
   <h2>Signup</h2>
+  <p>Please ensure you are familiar with the
+  <a href="http://smokeyfeet.com/registration/" target="_blank">registration process</a>
+  before signing up.</p>
 </div>
 
 <form action="." method="post">
@@ -25,6 +28,19 @@
 
   <div class="row">
     <div class="medium-6 columns">
+      {{ form.first_name.errors }}
+      <label for="{{ form.first_name.id_for_label }}">First name</label>
+      {{ form.first_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.last_name.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Last name</label>
+      {{ form.last_name }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
       {{ form.email.errors }}
       <label for="{{ form.last_name.id_for_label }}">Email</label>
       {{ form.email }}
@@ -36,17 +52,11 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="medium-6 columns">
-      {{ form.first_name.errors }}
-      <label for="{{ form.first_name.id_for_label }}">First name</label>
-      {{ form.first_name }}
-    </div>
-    <div class="medium-6 columns">
-      {{ form.last_name.errors }}
-      <label for="{{ form.last_name.id_for_label }}">Last name</label>
-      {{ form.last_name }}
-    </div>
+  <div class="row columns">
+    {{ form.residing_country.errors }}
+    <label for="{{ form.residing_country.id_for_label }}">
+      Residing country</label>
+    {{ form.residing_country }}
   </div>
 
   <div class="row columns">
@@ -69,8 +79,14 @@
       <legend>Pass Type</legend>
       {{ form.pass_type.errors }}
 
+      <p><i>Note: Party passes go on sale on February 11th, 2017.</i></p>
+
+      <p>Make sure you have read the <a href="http://smokeyfeet.com/level-descriptions/"
+      target="_blank">workshop level descriptions</a> before choosing your
+      pass type.</p>
+
 {% for radio in form.pass_type %}
-      {{ radio }}
+    {{ radio }}
 {% endfor %}
     </fieldset>
   </div>
@@ -82,20 +98,45 @@
 
   <div class="row">
     <div class="medium-6 columns">
-      {{ form.workshop_partner_email.errors }}
-      <label for="{{ form.workshop_partner_email.id_for_label }}">
-      Partner email</label>
-      {{ form.workshop_partner_email }}
-    </div>
-    <div class="medium-6 columns">
       {{ form.workshop_partner_name.errors }}
       <label for="{{ form.workshop_partner_name.id_for_label }}">
       Partner full name</label>
       {{ form.workshop_partner_name }}
     </div>
+    <div class="medium-6 columns">
+      {{ form.workshop_partner_email.errors }}
+      <label for="{{ form.workshop_partner_email.id_for_label }}">
+      Partner email</label>
+      {{ form.workshop_partner_email }}
+    </div>
+  </div>
+
+  <div class="row columns">
+    <fieldset class="fieldset">
+      <legend>Workshop Lunch</legend>
+      {{ form.lunch.errors }}
+
+{% for radio in form.lunch %}
+      {{ radio }}
+{% endfor %}
+
+      <p>In case of special dietary requirements feel free to
+      <a href="http://smokeyfeet.com/contact/" target="_blank">contact us</a>.</p>
+    </fieldset>
+  </div>
+
+  <div class="row columns">
+    <h3>Terms and Conditions</h3>
+    {{ form.agree_to_terms.errors }}
+    <label for="{{ form.agree_to_terms.id_for_label }}">
+      {{ form.agree_to_terms }}
+      I have read, understand, and agree to the Smokey Feet
+      <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>
+    </label>
   </div>
 
   <div class="row columns text-center">
+    <br/>
     <input type="submit" class="success large button" value="Sign me up!" />
   </div>
 </form>

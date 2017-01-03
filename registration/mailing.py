@@ -1,60 +1,65 @@
+from urllib.parse import urljoin
+
 from django.conf import settings
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
-
-from .utils import make_token
-
-
-def send_thanks_mail(registration):
-    subject = "[SF2016] Signup received"
-
-    context = {'registration': registration, 'subject': subject}
-    text_msg = render_to_string('mail/thanks.text', context=context)
-    html_msg = render_to_string('mail/thanks.html', context=context)
-
-    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-            [registration.email], fail_silently=False,
-            html_message=html_msg)
+from django.urls import reverse
+from html2text import html2text
 
 
-def send_completion_mail(registration):
-    token = make_token(registration)
-    path = reverse('complete', args=[token])
-    url = "{}{}".format(settings.EMAIL_BASE_URI, path)
-    subject = "[SF2016] Complete registration"
+def send_registration_mail(subject, template_name, registration):
+    status_url = urljoin(
+            settings.EMAIL_BASE_URI,
+            reverse("registration:status", args=[registration.id]))
 
-    context = {'registration': registration, 'subject': subject, 'url': url}
-    text_msg = render_to_string('mail/complete.text', context=context)
-    html_msg = render_to_string('mail/complete.html', context=context)
+    context = dict(
+        registration=registration,
+        status_url=status_url)
+
+    html_msg = render_to_string(template_name, context=context)
+    text_msg = html2text(html_msg)
 
     send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-           [registration.email], fail_silently=False,
-           html_message=html_msg)
+              [registration.email], fail_silently=False,
+              html_message=html_msg)
+
+    registration.log_interaction(
+            "Mailed {} with subject: {}".format(registration.email, subject))
 
 
-def send_payment_mail(registration):
-    subject = "[SF2016] Payment received"
-    context = {'registration': registration, 'subject': subject}
+def send_signup_received(registration):
+    subject = "[SF2017] Signup received"
+    context = dict(registration=registration)
 
-    text_msg = render_to_string('mail/payment.text', context=context)
-    html_msg = render_to_string('mail/payment.html', context=context)
-
-    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-            [registration.email], fail_silently=False,
-            html_message=html_msg)
-
-
-def send_payment_reminder_mail(registration):
-    token = make_token(registration)
-    path = reverse('complete', args=[token])
-    url = "{}{}".format(settings.EMAIL_BASE_URI, path)
-    subject = "[SF2016] Payment reminder"
-
-    context = {'registration': registration, 'subject': subject, 'url': url}
-    text_msg = render_to_string('mail/payment_reminder.text', context=context)
-    html_msg = render_to_string('mail/payment_reminder.html', context=context)
+    html_msg = render_to_string(
+            "mail/01_auto_signup.html", context=context)
+    text_msg = html2text(html_msg)
 
     send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-            [registration.email], fail_silently=False,
-            html_message=html_msg)
+              [registration.email], fail_silently=False,
+              html_message=html_msg)
+
+    registration.log_interaction(
+            "Mailed {} with subject: {}".format(registration.email, subject))
+
+
+def send_payment_received(registration):
+    subject = "[SF2017] Payment received"
+    status_url = urljoin(
+            settings.EMAIL_BASE_URI,
+            reverse("registration:status", args=[registration.id]))
+
+    context = dict(
+        registration=registration,
+        status_url=status_url)
+
+    html_msg = render_to_string(
+            "mail/04_auto_payment_received.html", context=context)
+    text_msg = html2text(html_msg)
+
+    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
+              [registration.email], fail_silently=False,
+              html_message=html_msg)
+
+    registration.log_interaction(
+            "Mailed {} with subject: {}".format(registration.email, subject))

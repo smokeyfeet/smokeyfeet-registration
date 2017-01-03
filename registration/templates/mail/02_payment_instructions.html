@@ -1,0 +1,50 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+<p>Hello {{ registration.first_name }},</p>
+
+<p>Congratulations, you're one step closer to Smokey Feet 2017!</p>
+
+<h3>Payment Instructions</h3>
+<p>To secure your spot you must <strong>pay within 7 days</strong>.
+Failing to do so means we're free to give your spot to someone else.
+So please take care of this quickly. ;)</p>
+
+<p><i>Note: A bank transfer may take a couple of days.</i></p>
+
+<p><strong><a href="{{ status_url }}">Pay now!</a></strong></p>
+
+{% if registration.pass_type.video_audition_required %}
+<h3>Video Audition</h3>
+<p>You've signed up for a workshop pass that <strong>requires a video
+audition</strong>. It should be a video of you social dancing, no routines
+allowed. If it's a video of a Jack and Jill or a video with more people in it,
+please let us know who you are to prevent confusion :). As far as tempos: mid-
+to high-tempo songs are required.</p>
+
+<p>To make it a bit more fun we added a challenge this year. There will be a
+prize for the most original video audition. To give you ideas: record your
+video in a weird location or add your best Halloween outfit.</p>
+
+<p>Please upload your video audition to
+<a href="https://www.youtube.com">YouTube</a> and mail us
+(<a href="mailto:info@smokeyfeet.com">info@smokeyfeet.com</a>) the shareable
+link. Make sure we receive your video before
+{{ registration.video_audition_due_date|date:"SHORT_DATE_FORMAT" }}.
+We will respond as soon as possible to let you know in which level you are.
+</p>
+{% endif %}
+
+<h3>Volunteering &amp; Hosting</h3>
+<p>Interested in a volunteer position? Check out the
+<a href="http://smokeyfeet.com/volunteers/">Smokey Feet volunteer page</a>
+to find out more.</p>
+
+<p>If you want to host or look for a host please see the
+<a href="https://www.facebook.com/groups/786669158122791/">Smokey Feet hosting Facebook group</a>.
+</p>
+
+<p>All the best,</p>
+
+<p>Smokey Feet Crew</p>
+{% endblock %}

@@ -4,54 +4,50 @@
 <div class="row columns">
   <h2>Registration Status</h2>
 
-  <p>Refresh page to get the latest status.</p>
+  <p><i>You registered on {{ registration.created_at|date:"r" }} as:</i></p>
 
-  <h3>Details</h3>
-  <ul>
-    <li>Name: {{ registration.first_name }}</li>
-    <li>Last name: {{ registration.last_name }}</li>
-    <li>Dance role: {{ registration.dance_role|capfirst }}</li>
-    <li>Pass type: {{ registration.pass_type.name }}</li>
-  </ul>
+  <section>
+    Name: {{ registration.last_name }}, {{ registration.first_name }}<br/>
+    Dance role: {{ registration.dance_role|capfirst }}<br/>
+    Pass type: {{ registration.pass_type.name }}<br/>
+  </section>
+
+  <hr/>
 
 {% if registration.is_accepted %}
+  <section>
+    <p><i>Your registration was accepted on {{ registration.accepted_at|date:"r" }}.</i></p>
 
-  <ul>
-{% if registration.is_full_pass %}
-  {% if registration.include_lunch %}
-    <li>Workshop lunch included</li>
-    <li>Dietary requirements: {{ registration.diet_requirements }}</li>
-  {% else %}
-    <li>Workshop Lunch <b>not</b> included</li>
-  {% endif %}
-{% endif %}
+    <h4>Invoice</h4>
+    <p>
+    Pass type: {{ registration.pass_type.name }} - &euro; {{ registration.pass_type.unit_price }}<br/>
+    Lunch: {{ registration.lunch.name }} - &euro; {{ registration.lunch.unit_price }}<br/>
+    Grand total: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
+    </p>
 
-    <li>
-{% for comp in registration.competitions.all %}
-  {{ comp.name }}{% if not forloop.last %}, {% endif %}
-{% empty %}
-  No competitions
-{% endfor %}
-    </li>
-
-    <li>Strictly partner: {{ registration.strictly_partner|default:"None" }}</li>
-  </ul>
-
-  <p>Total amount: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></p>
-
-  <h3>Payments</h3>
-
-{% for payment in registration.molliepayment_set.all %}
-  <div class="payment">
+    <hr/>
     <ul>
-      <li>Created at: {{ payment.created_at }}</li>
-      <li>Amount: &euro;{{ payment.mollie_amount|floatformat:2 }}</li>
-      <li>Status: {{ payment.mollie_status }}</li>
+    {% for payment in registration.payment_set.all %}
+      <li>Received payment (&euro; {{ payment.amount }}) on {{ payment.created_at|date:"r" }}</li>
+    {% endfor %}
     </ul>
-  </div>
-{% endfor %}
-  </ul>
 
+    {% if not registration.paid_in_full %}
+    <form method="post">
+    {% csrf_token %}
+      <input type="submit" name="make_payment" class="success large button"
+          value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}"/>
+    </form>
+    {% else %}
+    <p><i>Your registration is fully paid!</i></p>
+    {% endif %}
+  </section>
+{% else %}
+  <section>
+    <p>Please be patient while we process your registration.</p>
+    <p>Keep an eye on your inbox.</p>
+  </section>
 {% endif %}
+
 </div>
 {% endblock %}
