@@ -4,7 +4,7 @@
 <div class="row columns">
   <h2>Registration Status</h2>
 
-  <p><i>You registered on {{ registration.created_at|date:"r" }} as:</i></p>
+  <p><i>Signed up on {{ registration.created_at|date:"r" }}</i></p>
 
   <section>
     Name: {{ registration.last_name }}, {{ registration.first_name }}<br/>
@@ -16,7 +16,7 @@
 
 {% if registration.is_accepted %}
   <section>
-    <p><i>Your registration was accepted on {{ registration.accepted_at|date:"r" }}.</i></p>
+    <p><i>Registration accepted on {{ registration.accepted_at|date:"r" }}.</i></p>
 
     <h4>Invoice</h4>
     <p>
