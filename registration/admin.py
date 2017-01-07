@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -16,46 +17,85 @@ class PassTypeAdmin(admin.ModelAdmin):
 
 
 class RegistrationStatusFilter(admin.SimpleListFilter):
-    title = _('status')
+    title = _("status")
 
-    parameter_name = 'status'
+    parameter_name = "status"
 
     def lookups(self, request, model_admin):
         return (
-            ('pending', _('Signup pending')),
-            ('accepted', _('Signup accepted')),
-            ('paid', _('Paid')),
+            ("pending", _("Pending")),
+            ("accepted", _("Accepted")),
+            ("accepted_04d", _("Accepted > 4d ago")),
+            ("accepted_10d", _("Accepted > 10d ago")),
             )
 
     def queryset(self, request, queryset):
-        if self.value() == 'pending':
+        if self.value() == "pending":
             return queryset.filter(accepted_at__isnull=True)
-        if self.value() == 'accepted':
+        if self.value() == "accepted":
             return queryset.filter(accepted_at__isnull=False)
-        if self.value() == 'paid':
-            return queryset.none()
+        if self.value() == "accepted_04d":
+            return queryset.filter(
+                    accepted_at__lte=timezone.now() - timedelta(days=4))
+        if self.value() == "accepted_10d":
+            return queryset.filter(
+                    accepted_at__lte=timezone.now() - timedelta(days=10))
+
+
+class RegistrationPaidFilter(admin.SimpleListFilter):
+
+    title = _("has paid")
+
+    parameter_name = "has_paid"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+            )
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            paid_qs = Registration.objects.raw("""
+                select r.id
+                    from registration_registration r
+                      join registration_payment p on p.registration_id = r.id
+                      group by r.id
+                      having sum(p.amount) >= r.total_price
+                """)
+            return queryset.filter(id__in=[p.id for p in paid_qs])
+
+        if self.value() == "no":
+            paid_qs = Registration.objects.raw("""
+                select r.id
+                    from registration_registration r
+                      join registration_payment p on p.registration_id = r.id
+                      group by r.id
+                      having sum(p.amount) >= r.total_price
+                """)
+            return queryset.exclude(id__in=[p.id for p in paid_qs])
 
 
 class RegistrationPartnerFilter(admin.SimpleListFilter):
-    title = _('has partner')
+    title = _("has partner")
 
-    parameter_name = 'has_partner'
+    parameter_name = "has_partner"
 
     def lookups(self, request, model_admin):
         return (
-            ('yes', _('Yes')),
-            ('no', _('No')),
+            ("yes", _("Yes")),
+            ("no", _("No")),
             )
 
     def queryset(self, request, queryset):
-        if self.value() == 'yes':
+        if self.value() == "yes":
             return queryset.exclude(
-                    workshop_partner_email__exact=''
-                ).exclude(workshop_partner_name__exact='')
-        if self.value() == 'no':
+                    workshop_partner_email__exact=""
+                ).exclude(workshop_partner_name__exact="")
+        if self.value() == "no":
             return queryset.filter(
-                    workshop_partner_email__exact='',
-                    workshop_partner_name__exact='')
+                    workshop_partner_email__exact="",
+                    workshop_partner_name__exact="")
 
 
 class RegistrationAuditionFilter(admin.SimpleListFilter):
@@ -71,16 +111,17 @@ class RegistrationAuditionFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "yes":
-            return queryset.exclude(audition_url__exact='')
+            return queryset.exclude(audition_url__exact="")
         if self.value() == "no":
-            return queryset.filter(audition_url__exact='')
+            return queryset.filter(audition_url__exact="")
 
 
 def _workshop_partner(obj):
-    return ("%s %s" % (obj.workshop_partner_name, obj.workshop_partner_email)).strip()
+    return "{} {}".format(
+        obj.workshop_partner_name, obj.workshop_partner_email)
 
 
-_workshop_partner.short_description = 'Workshop partner'
+_workshop_partner.short_description = "Workshop partner"
 
 
 class PaymentInline(admin.TabularInline):
@@ -95,23 +136,26 @@ class InteractionInline(admin.TabularInline):
 
 
 class RegistrationAdmin(admin.ModelAdmin):
-    list_filter = (RegistrationStatusFilter, 'pass_type', 'dance_role',
-            RegistrationPartnerFilter, 'lunch', RegistrationAuditionFilter)
+    list_filter = (
+            RegistrationStatusFilter, RegistrationPaidFilter,
+            "pass_type", "dance_role", RegistrationPartnerFilter,
+            "lunch", RegistrationAuditionFilter)
 
-    list_display = ('first_name', 'last_name', 'email', 'pass_type',
-            _workshop_partner, 'created_at', 'amount_paid')
+    list_display = (
+            "first_name", "last_name", "email", "pass_type",
+            _workshop_partner, "created_at", "amount_paid")
 
     inlines = [PaymentInline, InteractionInline]
 
-    ordering = ('created_at',)
+    ordering = ["created_at"]
 
     actions = [
-            'action_accept',
-            'action_payment_reminder',
-            'action_cancel',
-            'action_audition_received',
-            'action_audition_reminder',
-            'action_audition_accepted',
+            "action_accept",
+            "action_payment_reminder",
+            "action_cancel",
+            "action_audition_received",
+            "action_audition_reminder",
+            "action_audition_accepted",
             ]
 
     def action_accept(self, request, queryset):

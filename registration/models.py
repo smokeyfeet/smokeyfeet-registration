@@ -119,6 +119,10 @@ class Registration(models.Model):
     def paid_in_full(self):
         return self.amount_paid >= self.amount_due
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('registration:status', args=[self.id])
+
     def fixate_price(self):
         self.total_price = self.pass_type.unit_price + self.lunch.unit_price
 
