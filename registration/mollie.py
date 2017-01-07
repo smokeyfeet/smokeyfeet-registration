@@ -34,7 +34,7 @@ def create_payment(request, registration):
     try:
         payment = client.payments.create(params)
     except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
+        logger.error("Mollie API call failed: %s", str(err))
         return None
 
     return payment
@@ -46,7 +46,7 @@ def retrieve_payment(payment_id):
     try:
         payment = client.payments.get(payment_id)
     except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
+        logger.error("Mollie API call failed: %s", str(err))
         return None
     else:
         return payment
