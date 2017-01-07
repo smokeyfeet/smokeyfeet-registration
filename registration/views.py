@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 
 from django.contrib import messages
@@ -17,8 +18,16 @@ from .models import Registration
 logger = logging.getLogger(__name__)
 
 
+def signup_is_closed():
+    return Path("/var/tmp/sf_closed").is_file()
+
+
 @require_http_methods(["GET", "POST"])
 def signup(request):
+
+    if signup_is_closed():
+        return render(request, "closed.html")
+
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
