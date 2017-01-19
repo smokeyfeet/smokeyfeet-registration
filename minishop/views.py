@@ -2,7 +2,6 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,10 +11,11 @@ from django.views.decorators.http import require_http_methods
 from Mollie.API import Payment
 import Mollie
 
+from . import mollie
 from .exceptions import MinishopException
 from .forms import AddProductForm, OrderForm
-from .models import Cart, Order, Product
 from .mailing import send_order_paid_mail
+from .models import Cart, Order, Product
 
 
 logger = logging.getLogger(__name__)
@@ -26,15 +26,15 @@ logger = logging.getLogger(__name__)
 def order(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
 
-    # Hack; cancelling payment results in deleting the order
+    # Hack; canceling payment results in deleting the order
     if order.mollie_payment_status == Payment.STATUS_CANCELLED:
         logger.info(
-                "Payment cancelled; restock & delete order (%s) %s %s <%s>:",
+                "Payment canceled; restock & delete order (%s) %s %s <%s>:",
                 order.id, order.first_name, order.last_name, order.email)
 
         order.return_to_stock()
         order.delete()
-        return redirect('catalog')
+        return redirect('minishop:catalog')
 
     return render(request, 'order.html', {'order': order})
 
@@ -54,36 +54,9 @@ def catalog(request):
             except MinishopException as err:
                 messages.error(request, 'Failed to add to cart: %s' % str(err))
             else:
-                return redirect('cart')
+                return redirect('minishop:cart')
 
     return render(request, 'catalog.html', {'products': products})
-
-
-def _make_payment_then_redirect(request, order):
-    client = Mollie.API.Client()
-    client.setApiKey(settings.MOLLIE_API_KEY)
-
-    redirect_url = request.build_absolute_uri(
-            (reverse('order', args=[order.id])))
-
-    try:
-        payment = client.payments.create({
-            'amount': order.total_due,
-            'description': 'Smokey Feet 2016 PP',
-            'redirectUrl': redirect_url,
-            'metadata': {'order_id': str(order.id)}
-            })
-    except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
-        raise
-    else:
-        logger.info(
-                "Order (%s) - New Mollie payment %s @ %f",
-                order.id, payment['id'], payment['amount'])
-        order.mollie_payment_id = payment['id']
-        order.mollie_payment_status = payment['status']
-        order.save()
-        return redirect(payment.getPaymentUrl())
 
 
 @require_http_methods(["GET", "POST"])
@@ -94,7 +67,7 @@ def cart(request):
     if cart.has_stockout_items():
         cart.remove_stockout_items()
         messages.warning(request, 'Out of stock items removed from cart')
-        redirect('cart')
+        redirect('minishop:cart')
 
     if request.method == 'POST' and 'remove_item' in request.POST:
         item_id = request.POST.get('item_id', None)
@@ -109,8 +82,21 @@ def cart(request):
         if form.is_valid():
             order = form.save()
             order.add_items_from_cart(cart)
+
             cart.clear()  # clear out cart on successful order; perhaps delete
-            return _make_payment_then_redirect(request, order)
+
+            payment = mollie.create_payment(request, order)
+            if payment is not None:
+
+                # Associate Mollie payment with order
+                order.mollie_payment_id = payment['id']
+                order.mollie_payment_status = payment['status']
+                order.save()
+
+                return redirect(payment.getPaymentUrl())
+            else:
+                messages.error(
+                    request, "Could not create payment; try again later")
     else:
         form = OrderForm()
 

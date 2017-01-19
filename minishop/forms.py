@@ -22,4 +22,4 @@ class OrderForm(forms.ModelForm):
         email_repeat = cleaned_data.get("email_repeat")
 
         if email != email_repeat:
-            raise forms.ValidationError("Ensure email verfication matches.")
+            raise forms.ValidationError("Ensure email verification matches.")
