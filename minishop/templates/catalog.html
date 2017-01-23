@@ -14,12 +14,12 @@
     <hr/>
     <div class="stat text-center">&euro;&nbsp;{{ product.unit_price|floatformat:2 }}</div>
     <br/>
-{% if product.in_stock %}
+{% if product.in_stock or product.allow_backorder %}
     <form action="." method="post">
       {% csrf_token %}
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="submit" name="add_to_cart" class="success large button expanded"
-        value="Buy now"/>
+        value="{% if product.in_stock %}Buy now{% else %}Back order {% endif %}"/>
     </form>
 {% endif %}
     </div>

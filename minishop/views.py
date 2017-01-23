@@ -43,7 +43,7 @@ def order(request, order_id):
 def catalog(request):
     products = Product.objects.all()
 
-    if request.method == 'POST':
+    if request.method == 'POST' and 'add_to_cart' in request.POST:
         form = AddProductForm(request.POST)
         if form.is_valid():
             product_id = form.cleaned_data['product_id']
@@ -64,11 +64,6 @@ def catalog(request):
 def cart(request):
     cart = Cart.objects.from_request(request)
 
-    if cart.has_stockout_items():
-        cart.remove_stockout_items()
-        messages.warning(request, 'Out of stock items removed from cart')
-        redirect('minishop:cart')
-
     if request.method == 'POST' and 'remove_item' in request.POST:
         item_id = request.POST.get('item_id', None)
         if item_id is not None:
@@ -77,7 +72,20 @@ def cart(request):
     if cart.is_empty:
         return render(request, 'cart_empty.html')
 
-    if request.method == 'POST' and 'pay' in request.POST:
+    if request.method == 'POST' and 'backorder' in request.POST:
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.status = Order.STATUS_BACKORDER
+            order.save()
+
+            order.add_items_from_cart(cart, verify_stock=False)
+
+            cart.clear()  # clear out cart on successful order; perhaps delete
+
+            return redirect('minishop:catalog')
+
+    elif request.method == 'POST' and 'pay' in request.POST:
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save()
@@ -137,6 +145,7 @@ def mollie_notif(request):
             logger.warning(
                     "Order (%s) does not exist; status dropped", order_id)
         else:
+            order.status = Order.STATUS_PAID
             order.mollie_payment_status = payment['status']
             order.save()
 

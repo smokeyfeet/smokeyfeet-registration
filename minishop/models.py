@@ -21,8 +21,9 @@ class Product(models.Model):
 
     name = models.CharField(max_length=128)
     description = models.TextField()
-    num_in_stock = models.PositiveIntegerField(default=0)
+    num_in_stock = models.IntegerField(default=0)
     unit_price = models.FloatField(default=0)
+    allow_backorder = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['name']
@@ -40,6 +41,18 @@ class Product(models.Model):
 
         if self.num_in_stock < quantity:
             raise StockOutError()
+
+    def backorder_required(self, quantity):
+        return self.num_in_stock < quantity
+
+    def get_backorder_quantity(self, quantity):
+        if quantity < 0:
+            raise ValueError("Quantity may not be negative")
+
+        if self.num_in_stock >= quantity:
+            return (quantity, 0)
+        else:
+            return (self.num_in_stock, quantity - self.num_in_stock)
 
 
 class CartManager(models.Manager):
@@ -98,11 +111,11 @@ class Cart(models.Model):
             total += item.total_price
         return total
 
-    def add_product(self, product, quantity=1, verify_quantity=True):
+    def add_product(self, product, quantity=1, verify_stock=True):
         if self.is_full:
             raise CartFullError("Cart is full")
 
-        if verify_quantity:
+        if verify_stock and not product.allow_backorder:
             product.verify_stock(quantity)  # raises StockOutError
 
         CartItem.objects.create(
@@ -168,6 +181,19 @@ class Order(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
 
+    STATUS_NEW = "new"
+    STATUS_BACKORDER = "back_order"
+    STATUS_PAID = "paid"
+
+    STATUS_CHOICES = [
+        (STATUS_NEW, "New"),
+        (STATUS_BACKORDER, "Backorder"),
+        (STATUS_PAID, "Paid")
+    ]
+
+    status = models.CharField(
+            max_length=32, default=STATUS_NEW, choices=STATUS_CHOICES)
+
     mollie_payment_id = models.CharField(max_length=64, unique=True)
     mollie_payment_status = models.CharField(
             max_length=32, default=Payment.STATUS_OPEN)
@@ -202,6 +228,10 @@ class Order(models.Model):
             order_item.product.num_in_stock -= order_item.quantity
             order_item.product.save()
 
+        if cart.has_stockout_items():
+            self.status = Order.STATUS_BACKORDER
+            self.save()
+
     def return_to_stock(self):
         for order_item in self.items.all():
             if order_item.product is not None:
@@ -216,13 +246,14 @@ class OrderItem(models.Model):
 
     product_name = models.CharField(max_length=128, default="{unknown}")
     quantity = models.PositiveIntegerField()
+    quantity_backorder = models.PositiveIntegerField(default=0)
     price = models.FloatField()
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return "%s" % (self.product_name,)
+        return self.product_name
 
     @property
     def total_price(self):
