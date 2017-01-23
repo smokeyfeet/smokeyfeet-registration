@@ -23,7 +23,7 @@ class PassType(models.Model):
     unit_price = models.DecimalField(
             max_digits=12, decimal_places=2, default=0)
 
-    data = JSONField()
+    data = JSONField(blank=True)
 
     def __str__(self):
         s = "{} - €{}".format(self.name, self.unit_price)
