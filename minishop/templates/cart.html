@@ -2,29 +2,24 @@
 
 {% block content %}
 <div class="row columns">
-  <h1 class="text-center">Complete order</h2>
+  <h3>Cart</h3>
 </div>
 
 {% if cart.has_stockout_items %}
 <div class="row columns">
-  <h4>Warning: Cart contains stock out items</h4>
+  <i>Please note the following:</i>
+  <p>Your cart contains out of stock items. You may "back" order
+  and we'll notify you as soon as the desired items are back in
+  stock.</p>
 </div>
 {% endif %}
 
 <div class="row columns">
-  <h2>Cart items</h2>
-
   <table>
-    <tr>
-      <th>Product</th>
-      <th>Quantity</th>
-      <th>Price</th>
-      <th></th>
-    </tr>
 {% for item in cart.items.all %}
     <tr class="text-center">
       <td>{{ item.product.name }}</td>
-      <td>{{ item.quantity }}</td>
+      <td>Quantity: {{ item.quantity }}</td>
       <td>&euro;&nbsp;{{ item.price|floatformat:2 }}</td>
       <td>
         <form action="." method="post">
@@ -37,11 +32,11 @@
 {% endfor %}
   </table>
 
-  <h4 class="text-center">Total due: &euro;&nbsp;{{ cart.total_due|floatformat:2 }}</h4>
+  <h4 class="text-center">Subtotal: &euro;&nbsp;{{ cart.get_subtotal|floatformat:2 }}</h4>
 </div>
 
 <div class="row columns">
-  <h2>Personal details</h2>
+  <h3>Personal details</h3>
 </div>
 
 <form action="." method="post">
@@ -92,7 +87,7 @@
 {% else %}
   <div class="row columns text-center">
     <input type="submit" name="pay" class="success large button"
-        value="Pay &euro;&nbsp;{{ cart.total_due|floatformat:2 }}"/>
+        value="Pay &euro;&nbsp;{{ cart.get_subtotal|floatformat:2 }}"/>
         <i>
     <p>By clicking on the 'Pay' button you agree to our
       <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>

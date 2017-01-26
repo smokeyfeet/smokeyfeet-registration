@@ -22,7 +22,8 @@ class Product(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
     num_in_stock = models.IntegerField(default=0)
-    unit_price = models.FloatField(default=0)
+    unit_price = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
     allow_backorder = models.BooleanField(default=False)
 
     class Meta:
@@ -93,8 +94,8 @@ class Cart(models.Model):
 
     objects = CartManager()
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def is_empty(self):
@@ -104,12 +105,8 @@ class Cart(models.Model):
     def is_full(self):
         return self.items.count() >= 1
 
-    @property
-    def total_due(self):
-        total = 0.0
-        for item in self.items.all():
-            total += item.total_price
-        return total
+    def get_subtotal(self):
+        return sum(item.total_price for item in self.items.all())
 
     def add_product(self, product, quantity=1, verify_stock=True):
         if self.is_full:
@@ -163,10 +160,11 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product)
 
     quantity = models.PositiveIntegerField()
-    price = models.FloatField()
+    price = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def total_price(self):
@@ -198,8 +196,8 @@ class Order(models.Model):
     mollie_payment_status = models.CharField(
             max_length=32, default=Payment.STATUS_OPEN)
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s %s <%s>" % (self.first_name, self.last_name, self.email)
@@ -207,12 +205,8 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse('order', args=[str(self.id)])
 
-    @property
-    def total_due(self):
-        total = 0.0
-        for item in self.items.all():
-            total += item.total_price
-        return total
+    def get_subtotal(self):
+        return sum(item.total_price for item in self.items.all())
 
     def add_items_from_cart(self, cart, verify_stock=True):
         for cart_item in cart.items.all():
@@ -247,10 +241,11 @@ class OrderItem(models.Model):
     product_name = models.CharField(max_length=128, default="{unknown}")
     quantity = models.PositiveIntegerField()
     quantity_backorder = models.PositiveIntegerField(default=0)
-    price = models.FloatField()
+    price = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.product_name

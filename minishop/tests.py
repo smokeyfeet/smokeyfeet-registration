@@ -70,6 +70,14 @@ class TestCart(TestCase):
         cart.clear()
         self.assertEqual(cart.items.count(), 0)
 
+    def test_get_subtotal(self):
+        product = Product.objects.create(num_in_stock=20, unit_price=15.50)
+
+        cart = Cart.objects.create()
+        cart.add_product(product, quantity=3)
+
+        self.assertEqual(cart.get_subtotal(), 46.5)
+
 
 class TestOrder(TestCase):
 
@@ -84,6 +92,12 @@ class TestOrder(TestCase):
 
         product = Product.objects.get(pk=self.product.id)
         self.assertEqual(product.num_in_stock, 11)
+
+    def test_get_subtotal(self):
+        order = Order.objects.create()
+        order.items.create(product=self.product, quantity=3, price=22.5)
+
+        self.assertEqual(order.get_subtotal(), 67.5)
 
 
 class TestMollieNotif(TestCase):

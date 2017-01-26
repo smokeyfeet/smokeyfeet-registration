@@ -14,7 +14,7 @@
 {% endfor %}
   </ul>
 
-  <p>Total: &euro;&nbsp;{{ order.total_due|floatformat:2 }}</p>
+  <p>Subtotal: &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}</p>
 </div>
 
 {% endblock %}
