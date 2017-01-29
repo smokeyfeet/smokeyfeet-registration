@@ -80,29 +80,29 @@ def mollie_notif(request):
     payment = mollie.retrieve_payment(payment_id)
     if payment is None:
         return HttpResponseServerError()
-    else:
-        registration_id = payment.get("metadata", {}).get("registration_id", None)
-        if registration_id is not None:
-            logger.info(
-                    "Mollie payment (%s) status changed for registration %s => %s",
-                    payment_id, registration_id, payment["status"])
-        else:
-            logger.info(
-                    "Mollie payment (%s) status changed => %s",
-                    payment_id, payment["status"])
 
-        try:
-            registration = Registration.objects.get(pk=registration_id)
-        except Registration.DoesNotExist:
-            logger.warning(
-                    "Registration (%s) does not exist; Mollie status dropped",
-                    payment_id)
-        else:
-            if payment.isPaid():
-                registration.payment_set.create(
-                    mollie_payment_id=payment["id"],
-                    amount=payment["amount"])
-                mailing.send_payment_received(registration)
+    registration_id = payment.get("metadata", {}).get("registration_id", None)
+    if registration_id is not None:
+        logger.info(
+                "Mollie payment (%s) status changed for registration %s => %s",
+                payment_id, registration_id, payment["status"])
+    else:
+        logger.info(
+                "Mollie payment (%s) status changed => %s",
+                payment_id, payment["status"])
+
+    try:
+        registration = Registration.objects.get(pk=registration_id)
+    except Registration.DoesNotExist:
+        logger.warning(
+                "Registration (%s) does not exist; Mollie status dropped",
+                payment_id)
+    else:
+        if payment.isPaid():
+            registration.payment_set.create(
+                mollie_payment_id=payment["id"],
+                amount=payment["amount"])
+            mailing.send_payment_received(registration)
 
     return HttpResponse(status=200)
 

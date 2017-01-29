@@ -1,15 +1,12 @@
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-
 from Mollie.API import Payment
-import Mollie
 
 from . import mollie
 from .exceptions import MinishopException
@@ -125,31 +122,25 @@ def mollie_notif(request):
         return HttpResponse(status=200)
 
     # Retrieve the payment
-    client = Mollie.API.Client()
-    client.setApiKey(settings.MOLLIE_API_KEY)
-
-    try:
-        payment = client.payments.get(payment_id)
-    except Mollie.API.Error as err:
-        logger.error("Mollie API call failed: %s", err.message)
+    payment = mollie.retrieve_payment(payment_id)
+    if payment is None:
         return HttpResponseServerError()
 
     order_id = payment.get("metadata", {}).get("order_id", None)
     logger.info("Payment (%s) status changed for order %s => %s",
                 payment_id, str(order_id), payment['status'])
 
-    if order_id is not None:
-        try:
-            order = Order.objects.get(pk=order_id)
-        except Order.DoesNotExist:
-            logger.warning(
-                    "Order (%s) does not exist; status dropped", order_id)
-        else:
+    try:
+        order = Order.objects.get(pk=order_id)
+    except Order.DoesNotExist:
+        logger.warning(
+                "Order (%s) does not exist; Mollie status dropped", order_id)
+    else:
+        if payment.isPaid():
             order.status = Order.STATUS_PAID
             order.mollie_payment_status = payment['status']
             order.save()
 
-            if payment.isPaid():
-                send_order_paid_mail(order)
+            send_order_paid_mail(order)
 
     return HttpResponse(status=200)

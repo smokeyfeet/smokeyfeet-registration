@@ -119,7 +119,6 @@ class Cart(models.Model):
                 cart=self, product_id=product.id,
                 price=product.unit_price, quantity=quantity)
 
-        self.updated_at = timezone.now()
         self.save()
 
     def has_stockout_items(self):
@@ -139,17 +138,7 @@ class Cart(models.Model):
                 item.delete()
 
     def remove_item_by_id(self, item_id):
-        try:
-            item_id = int(item_id)
-        except ValueError:
-            return
-
-        try:
-            item = CartItem.objects.filter(cart=self, id=item_id)
-        except CartItem.DoesNotExist:
-            return
-        else:
-            item.delete()
+        CartItem.objects.filter(cart=self, id=item_id).delete()
 
     def clear(self):
         CartItem.objects.filter(cart=self).delete()

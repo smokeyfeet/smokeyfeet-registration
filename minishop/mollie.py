@@ -42,3 +42,15 @@ def create_payment(request, order):
                 order.id, payment['id'], payment['amount'])
 
         return payment
+
+
+def retrieve_payment(payment_id):
+    client = _make_mollie_client()
+
+    try:
+        payment = client.payments.get(payment_id)
+    except Mollie.API.Error as err:
+        logger.error("Mollie API call failed: %s", str(err))
+        return None
+    else:
+        return payment
