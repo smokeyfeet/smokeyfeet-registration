@@ -20,7 +20,7 @@ def create_payment(request, order):
             reverse('minishop:order', args=[order.id]))
 
     params = {
-        "amount": float(order.total_due),
+        "amount": float(order.get_subtotal()),
         "description": "Smokey Feet 2017 PP",
         "redirectUrl": redirect_url,
         "metadata": {

@@ -92,11 +92,10 @@ def cart(request):
 
             payment = mollie.create_payment(request, order)
             if payment is not None:
-
-                # Associate Mollie payment with order
-                order.mollie_payment_id = payment['id']
-                order.mollie_payment_status = payment['status']
-                order.save()
+                order.payment_set.create(
+                    amount=order.get_subtotal(),
+                    mollie_payment_id=payment['id'],
+                    mollie_payment_status=payment['status'])
 
                 return redirect(payment.getPaymentUrl())
             else:
@@ -131,6 +130,16 @@ def mollie_notif(request):
                 payment_id, str(order_id), payment['status'])
 
     try:
+        Payment.objects.get(mollie_payment_id=payment_id)
+    except Payment.DoesNotExist:
+        logger.warning(
+                "Payment (%s) does not exist; Mollie status dropped",
+                payment_id)
+    else:
+        payment.mollie_payment_status = payment['status']
+        payment.save()
+
+    try:
         order = Order.objects.get(pk=order_id)
     except Order.DoesNotExist:
         logger.warning(
@@ -138,7 +147,6 @@ def mollie_notif(request):
     else:
         if payment.isPaid():
             order.status = Order.STATUS_PAID
-            order.mollie_payment_status = payment['status']
             order.save()
 
             send_order_paid_mail(order)

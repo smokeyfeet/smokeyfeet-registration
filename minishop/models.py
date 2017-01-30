@@ -145,8 +145,9 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name="items")
-    product = models.ForeignKey(Product)
+    cart = models.ForeignKey(
+            Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(
@@ -180,10 +181,6 @@ class Order(models.Model):
 
     status = models.CharField(
             max_length=32, default=STATUS_NEW, choices=STATUS_CHOICES)
-
-    mollie_payment_id = models.CharField(max_length=64, unique=True)
-    mollie_payment_status = models.CharField(
-            max_length=32, default=Payment.STATUS_OPEN)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -223,9 +220,10 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name="items")
+    order = models.ForeignKey(
+            Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(
-            Product, models.SET_NULL, blank=True, null=True)
+            Product, on_delete=models.SET_NULL, blank=True, null=True)
 
     product_name = models.CharField(max_length=128, default="{unknown}")
     quantity = models.PositiveIntegerField()
@@ -242,3 +240,17 @@ class OrderItem(models.Model):
     @property
     def total_price(self):
         return self.quantity * self.price
+
+
+class Payment(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    amount = models.DecimalField(
+            max_digits=12, decimal_places=2, default=0)
+
+    mollie_payment_id = models.CharField(max_length=64, unique=True)
+    mollie_payment_status = models.CharField(
+            max_length=32, default=Payment.STATUS_OPEN)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
