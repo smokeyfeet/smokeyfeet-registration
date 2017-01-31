@@ -17,7 +17,7 @@ def _make_mollie_client():
 
 def create_payment(request, order):
     redirect_url = request.build_absolute_uri(
-            reverse('minishop:order', args=[order.id]))
+            reverse("minishop:order", args=[order.id]))
 
     params = {
         "amount": float(order.get_subtotal()),
@@ -39,7 +39,7 @@ def create_payment(request, order):
     else:
         logger.info(
                 "Order (%s) - New Mollie payment %s @ %s",
-                order.id, payment['id'], payment['amount'])
+                order.id, payment["id"], payment["amount"])
 
         return payment
 

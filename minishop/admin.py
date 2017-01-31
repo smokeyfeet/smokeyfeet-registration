@@ -23,9 +23,9 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
 
     list_display = (
-        'first_name', 'last_name', 'email', 'created_at', 'display_product')
+        "first_name", "last_name", "email", "created_at", "display_product")
 
-    ordering = ('created_at',)
+    ordering = ("created_at",)
 
     def display_product(self, obj):
         qs = obj.items.all()
@@ -34,4 +34,4 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'num_in_stock', 'unit_price')
+    list_display = ("name", "num_in_stock", "unit_price")

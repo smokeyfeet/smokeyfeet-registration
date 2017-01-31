@@ -27,7 +27,7 @@ class Product(models.Model):
     allow_backorder = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -63,12 +63,11 @@ class CartManager(models.Manager):
         cart_id = request.session.get("cart_id", None)
         cart, created = Cart.objects.get_or_create(pk=cart_id)
         if created:
-            request.session['cart_id'] = cart.id
+            request.session["cart_id"] = cart.id
         else:
-            cart.updated_at = timezone.now()
-            cart.save()
+            cart.save()  # Update "updated_at" timestamp
 
-        # Purge any other inactive carts
+        # Delete all inactive carts
         self.inactive().delete()
 
         return cart
@@ -97,11 +96,9 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
     def is_empty(self):
         return self.items.count() == 0
 
-    @property
     def is_full(self):
         return self.items.count() >= 1
 
@@ -109,7 +106,7 @@ class Cart(models.Model):
         return sum(item.total_price for item in self.items.all())
 
     def add_product(self, product, quantity=1, verify_stock=True):
-        if self.is_full:
+        if self.is_full():
             raise CartFullError("Cart is full")
 
         if verify_stock and not product.allow_backorder:
@@ -189,7 +186,7 @@ class Order(models.Model):
         return "%s %s <%s>" % (self.first_name, self.last_name, self.email)
 
     def get_absolute_url(self):
-        return reverse('order', args=[str(self.id)])
+        return reverse("order", args=[str(self.id)])
 
     def get_subtotal(self):
         return sum(item.total_price for item in self.items.all())

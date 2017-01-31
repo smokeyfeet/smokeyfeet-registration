@@ -106,8 +106,8 @@ class TestMollieNotif(TestCase):
         self.client = HttpClient()
         self.path = reverse("registration:mollie_notif")
 
-    @mock.patch('Mollie.API.Resource.Payments.get')
+    @mock.patch("Mollie.API.Resource.Payments.get")
     def test_x(self, get_func):
-        get_func.side_effect = Exception('Boom!')
+        get_func.side_effect = Exception("Boom!")
         # Mollie.API.Error
-        self.client.post(self.path, {'payment_id': 'tr_XXX'})
+        self.client.post(self.path, {"payment_id": "tr_XXX"})

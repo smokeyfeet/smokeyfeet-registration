@@ -31,29 +31,29 @@ def order(request, order_id):
 
         order.return_to_stock()
         order.delete()
-        return redirect('minishop:catalog')
+        return redirect("minishop:catalog")
 
-    return render(request, 'order.html', {'order': order})
+    return render(request, "order.html", {"order": order})
 
 
 @require_http_methods(["GET", "POST"])
 def catalog(request):
     products = Product.objects.all()
 
-    if request.method == 'POST' and 'add_to_cart' in request.POST:
+    if request.method == "POST" and "add_to_cart" in request.POST:
         form = AddProductForm(request.POST)
         if form.is_valid():
-            product_id = form.cleaned_data['product_id']
+            product_id = form.cleaned_data["product_id"]
             product = get_object_or_404(Product, pk=product_id)
             cart = Cart.objects.from_request(request)
             try:
                 cart.add_product(product)
             except MinishopException as err:
-                messages.error(request, 'Failed to add to cart: %s' % str(err))
+                messages.error(request, "Failed to add to cart: %s" % str(err))
             else:
-                return redirect('minishop:cart')
+                return redirect("minishop:cart")
 
-    return render(request, 'catalog.html', {'products': products})
+    return render(request, "catalog.html", {"products": products})
 
 
 @require_http_methods(["GET", "POST"])
@@ -61,15 +61,15 @@ def catalog(request):
 def cart(request):
     cart = Cart.objects.from_request(request)
 
-    if request.method == 'POST' and 'remove_item' in request.POST:
-        item_id = request.POST.get('item_id', None)
+    if request.method == "POST" and "remove_item" in request.POST:
+        item_id = request.POST.get("item_id", None)
         if item_id is not None:
             cart.remove_item_by_id(item_id)
 
     if cart.is_empty:
-        return render(request, 'cart_empty.html')
+        return render(request, "cart_empty.html")
 
-    if request.method == 'POST' and 'backorder' in request.POST:
+    if request.method == "POST" and "backorder" in request.POST:
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
@@ -80,9 +80,9 @@ def cart(request):
 
             cart.clear()  # clear out cart on successful order; perhaps delete
 
-            return redirect('minishop:catalog')
+            return redirect("minishop:catalog")
 
-    elif request.method == 'POST' and 'pay' in request.POST:
+    elif request.method == "POST" and "pay" in request.POST:
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save()
@@ -94,8 +94,8 @@ def cart(request):
             if payment is not None:
                 order.payment_set.create(
                     amount=order.get_subtotal(),
-                    mollie_payment_id=payment['id'],
-                    mollie_payment_status=payment['status'])
+                    mollie_payment_id=payment["id"],
+                    mollie_payment_status=payment["status"])
 
                 return redirect(payment.getPaymentUrl())
             else:
@@ -104,7 +104,7 @@ def cart(request):
     else:
         form = OrderForm()
 
-    return render(request, 'cart.html', {'cart': cart, 'form': form})
+    return render(request, "cart.html", {"cart": cart, "form": form})
 
 
 @csrf_exempt
@@ -127,7 +127,7 @@ def mollie_notif(request):
 
     order_id = payment.get("metadata", {}).get("order_id", None)
     logger.info("Payment (%s) status changed for order %s => %s",
-                payment_id, str(order_id), payment['status'])
+                payment_id, str(order_id), payment["status"])
 
     try:
         Payment.objects.get(mollie_payment_id=payment_id)
@@ -136,7 +136,7 @@ def mollie_notif(request):
                 "Payment (%s) does not exist; Mollie status dropped",
                 payment_id)
     else:
-        payment.mollie_payment_status = payment['status']
+        payment.mollie_payment_status = payment["status"]
         payment.save()
 
     try:
