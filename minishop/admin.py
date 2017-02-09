@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cart, CartItem, Order, OrderItem, Product
+from .models import Cart, CartItem, Order, OrderItem, Payment, Product
 
 
 class CartItemInline(admin.TabularInline):
@@ -18,18 +18,19 @@ class OrderItemInline(admin.TabularInline):
     extra = 0
 
 
+class PaymentInline(admin.TabularInline):
+    model = Payment
+    extra = 0
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    inlines = [OrderItemInline]
+    inlines = [OrderItemInline, PaymentInline]
 
     list_display = (
-        "first_name", "last_name", "email", "created_at", "display_product")
+        "first_name", "last_name", "email", "created_at")
 
     ordering = ("created_at",)
-
-    def display_product(self, obj):
-        qs = obj.items.all()
-        return qs[0].product_name if qs.count else "none"
 
 
 @admin.register(Product)

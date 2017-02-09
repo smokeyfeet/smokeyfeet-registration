@@ -6,7 +6,6 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from Mollie.API import Payment
 
 from . import mollie
 from .exceptions import MinishopException
@@ -22,17 +21,6 @@ logger = logging.getLogger(__name__)
 @transaction.atomic
 def order(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
-
-    # Hack; canceling payment results in deleting the order
-    if order.mollie_payment_status == Payment.STATUS_CANCELLED:
-        logger.info(
-                "Payment canceled; restock & delete order (%s) %s %s <%s>:",
-                order.id, order.first_name, order.last_name, order.email)
-
-        order.return_to_stock()
-        order.delete()
-        return redirect("minishop:catalog")
-
     return render(request, "order.html", {"order": order})
 
 
@@ -46,10 +34,12 @@ def catalog(request):
             product_id = form.cleaned_data["product_id"]
             product = get_object_or_404(Product, pk=product_id)
             cart = Cart.objects.from_request(request)
+
             try:
                 cart.add_product(product)
             except MinishopException as err:
-                messages.error(request, "Failed to add to cart: %s" % str(err))
+                msg = "Could not add product to cart: {}".format(err)
+                messages.error(request, msg)
             else:
                 return redirect("minishop:cart")
 
@@ -66,23 +56,10 @@ def cart(request):
         if item_id is not None:
             cart.remove_item_by_id(item_id)
 
-    if cart.is_empty:
+    if cart.is_empty():
         return render(request, "cart_empty.html")
 
-    if request.method == "POST" and "backorder" in request.POST:
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.status = Order.STATUS_BACKORDER
-            order.save()
-
-            order.add_items_from_cart(cart, verify_stock=False)
-
-            cart.clear()  # clear out cart on successful order; perhaps delete
-
-            return redirect("minishop:catalog")
-
-    elif request.method == "POST" and "pay" in request.POST:
+    if request.method == "POST":
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save()
@@ -90,17 +67,15 @@ def cart(request):
 
             cart.clear()  # clear out cart on successful order; perhaps delete
 
-            payment = mollie.create_payment(request, order)
-            if payment is not None:
-                order.payment_set.create(
-                    amount=order.get_subtotal(),
-                    mollie_payment_id=payment["id"],
-                    mollie_payment_status=payment["status"])
-
-                return redirect(payment.getPaymentUrl())
+            if order.has_backorder_items():
+                return redirect("minishop:order", order_id=order.id)
             else:
-                messages.error(
-                    request, "Could not create payment; try again later")
+                payment = mollie.create_payment(request, order)
+                if payment is not None:
+                    return redirect(payment.getPaymentUrl())
+                else:
+                    messages.error(
+                        request, "Could not create payment; try again later")
     else:
         form = OrderForm()
 
@@ -114,41 +89,44 @@ def mollie_notif(request):
     the payment id is passed and we are responsible for retrieving
     the payment.
     """
-    # Pull out the payment id from the notification
-    payment_id = request.POST.get("id", "")
-    if not payment_id:
+    # Pull out the Mollie payment id from the notification
+    mollie_payment_id = request.POST.get("id", "")
+    if not mollie_payment_id:
         logger.warning("Missing payment id in Mollie notif (probably test)")
         return HttpResponse(status=200)
 
-    # Retrieve the payment
-    payment = mollie.retrieve_payment(payment_id)
-    if payment is None:
+    # Retrieve the Mollie payment
+    mollie_payment = mollie.retrieve_payment(mollie_payment_id)
+    if mollie_payment is None:
         return HttpResponseServerError()
 
-    order_id = payment.get("metadata", {}).get("order_id", None)
+    order_id = mollie_payment.get("metadata", {}).get("order_id", None)
     logger.info("Payment (%s) status changed for order %s => %s",
-                payment_id, str(order_id), payment["status"])
-
-    try:
-        Payment.objects.get(mollie_payment_id=payment_id)
-    except Payment.DoesNotExist:
-        logger.warning(
-                "Payment (%s) does not exist; Mollie status dropped",
-                payment_id)
-    else:
-        payment.mollie_payment_status = payment["status"]
-        payment.save()
+                mollie_payment_id, str(order_id), mollie_payment["status"])
 
     try:
         order = Order.objects.get(pk=order_id)
     except Order.DoesNotExist:
         logger.warning(
                 "Order (%s) does not exist; Mollie status dropped", order_id)
-    else:
-        if payment.isPaid():
-            order.status = Order.STATUS_PAID
-            order.save()
 
+    if mollie_payment.isPaid():
+        # Record the payment with the order
+        order.payments.create(
+            mollie_payment_id=mollie_payment["id"],
+            amount=mollie_payment["amount"])
+
+        if order.is_paid_in_full():
             send_order_paid_mail(order)
+
+    elif (mollie_payment.isCancelled() or
+            mollie_payment.isExpired() or
+            mollie_payment.isFailed()):
+        # HACK
+        logger.info(
+                "Payment unsuccessful; restock & delete order (%s) %s %s <%s>:",
+                order.id, order.first_name, order.last_name, order.email)
+        order.return_to_stock()
+        order.delete()
 
     return HttpResponse(status=200)

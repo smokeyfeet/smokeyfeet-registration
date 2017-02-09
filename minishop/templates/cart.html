@@ -1,25 +1,26 @@
 {% extends '_minishop.html' %}
 
+{% load humanize %}
+
 {% block content %}
 <div class="row columns">
-  <h3>Cart</h3>
+  <h4>Cart</h4>
 </div>
 
-{% if cart.has_stockout_items %}
+{% if cart.has_backorder_items %}
 <div class="row columns">
-  <i>Please note the following:</i>
-  <p>Your cart contains out of stock items. You may "back" order
-  and we'll notify you as soon as the desired items are back in
-  stock.</p>
+  <i>Unfortunately we're all sold out. :/</i>
+  <p>Feel free to join the waiting list and we'll notify you as soon as spots
+  open up.</p>
 </div>
 {% endif %}
 
 <div class="row columns">
   <table>
-{% for item in cart.items.all %}
+{% for item in cart.items.active %}
     <tr class="text-center">
-      <td>{{ item.product.name }}</td>
-      <td>Quantity: {{ item.quantity }}</td>
+      <td class="text-left">{{ item.product.name }} (expires {{ item.expires_at|naturaltime }})</td>
+      <td>{% if item.quantity_backorder %}<strong>WAITING LIST</strong>{% endif %}</td>
       <td>&euro;&nbsp;{{ item.price|floatformat:2 }}</td>
       <td>
         <form action="." method="post">
@@ -36,7 +37,7 @@
 </div>
 
 <div class="row columns">
-  <h3>Personal details</h3>
+  <h4>Personal details</h4>
 </div>
 
 <form action="." method="post">
@@ -80,9 +81,10 @@
 
   <br/>
 
-{% if cart.has_stockout_items %}
+{% if cart.has_backorder_items %}
   <div class="row columns text-center">
-    <input type="submit" name="backorder" class="success large button" value="Backorder"/>
+    <input type="submit" name="backorder" class="success large button"
+    value="Join waiting list"/>
   </div>
 {% else %}
   <div class="row columns text-center">

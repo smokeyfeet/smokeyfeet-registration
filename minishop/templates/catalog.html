@@ -6,20 +6,20 @@
   <div class="columns">
     <div class="callout large">
     <h3 class="text-center">{{ product.name }}</h3>
-{% if product.in_stock %}
-    <h6 class="text-center subheader">{{ product.num_in_stock }} left</h6>
+{% if product.purchasable %}
+    <h6 class="text-center subheader">{{ product.get_quantity_available }} left</h6>
 {% else %}
     <h6 class="text-center subheader">SOLD OUT</h6>
 {% endif %}
     <hr/>
     <div class="stat text-center">&euro;&nbsp;{{ product.unit_price|floatformat:2 }}</div>
     <br/>
-{% if product.in_stock or product.allow_backorder %}
+{% if product.purchasable or product.allow_backorder %}
     <form action="." method="post">
       {% csrf_token %}
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="submit" name="add_to_cart" class="success large button expanded"
-        value="{% if product.in_stock %}Buy now{% else %}Back order {% endif %}"/>
+        value="{% if product.purchasable %}Purchase{% else %}Join waiting list{% endif %}"/>
     </form>
 {% endif %}
     </div>

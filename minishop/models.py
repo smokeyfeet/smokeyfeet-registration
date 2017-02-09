@@ -4,9 +4,14 @@ import uuid
 from Mollie.API import Payment
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 
 from .exceptions import CartFullError, StockOutError
+
+
+CART_ITEM_EXPIRY_SECS = 60 * 5  # 5 minutes
+UNPAID_ORDER_EXPIRY_SECS = 60 * 15  # 15 minutes
 
 
 class ProductManager(models.Manager):
@@ -36,24 +41,32 @@ class Product(models.Model):
     def in_stock(self):
         return self.num_in_stock > 0
 
+    def get_quantity_in_carts(self):
+        active_items = CartItem.objects.active().filter(product=self)
+        return sum(item.quantity for item in active_items)
+
+    def get_quantity_available(self):
+        return self.num_in_stock - self.get_quantity_in_carts()
+
+    def purchasable(self):
+        return self.get_quantity_available() > 0
+
+    def backorder_required(self, quantity):
+        return self.get_quantity_available() < quantity
+
+    def verify_available(self, quantity):
+        if quantity < 0:
+            raise ValueError("Quantity may not be negative")
+
+        if self.get_quantity_available() < quantity:
+            raise StockOutError("Product unavailable")
+
     def verify_stock(self, quantity):
         if quantity < 0:
             raise ValueError("Quantity may not be negative")
 
         if self.num_in_stock < quantity:
-            raise StockOutError()
-
-    def backorder_required(self, quantity):
-        return self.num_in_stock < quantity
-
-    def get_backorder_quantity(self, quantity):
-        if quantity < 0:
-            raise ValueError("Quantity may not be negative")
-
-        if self.num_in_stock >= quantity:
-            return (quantity, 0)
-        else:
-            return (self.num_in_stock, quantity - self.num_in_stock)
+            raise StockOutError("Out of stock")
 
 
 class CartManager(models.Manager):
@@ -97,29 +110,42 @@ class Cart(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def is_empty(self):
-        return self.items.count() == 0
+        return self.items.active().count() == 0
 
     def is_full(self):
-        return self.items.count() >= 1
+        return self.items.active().count() >= 1
+
+    def has_backorder_items(self):
+        return any(item.quantity_backorder > 0 for item in self.items.active())
 
     def get_subtotal(self):
-        return sum(item.total_price for item in self.items.all())
+        return sum(item.total_price for item in self.items.active())
 
-    def add_product(self, product, quantity=1, verify_stock=True):
+    def add_product(self, product, quantity=1):
         if self.is_full():
             raise CartFullError("Cart is full")
 
-        if verify_stock and not product.allow_backorder:
-            product.verify_stock(quantity)  # raises StockOutError
+        qty = 0
+        qty_backorder = 0
+
+        if product.allow_backorder:
+            if product.backorder_required(quantity):
+                qty_backorder = quantity
+            else:
+                qty = quantity
+        else:
+            product.verify_available(quantity)  # raises StockOutError
+            qty = quantity
 
         CartItem.objects.create(
                 cart=self, product_id=product.id,
-                price=product.unit_price, quantity=quantity)
+                price=product.unit_price, quantity=qty,
+                quantity_backorder=qty_backorder)
 
-        self.save()
+        self.save()  # Update "updated_at" timestamp
 
     def has_stockout_items(self):
-        for item in self.items.all():
+        for item in self.items.active():
             try:
                 item.product.verify_stock(item.quantity)
             except StockOutError:
@@ -141,12 +167,31 @@ class Cart(models.Model):
         CartItem.objects.filter(cart=self).delete()
 
 
+class CartItemManager(models.Manager):
+
+    def _expiry_time(self):
+        """
+        An item may be kept in the cart for a limited duration.
+        """
+        return timezone.now() - timedelta(seconds=CART_ITEM_EXPIRY_SECS)
+
+    def active(self):
+        return self.filter(created_at__gte=self._expiry_time())
+
+    def expired(self):
+        return self.filter(created_at__lt=self._expiry_time())
+
+
 class CartItem(models.Model):
+
+    objects = CartItemManager()
+
     cart = models.ForeignKey(
             Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
+    quantity_backorder = models.PositiveIntegerField()
     price = models.DecimalField(
             max_digits=12, decimal_places=2, default=0)
 
@@ -157,6 +202,10 @@ class CartItem(models.Model):
     def total_price(self):
         return self.quantity * self.price
 
+    @property
+    def expires_at(self):
+        return self.created_at + timedelta(seconds=CART_ITEM_EXPIRY_SECS)
+
 
 class Order(models.Model):
 
@@ -165,19 +214,6 @@ class Order(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
-
-    STATUS_NEW = "new"
-    STATUS_BACKORDER = "back_order"
-    STATUS_PAID = "paid"
-
-    STATUS_CHOICES = [
-        (STATUS_NEW, "New"),
-        (STATUS_BACKORDER, "Backorder"),
-        (STATUS_PAID, "Paid")
-    ]
-
-    status = models.CharField(
-            max_length=32, default=STATUS_NEW, choices=STATUS_CHOICES)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -191,29 +227,38 @@ class Order(models.Model):
     def get_subtotal(self):
         return sum(item.total_price for item in self.items.all())
 
-    def add_items_from_cart(self, cart, verify_stock=True):
-        for cart_item in cart.items.all():
-            if verify_stock:
-                cart_item.product.verify_stock(cart_item.quantity)
+    def get_amount_paid(self):
+        result = self.payments.aggregate(amount_paid=Sum("amount"))
+        return result.get("amount_paid") or 0.0
+
+    def is_paid_in_full(self):
+        return self.get_amount_paid() > self.get_subtotal()
+
+    def add_items_from_cart(self, cart):
+        for cart_item in cart.items.active():
             order_item = self.items.create(
                     product=cart_item.product,
                     product_name=cart_item.product.name,
                     quantity=cart_item.quantity,
+                    quantity_backorder=cart_item.quantity_backorder,
                     price=cart_item.price)
 
             # Reduce product stock
             order_item.product.num_in_stock -= order_item.quantity
             order_item.product.save()
 
-        if cart.has_stockout_items():
-            self.status = Order.STATUS_BACKORDER
-            self.save()
+    def has_backorder_items(self):
+        return any(item.quantity_backorder > 0 for item in self.items.all())
 
     def return_to_stock(self):
+        """race condition"""
         for order_item in self.items.all():
             if order_item.product is not None:
                 order_item.product.num_in_stock += order_item.quantity
                 order_item.product.save()
+
+    def expires_at(self):
+        return self.created_at + timedelta(seconds=UNPAID_ORDER_EXPIRY_SECS)
 
 
 class OrderItem(models.Model):
@@ -240,7 +285,8 @@ class OrderItem(models.Model):
 
 
 class Payment(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(
+            Order, on_delete=models.CASCADE, related_name="payments")
 
     amount = models.DecimalField(
             max_digits=12, decimal_places=2, default=0)

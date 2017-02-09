@@ -3,18 +3,30 @@
 {% block content %}
 <div class="row columns">
   <h1>Order</h1>
-  <h2 class="subheader">ID: {{ order.id }}</h2>
-
-  <h2>Payment status: {{ order.mollie_payment_status }}</h2>
+  <h4 class="subheader">ID: {{ order.id }}</h4>
 
   <p>{{ order.first_name }} {{ order.last_name }}</p>
+
+{% if order.has_backorder_items %}
+  <p>You're on the waiting list. We'll let you know as soon as a spot becomes
+  available.</p>
+
   <ul>
 {% for item in order.items.all %}
-    <li>{{ item.product.name }} &euro;&nbsp;{{ item.price }} x {{ item.quantity }} = &euro;&nbsp;{{ item.total_price|floatformat:2 }}</li>
+    <li>{{ item.product.name }}</li>
 {% endfor %}
   </ul>
 
-  <p>Subtotal: &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}</p>
-</div>
+{% else %}
 
+{% for item in order.items.all %}
+    <li>{{ item.product.name }} &euro;&nbsp;{{ item.price }} x {{ item.quantity }} = &euro;&nbsp;{{ item.total_price|floatformat:2 }}</li>
+{% endfor %}
+
+  <p>Subtotal: &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}</p>
+
+  <h2>Payment status:</h2>
+{% endif %}
+
+</div>
 {% endblock %}
