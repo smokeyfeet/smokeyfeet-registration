@@ -10,7 +10,7 @@ from html2text import html2text
 def send_order_paid_mail(order):
     subject = "[SF2017] Order"
 
-    path = reverse("order", args=[order.id])
+    path = reverse("minishop:order", args=[order.id])
     order_url = urljoin(settings.EMAIL_BASE_URI, path)
     context = {"order": order, "subject": subject, "order_url": order_url}
     html_msg = render_to_string("mail/order_paid.html", context=context)
