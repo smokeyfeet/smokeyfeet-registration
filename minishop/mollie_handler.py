@@ -33,13 +33,3 @@ def on_payment_change(mollie_payment):
 
         if order.is_paid():
             mailing.send_order_paid_mail(order)
-
-    elif (mollie_payment.isCancelled() or
-            mollie_payment.isExpired() or
-            mollie_payment.isFailed()):
-        # HACK
-        logger.info(
-                "Payment unsuccessful; restock & delete order (%s) %s %s <%s>:",
-                order.id, order.first_name, order.last_name, order.email)
-        order.return_to_stock()
-        order.delete()
