@@ -1,10 +1,10 @@
-from unittest import mock
+import unittest
 
-from django.urls import reverse
-from django.test import TestCase, Client as HttpClient
+from django.test import TestCase
 
 from .exceptions import CartFullError, StockOutError
 from .models import Cart, Order, Product
+from .mollie_handler import on_payment_change
 
 
 class TestProduct(TestCase):
@@ -116,14 +116,12 @@ class TestOrder(TestCase):
         self.assertTrue(order.is_paid_in_full())
 
 
-class TestMollieNotif(TestCase):
+class TestMollieHandler(TestCase):
 
     def setUp(self):
-        self.client = HttpClient()
-        self.path = reverse("registration:mollie_notif")
+        pass
 
-    @mock.patch("Mollie.API.Resource.Payments.get")
+    @unittest.skip
     def test_x(self, get_func):
-        get_func.side_effect = Exception("Boom!")
-        # Mollie.API.Error
-        self.client.post(self.path, {"payment_id": "tr_XXX"})
+        payment = {}
+        on_payment_change(payment)
