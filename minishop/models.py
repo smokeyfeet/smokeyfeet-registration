@@ -235,7 +235,7 @@ class Order(models.Model):
         return result.get("amount_paid") or 0.0
 
     def is_paid_in_full(self):
-        return self.get_amount_paid() > self.get_subtotal()
+        return self.get_amount_paid() >= self.get_subtotal()
 
     def add_items_from_cart(self, cart):
         for cart_item in cart.items.active():

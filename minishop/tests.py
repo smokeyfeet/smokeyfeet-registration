@@ -99,6 +99,22 @@ class TestOrder(TestCase):
 
         self.assertEqual(order.get_subtotal(), 67.5)
 
+    def test_get_amount_paid(self):
+        order = Order.objects.create()
+        order.payments.create(mollie_payment_id="pmt1", amount=22.5)
+        order.payments.create(mollie_payment_id="pmt2", amount=22.5)
+
+        self.assertEqual(order.get_amount_paid(), 45.0)
+
+    def test_is_paid_in_full(self):
+        order = Order.objects.create()
+        order.items.create(product=self.product, quantity=1, price=22.5)
+
+        self.assertFalse(order.is_paid_in_full())
+
+        order.payments.create(mollie_payment_id="pmt1", amount=22.5)
+        self.assertTrue(order.is_paid_in_full())
+
 
 class TestMollieNotif(TestCase):
 
