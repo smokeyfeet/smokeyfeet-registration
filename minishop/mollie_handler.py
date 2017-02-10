@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def on_payment_change(mollie_payment):
     order_id = mollie_payment.get("metadata", {}).get("order_id", None)
-    if order_id is not None:
+    if order_id is None:
         logger.error("Mollie payment missing order_id")
         return
 
