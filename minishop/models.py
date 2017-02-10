@@ -224,7 +224,7 @@ class Order(models.Model):
         return "%s %s <%s>" % (self.first_name, self.last_name, self.email)
 
     def get_absolute_url(self):
-        return reverse("order", args=[str(self.id)])
+        return reverse("minishop:order", args=[str(self.id)])
 
     def get_subtotal(self):
         return sum(item.total_price for item in self.items.all())

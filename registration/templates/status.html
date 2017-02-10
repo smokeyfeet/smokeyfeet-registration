@@ -7,25 +7,26 @@
   <p><i>Signed up on {{ registration.created_at|date:"r" }}</i></p>
 
   <section>
-    Name: {{ registration.last_name }}, {{ registration.first_name }}<br/>
-    Dance role: {{ registration.dance_role|capfirst }}<br/>
-    Pass type: {{ registration.pass_type.name }}<br/>
+    Name: {{ registration.last_name }}, {{ registration.first_name }}<br>
+    Dance role: {{ registration.dance_role|capfirst }}<br>
+    Pass type: {{ registration.pass_type.name }}<br>
   </section>
 
-  <hr/>
+  <hr>
 
-{% if registration.is_accepted %}
   <section>
+{% if registration.is_accepted %}
     <p><i>Registration accepted on {{ registration.accepted_at|date:"r" }}.</i></p>
 
     <h4>Invoice</h4>
     <p>
     Pass type: {{ registration.pass_type.name }} - &euro; {{ registration.pass_type.unit_price }}<br/>
     Lunch: {{ registration.lunch.name }} - &euro; {{ registration.lunch.unit_price }}<br/>
-    Grand total: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
+    Subtotal: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
     </p>
 
-    <hr/>
+    <hr>
+
     <ul>
     {% for payment in registration.payment_set.all %}
       <li>Received payment (&euro; {{ payment.amount }}) on {{ payment.created_at|date:"r" }}</li>
@@ -41,13 +42,11 @@
     {% else %}
     <p><i>Your registration is fully paid!</i></p>
     {% endif %}
-  </section>
 {% else %}
-  <section>
     <p>Please be patient while we process your registration.</p>
     <p>Keep an eye on your inbox.</p>
-  </section>
 {% endif %}
+  </section>
 
 </div>
 {% endblock %}

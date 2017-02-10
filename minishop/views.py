@@ -14,10 +14,18 @@ from .models import Cart, Order, Product
 logger = logging.getLogger(__name__)
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 @transaction.atomic
 def order(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
+
+    if request.method == "POST" and "make_payment" in request.POST:
+        payment = mollie.create_payment(request, order)
+        if payment is not None:
+            return redirect(payment.getPaymentUrl())
+        else:
+            messages.error(
+                    request, "Could not create payment; try again later")
     return render(request, "order.html", {"order": order})
 
 
@@ -64,15 +72,7 @@ def cart(request):
 
             cart.clear()  # clear out cart on successful order; perhaps delete
 
-            if order.has_backorder_items():
-                return redirect("minishop:order", order_id=order.id)
-            else:
-                payment = mollie.create_payment(request, order)
-                if payment is not None:
-                    return redirect(payment.getPaymentUrl())
-                else:
-                    messages.error(
-                        request, "Could not create payment; try again later")
+            return redirect("minishop:order", order_id=order.id)
     else:
         form = OrderForm()
 
