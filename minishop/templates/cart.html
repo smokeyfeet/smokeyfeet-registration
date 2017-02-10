@@ -79,6 +79,26 @@
     </div>
   </div>
 
+  <div class="row columns">
+    <h4>Your partner</h4>
+    <p><b>Leave partner fields blank if signing up as single lead/follow</b></p>
+  </div>
+
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.partner_name.errors }}
+      <label for="{{ form.partner_name.id_for_label }}">
+      Partner full name</label>
+      {{ form.partner_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.partner_email.errors }}
+      <label for="{{ form.partner_email.id_for_label }}">
+      Partner email</label>
+      {{ form.partner_email }}
+    </div>
+  </div>
+
   <br/>
 
 {% if cart.has_backorder_items %}

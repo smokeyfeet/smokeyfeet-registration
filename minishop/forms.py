@@ -11,7 +11,8 @@ class OrderForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ("email", "first_name", "last_name")
+        fields = ("email", "first_name", "last_name", "partner_name",
+                  "partner_email")
 
     email_repeat = forms.EmailField()
 

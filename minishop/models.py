@@ -215,6 +215,9 @@ class Order(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
 
+    partner_name = models.CharField(max_length=128, blank=True)
+    partner_email = models.EmailField(blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
