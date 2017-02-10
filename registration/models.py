@@ -131,7 +131,6 @@ class Registration(models.Model):
 
 
 class Payment(models.Model):
-
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
     mollie_payment_id = models.CharField(

@@ -1,5 +1,7 @@
 import logging
 
+from django.db import IntegrityError
+
 from . import mailing
 from .models import Order
 
@@ -22,9 +24,12 @@ def on_payment_change(mollie_payment):
 
     if mollie_payment.isPaid():
         # Record the payment with the order
-        order.payments.create(
-            mollie_payment_id=mollie_payment["id"],
-            amount=mollie_payment["amount"])
+        try:
+            order.payments.create(
+                mollie_payment_id=mollie_payment["id"],
+                amount=mollie_payment["amount"])
+        except IntegrityError as err:
+            logger.error("Order payment already exists: %s", str(err))
 
         if order.is_paid_in_full():
             mailing.send_order_paid_mail(order)

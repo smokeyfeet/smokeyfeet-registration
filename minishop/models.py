@@ -1,7 +1,6 @@
 from datetime import timedelta
 import uuid
 
-from Mollie.API import Payment
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
@@ -291,12 +290,10 @@ class Payment(models.Model):
     order = models.ForeignKey(
             Order, on_delete=models.CASCADE, related_name="payments")
 
+    mollie_payment_id = models.CharField(max_length=64, unique=True)
+
     amount = models.DecimalField(
             max_digits=12, decimal_places=2, default=0)
-
-    mollie_payment_id = models.CharField(max_length=64, unique=True)
-    mollie_payment_status = models.CharField(
-            max_length=32, default=Payment.STATUS_OPEN)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
