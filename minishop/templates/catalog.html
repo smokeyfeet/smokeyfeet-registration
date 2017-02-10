@@ -11,15 +11,15 @@
 {% else %}
     <h6 class="text-center subheader">SOLD OUT</h6>
 {% endif %}
-    <hr/>
+    <hr>
     <div class="stat text-center">&euro;&nbsp;{{ product.unit_price|floatformat:2 }}</div>
-    <br/>
+    <br>
 {% if product.purchasable or product.allow_backorder %}
     <form action="." method="post">
       {% csrf_token %}
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="submit" name="add_to_cart" class="success large button expanded"
-        value="{% if product.purchasable %}Purchase{% else %}Join waiting list{% endif %}"/>
+        value="{% if product.purchasable %}Purchase{% else %}Join waiting list{% endif %}">
     </form>
 {% endif %}
     </div>

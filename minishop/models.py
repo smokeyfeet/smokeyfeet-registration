@@ -233,7 +233,7 @@ class Order(models.Model):
         result = self.payments.aggregate(amount_paid=Sum("amount"))
         return result.get("amount_paid") or 0.0
 
-    def is_paid_in_full(self):
+    def is_paid(self):
         return self.get_amount_paid() >= self.get_subtotal()
 
     def add_items_from_cart(self, cart):

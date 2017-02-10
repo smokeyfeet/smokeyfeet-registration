@@ -31,19 +31,23 @@
 {% for item in order.items.all %}
       <li>{{ item.product.name }} &euro;&nbsp;{{ item.price }} x {{ item.quantity }} = &euro;&nbsp;{{ item.total_price|floatformat:2 }}</li>
 {% endfor %}
-   </ul>
+    </ul>
 
-  <p>Subtotal: &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}</p>
+    <p>Subtotal: &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}</p>
 
-    {% if not order.paid_in_full %}
+{% if not order.is_paid %}
     <form method="post">
     {% csrf_token %}
       <input type="submit" name="make_payment" class="success large button"
-          value="Pay &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}"/>
+          value="Pay &euro;&nbsp;{{ order.get_subtotal|floatformat:2 }}">
     </form>
-    {% else %}
+
+    <p>By clicking on the 'Pay' button you agree to our
+      <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>
+    </p>
+{% else %}
     <p><i>Your order is fully paid!</i></p>
-    {% endif %}
+{% endif %}
 
 {% endif %}
   </section>

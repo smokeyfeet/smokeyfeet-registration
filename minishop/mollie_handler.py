@@ -31,7 +31,7 @@ def on_payment_change(mollie_payment):
         except IntegrityError as err:
             logger.error("Order payment already exists: %s", str(err))
 
-        if order.is_paid_in_full():
+        if order.is_paid():
             mailing.send_order_paid_mail(order)
 
     elif (mollie_payment.isCancelled() or
