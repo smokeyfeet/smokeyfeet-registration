@@ -1,10 +1,13 @@
 {% extends 'mail/_base.html' %}
 
 {% block content %}
-  <p>Thank you for your order, {{ order.first_name }}!</p>
+  <p>Hello {{ order.first_name }}!</p>
 
-  <p>We have received your payment and your spot for Smokey Feet 2017
-  is now confirmed! We will keep you up to date on any news via the
+  <p>Unfortunately we're temporarily sold out. You've been added to
+  the waiting list and we'll notify you as soon as spots become
+  available.</p>
+
+  <p>We will keep you up to date on any news via the
   <a href="http://www.smokeyfeet.com">website</a> and Facebook page.
 
   <p>Order #: <a href="{{ order_url }}">{{ order.id }}</a></p>

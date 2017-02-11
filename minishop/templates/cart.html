@@ -1,41 +1,43 @@
 {% extends '_minishop.html' %}
 
+{% load humanize %}
+
 {% block content %}
 <div class="row columns">
-  <h1 class="text-center">Complete order</h2>
+  <h4>Cart</h4>
 </div>
 
+{% if cart.has_backorder_items %}
 <div class="row columns">
-  <h2>Cart items</h2>
+  <i>Unfortunately we're all sold out. :/</i>
+  <p>Feel free to join the waiting list and we'll notify you as soon as spots
+  open up.</p>
+</div>
+{% endif %}
 
+<div class="row columns">
   <table>
-    <tr>
-      <th>Product</th>
-      <th>Quantity</th>
-      <th>Price</th>
-      <th></th>
-    </tr>
-{% for item in cart.items.all %}
+{% for item in cart.items.active %}
     <tr class="text-center">
-      <td>{{ item.product.name }}</td>
-      <td>{{ item.quantity }}</td>
+      <td class="text-left">{{ item.product.name }} (expires {{ item.expires_at|naturaltime }})</td>
+      <td>{% if item.quantity_backorder %}<strong>WAITING LIST</strong>{% endif %}</td>
       <td>&euro;&nbsp;{{ item.price|floatformat:2 }}</td>
       <td>
         <form action="." method="post">
           {% csrf_token %}
-          <input type="hidden" name="item_id" value="{{ item.id }}"/>
-          <input type="submit" name="remove_item" class="" value="Remove"/>
+          <input type="hidden" name="item_id" value="{{ item.id }}">
+          <input type="submit" name="remove_item" class="" value="Remove">
         </form>
       </td>
     </tr>
 {% endfor %}
   </table>
 
-  <h4 class="text-center">Total due: &euro;&nbsp;{{ cart.total_due|floatformat:2 }}</h4>
+  <h4 class="text-center">Subtotal: &euro;&nbsp;{{ cart.get_subtotal|floatformat:2 }}</h4>
 </div>
 
 <div class="row columns">
-  <h2>Personal details</h2>
+  <h4>Personal details</h4>
 </div>
 
 <form action="." method="post">
@@ -53,19 +55,6 @@
 
   <div class="row">
     <div class="medium-6 columns">
-      {{ form.email.errors }}
-      <label for="{{ form.last_name.id_for_label }}">Email</label>
-      {{ form.email }}
-    </div>
-    <div class="medium-6 columns">
-      {{ form.email_repeat.errors }}
-      <label for="{{ form.email_repeat.id_for_label }}">Confirm email</label>
-      {{ form.email_repeat }}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="medium-6 columns">
       {{ form.first_name.errors }}
       <label for="{{ form.first_name.id_for_label }}">First name</label>
       {{ form.first_name }}
@@ -77,16 +66,47 @@
     </div>
   </div>
 
-  <br/>
-
-  <div class="row columns text-center">
-    <input type="submit" name="pay" class="success large button"
-        value="Pay &euro;&nbsp;{{ cart.total_due|floatformat:2 }}"/>
-        <i>
-    <p>By clicking on the 'Pay' button you agree to our
-      <a href="http://www.smokeyfeet.com/terms/" target="_blank">Terms and Conditions</a>
-    </p>
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.email.errors }}
+      <label for="{{ form.last_name.id_for_label }}">Email</label>
+      {{ form.email }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.email_repeat.errors }}
+      <label for="{{ form.email_repeat.id_for_label }}">Confirm email</label>
+      {{ form.email_repeat }}
+    </div>
   </div>
+
+{% if cart.is_partner_required %}
+  <div class="row">
+    <div class="medium-6 columns">
+      {{ form.partner_name.errors }}
+      <label for="{{ form.partner_name.id_for_label }}">
+      Partner full name</label>
+      {{ form.partner_name }}
+    </div>
+    <div class="medium-6 columns">
+      {{ form.partner_email.errors }}
+      <label for="{{ form.partner_email.id_for_label }}">
+      Partner email</label>
+      {{ form.partner_email }}
+    </div>
+  </div>
+{% endif %}
+
+  <br>
+
+{% if cart.has_backorder_items %}
+  <div class="row columns text-center">
+    <input type="submit" name="backorder" class="success large button" value="Join waiting list">
+  </div>
+{% else %}
+  <div class="row columns text-center">
+    <input type="submit" name="pay" class="success large button" value="Checkout">
+  </div>
+{% endif %}
 
 </form>
 

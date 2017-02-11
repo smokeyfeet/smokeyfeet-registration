@@ -3,11 +3,8 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import (
-        require_http_methods, require_POST, require_GET)
+from django.views.decorators.http import require_http_methods, require_GET
 
 from . import mailing
 from . import mollie
@@ -61,50 +58,6 @@ def status(request, registration_id):
                     request, "Could not create payment; try again later")
 
     return render(request, "status.html", {"registration": registration})
-
-
-@csrf_exempt
-@require_POST
-def mollie_notif(request):
-    """
-    Mollie will notify us when a payment status changes. Only the payment id is
-    passed and we are responsible for retrieving the payment.
-    """
-    # Pull out the payment id from the notification
-    payment_id = request.POST.get("id", "")
-    if not payment_id:
-        logger.warning("Missing payment id in Mollie notif (probably test)")
-        return HttpResponse(status=200)
-
-    # Retrieve the payment
-    payment = mollie.retrieve_payment(payment_id)
-    if payment is None:
-        return HttpResponseServerError()
-    else:
-        registration_id = payment.get("metadata", {}).get("registration_id", None)
-        if registration_id is not None:
-            logger.info(
-                    "Mollie payment (%s) status changed for registration %s => %s",
-                    payment_id, registration_id, payment["status"])
-        else:
-            logger.info(
-                    "Mollie payment (%s) status changed => %s",
-                    payment_id, payment["status"])
-
-        try:
-            registration = Registration.objects.get(pk=registration_id)
-        except Registration.DoesNotExist:
-            logger.warning(
-                    "Registration (%s) does not exist; Mollie status dropped",
-                    payment_id)
-        else:
-            if payment.isPaid():
-                registration.payment_set.create(
-                    mollie_payment_id=payment["id"],
-                    amount=payment["amount"])
-                mailing.send_payment_received(registration)
-
-    return HttpResponse(status=200)
 
 
 @login_required

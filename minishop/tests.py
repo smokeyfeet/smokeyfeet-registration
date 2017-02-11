@@ -1,10 +1,10 @@
-from unittest import mock
+import unittest
 
-from django.urls import reverse
-from django.test import TestCase, Client as HttpClient
+from django.test import TestCase
 
 from .exceptions import CartFullError, StockOutError
 from .models import Cart, Order, Product
+from .mollie_handler import on_payment_change
 
 
 class TestProduct(TestCase):
@@ -70,6 +70,14 @@ class TestCart(TestCase):
         cart.clear()
         self.assertEqual(cart.items.count(), 0)
 
+    def test_get_subtotal(self):
+        product = Product.objects.create(num_in_stock=20, unit_price=15.50)
+
+        cart = Cart.objects.create()
+        cart.add_product(product, quantity=3)
+
+        self.assertEqual(cart.get_subtotal(), 46.5)
+
 
 class TestOrder(TestCase):
 
@@ -85,15 +93,35 @@ class TestOrder(TestCase):
         product = Product.objects.get(pk=self.product.id)
         self.assertEqual(product.num_in_stock, 11)
 
+    def test_get_subtotal(self):
+        order = Order.objects.create()
+        order.items.create(product=self.product, quantity=3, price=22.5)
 
-class TestMollieNotif(TestCase):
+        self.assertEqual(order.get_subtotal(), 67.5)
+
+    def test_get_amount_paid(self):
+        order = Order.objects.create()
+        order.payments.create(mollie_payment_id="pmt1", amount=22.5)
+        order.payments.create(mollie_payment_id="pmt2", amount=22.5)
+
+        self.assertEqual(order.get_amount_paid(), 45.0)
+
+    def test_is_paid(self):
+        order = Order.objects.create()
+        order.items.create(product=self.product, quantity=1, price=22.5)
+
+        self.assertFalse(order.is_paid())
+
+        order.payments.create(mollie_payment_id="pmt1", amount=22.5)
+        self.assertTrue(order.is_paid())
+
+
+class TestMollieHandler(TestCase):
 
     def setUp(self):
-        self.client = HttpClient()
-        self.path = reverse("registration:mollie_notif")
+        pass
 
-    @mock.patch('Mollie.API.Resource.Payments.get')
+    @unittest.skip
     def test_x(self, get_func):
-        get_func.side_effect = Exception('Boom!')
-        # Mollie.API.Error
-        self.client.post(self.path, {'payment_id': 'tr_XXX'})
+        payment = {}
+        on_payment_change(payment)

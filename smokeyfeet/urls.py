@@ -20,11 +20,13 @@ from django.contrib.auth import urls as auth_urls
 
 from registration import urls as registration_urls
 from minishop import urls as minishop_urls
+from mollie_webhook import urls as mollie_webhook_urls
 
 
 urlpatterns = [
     url(r'^', include(registration_urls, namespace="registration")),
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include(auth_urls)),
+    url(r'^mollie/', include(mollie_webhook_urls, namespace="mollie_webhook")),
     url(r'^shop/', include(minishop_urls, namespace="minishop")),
 ]
