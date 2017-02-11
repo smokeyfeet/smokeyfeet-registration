@@ -24,7 +24,7 @@ def shop_is_closed():
 def catalog(request):
 
     if shop_is_closed():
-        return render(request, "closed.html")
+        return render(request, "shop_closed.html")
 
     products = Product.objects.all()
 
