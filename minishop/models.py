@@ -1,4 +1,5 @@
 from datetime import timedelta
+import re
 import uuid
 
 from django.core.urlresolvers import reverse
@@ -11,6 +12,8 @@ from .exceptions import CartFullError, StockOutError
 
 CART_ITEM_EXPIRY_SECS = 60 * 5  # 5 minutes
 UNPAID_ORDER_EXPIRY_SECS = 60 * 15  # 15 minutes
+
+PARTNER_RE = re.compile(r"couple|partner", re.IGNORECASE)
 
 
 class ProductManager(models.Manager):
@@ -164,6 +167,16 @@ class Cart(models.Model):
 
     def clear(self):
         CartItem.objects.filter(cart=self).delete()
+
+    def is_partner_required(self):
+        """
+        HACK
+        """
+        for item in self.items.active():
+            match = PARTNER_RE.search(item.product.name)
+            if match is not None:
+                return True
+        return False
 
 
 class CartItemManager(models.Manager):

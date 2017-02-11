@@ -79,11 +79,7 @@
     </div>
   </div>
 
-  <div class="row columns">
-    <h4>Your partner</h4>
-    <p><b>Leave partner fields blank if signing up as single lead/follow</b></p>
-  </div>
-
+{% if cart.is_partner_required %}
   <div class="row">
     <div class="medium-6 columns">
       {{ form.partner_name.errors }}
@@ -98,6 +94,7 @@
       {{ form.partner_email }}
     </div>
   </div>
+{% endif %}
 
   <br>
 

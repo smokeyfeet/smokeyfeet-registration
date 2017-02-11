@@ -20,9 +20,9 @@
 
     <h4>Invoice</h4>
     <p>
-    Pass type: {{ registration.pass_type.name }} - &euro; {{ registration.pass_type.unit_price }}<br/>
-    Lunch: {{ registration.lunch.name }} - &euro; {{ registration.lunch.unit_price }}<br/>
-    Subtotal: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br/>
+    Pass type: {{ registration.pass_type.name }} - &euro; {{ registration.pass_type.unit_price }}<br>
+    Lunch: {{ registration.lunch.name }} - &euro; {{ registration.lunch.unit_price }}<br>
+    Subtotal: <b>&euro;{{ registration.amount_due|floatformat:2 }}</b></br>
     </p>
 
     <hr>
@@ -37,7 +37,7 @@
     <form method="post">
     {% csrf_token %}
       <input type="submit" name="make_payment" class="success large button"
-          value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}"/>
+          value="Pay &euro;&nbsp;{{ registration.amount_due|floatformat:2 }}">
     </form>
     {% else %}
     <p><i>Your registration is fully paid!</i></p>
