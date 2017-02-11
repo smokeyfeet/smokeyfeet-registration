@@ -5,6 +5,7 @@ from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
+from . import mailing
 from . import mollie
 from .exceptions import MinishopException
 from .forms import AddProductForm, OrderForm
@@ -71,6 +72,9 @@ def cart(request):
             order.add_items_from_cart(cart)
 
             cart.clear()  # clear out cart on successful order; perhaps delete
+
+            if order.has_backorder_items():
+                mailing.send_backorder_mail(order)
 
             return redirect("minishop:order", order_id=order.id)
     else:

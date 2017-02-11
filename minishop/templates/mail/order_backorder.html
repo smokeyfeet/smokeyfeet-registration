@@ -1,0 +1,18 @@
+{% extends 'mail/_base.html' %}
+
+{% block content %}
+  <p>Hello {{ order.first_name }}!</p>
+
+  <p>Unfortunately we're temporarily sold out. You've been added to
+  the waiting list and we'll notify you as soon as spots become
+  available.</p>
+
+  <p>We will keep you up to date on any news via the
+  <a href="http://www.smokeyfeet.com">website</a> and Facebook page.
+
+  <p>Order #: <a href="{{ order_url }}">{{ order.id }}</a></p>
+
+  <p>All the best,</p>
+
+  <p>Smokey Feet Crew</p>
+{% endblock %}

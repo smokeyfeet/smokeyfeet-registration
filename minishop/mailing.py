@@ -19,3 +19,16 @@ def send_order_paid_mail(order):
     send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
               [order.email], fail_silently=False,
               html_message=html_msg)
+
+def send_backorder_mail(order):
+    subject = "[SF2017] Waiting list"
+
+    path = reverse("minishop:order", args=[order.id])
+    order_url = urljoin(settings.EMAIL_BASE_URI, path)
+    context = {"order": order, "subject": subject, "order_url": order_url}
+    html_msg = render_to_string("mail/order_backorder.html", context=context)
+    text_msg = html2text(html_msg)
+
+    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
+              [order.email], fail_silently=False,
+              html_message=html_msg)
