@@ -1,3 +1,4 @@
+from pathlib import Path
 import logging
 
 from django.contrib import messages
@@ -15,23 +16,16 @@ from .models import Cart, Order, Product
 logger = logging.getLogger(__name__)
 
 
-@require_http_methods(["GET", "POST"])
-@transaction.atomic
-def order(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
-
-    if request.method == "POST" and "make_payment" in request.POST:
-        payment = mollie.create_payment(request, order)
-        if payment is not None:
-            return redirect(payment.getPaymentUrl())
-        else:
-            messages.error(
-                    request, "Could not create payment; try again later")
-    return render(request, "order.html", {"order": order})
+def shop_is_closed():
+    return Path("/var/tmp/sf_shop_closed").is_file()
 
 
 @require_http_methods(["GET", "POST"])
 def catalog(request):
+
+    if shop_is_closed():
+        return render(request, "closed.html")
+
     products = Product.objects.all()
 
     if request.method == "POST" and "add_to_cart" in request.POST:
@@ -81,3 +75,18 @@ def cart(request):
         form = OrderForm()
 
     return render(request, "cart.html", {"cart": cart, "form": form})
+
+
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def order(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    if request.method == "POST" and "make_payment" in request.POST:
+        payment = mollie.create_payment(request, order)
+        if payment is not None:
+            return redirect(payment.getPaymentUrl())
+        else:
+            messages.error(
+                    request, "Could not create payment; try again later")
+    return render(request, "order.html", {"order": order})
