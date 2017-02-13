@@ -1,6 +1,52 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Cart, CartItem, Order, OrderItem, Payment, Product
+
+
+class OrderPaidFilter(admin.SimpleListFilter):
+
+    title = _("has paid")
+
+    parameter_name = "has_paid"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+            )
+
+    def queryset(self, request, queryset):
+        ids = [order.id for order in queryset.all() if order.is_paid()]
+
+        if self.value() == "yes":
+            return queryset.filter(id__in=ids)
+
+        if self.value() == "no":
+            return queryset.exclude(id__in=ids)
+
+
+class OrderBackorderFilter(admin.SimpleListFilter):
+
+    title = _("on backorder")
+
+    parameter_name = "on_backorder"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+            )
+
+    def queryset(self, request, queryset):
+        ids = [order.id for order in queryset.all() if
+               order.has_backorder_items()]
+
+        if self.value() == "yes":
+            return queryset.filter(id__in=ids)
+
+        if self.value() == "no":
+            return queryset.exclude(id__in=ids)
 
 
 class CartItemInline(admin.TabularInline):
@@ -26,6 +72,10 @@ class PaymentInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline, PaymentInline]
+
+    list_filter = (
+            'created_at', 'items__product', OrderPaidFilter,
+            OrderBackorderFilter)
 
     list_display = (
         "first_name", "last_name", "email", "created_at")
