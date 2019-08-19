@@ -87,6 +87,5 @@ def order(request, order_id):
         if payment is not None:
             return redirect(payment.getPaymentUrl())
         else:
-            messages.error(
-                    request, "Could not create payment; try again later")
+            messages.error(request, "Could not create payment; try again later")
     return render(request, "order.html", {"order": order})

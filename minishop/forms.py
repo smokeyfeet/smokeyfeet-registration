@@ -8,11 +8,9 @@ class AddProductForm(forms.Form):
 
 
 class OrderForm(forms.ModelForm):
-
     class Meta:
         model = Order
-        fields = ("email", "first_name", "last_name", "partner_name",
-                  "partner_email")
+        fields = ("email", "first_name", "last_name", "partner_name", "partner_email")
 
     email_repeat = forms.EmailField()
 

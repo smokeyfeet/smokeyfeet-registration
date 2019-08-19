@@ -16,9 +16,14 @@ def send_order_paid_mail(order):
     html_msg = render_to_string("mail/order_paid.html", context=context)
     text_msg = html2text(html_msg)
 
-    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-              [order.email], fail_silently=False,
-              html_message=html_msg)
+    send_mail(
+        subject,
+        text_msg,
+        settings.DEFAULT_FROM_EMAIL,
+        [order.email],
+        fail_silently=False,
+        html_message=html_msg,
+    )
 
 
 def send_backorder_mail(order):
@@ -30,6 +35,11 @@ def send_backorder_mail(order):
     html_msg = render_to_string("mail/order_backorder.html", context=context)
     text_msg = html2text(html_msg)
 
-    send_mail(subject, text_msg, settings.DEFAULT_FROM_EMAIL,
-              [order.email], fail_silently=False,
-              html_message=html_msg)
+    send_mail(
+        subject,
+        text_msg,
+        settings.DEFAULT_FROM_EMAIL,
+        [order.email],
+        fail_silently=False,
+        html_message=html_msg,
+    )

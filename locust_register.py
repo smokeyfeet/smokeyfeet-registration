@@ -3,7 +3,6 @@ import random
 
 
 class UserBehaviour(TaskSet):
-
     @task
     def get_signup(self):
         self.client.get("/")
@@ -28,12 +27,11 @@ class UserBehaviour(TaskSet):
             "workshop_partner_name": "",
             "workshop_partner_email": "",
             "lunch": 3,
-            "agree_to_terms": "on"
-            }
+            "agree_to_terms": "on",
+        }
 
         headers = {"X-CSRFToken": csrftoken}
-        r = self.client.post(
-                "/", headers=headers, data=data, name="post_signup")
+        r = self.client.post("/", headers=headers, data=data, name="post_signup")
 
 
 class WebsiteUser(HttpLocust):

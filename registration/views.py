@@ -54,8 +54,7 @@ def status(request, registration_id):
         if payment is not None:
             return redirect(payment.getPaymentUrl())
         else:
-            messages.error(
-                    request, "Could not create payment; try again later")
+            messages.error(request, "Could not create payment; try again later")
 
     return render(request, "status.html", {"registration": registration})
 
@@ -63,8 +62,7 @@ def status(request, registration_id):
 @login_required
 def registrations(request):
     registrations = Registration.objects.all()
-    return render(
-            request, "list.html", {"registrations": registrations})
+    return render(request, "list.html", {"registrations": registrations})
 
 
 @login_required
