@@ -1,11 +1,16 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
+app_name = "registration"
 urlpatterns = [
-    url(r'^$', views.signup, name='signup'),
-    url(r'^thanks/$', views.thanks, name='thanks'),
-    url(r'^status/(?P<registration_id>[0-9a-z-]+)/$', views.status, name='status'),
-    url(r'^registrations/', views.registrations, name='list'),
-    url(r'^registration/(?P<registration_id>[0-9a-z-]+)/$', views.registration, name='detail'),
+    path("", views.signup, name="signup"),
+    path("thanks/", views.thanks, name="thanks"),
+    re_path(r"^status/(?P<registration_id>[0-9a-z-]+)/$", views.status, name="status"),
+    re_path(r"^registrations/", views.registrations, name="list"),
+    re_path(
+        r"^registration/(?P<registration_id>[0-9a-z-]+)/$",
+        views.registration,
+        name="detail",
+    ),
 ]

@@ -2,9 +2,9 @@ from datetime import timedelta
 import re
 import uuid
 
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
+from django.urls import reverse
 from django.utils import timezone
 
 from .exceptions import CartFullError, StockOutError

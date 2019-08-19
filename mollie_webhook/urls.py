@@ -1,8 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
-urlpatterns = [
-    url(r'^notif/$', views.mollie_notif, name='mollie_notif'),
-]
+app_name = "mollie_webhook"
+urlpatterns = [path("notif/", views.mollie_notif, name="mollie_notif")]

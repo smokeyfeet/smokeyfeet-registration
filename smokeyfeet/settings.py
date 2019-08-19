@@ -38,8 +38,8 @@ LOGGING = {
             'formatter': 'simple'
         },
         'console': {
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
     },
@@ -71,4 +71,4 @@ ANYMAIL = {
 
 EMAIL_BASE_URI = 'http://localhost:8000'
 
-MOLLIE_API_KEY = os.environ.get('SF_MOLLIE_API_KEY', '')
+MOLLIE_API_KEY = os.environ.get('SF_MOLLIE_API_KEY', 'test_foobar')

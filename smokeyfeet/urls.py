@@ -1,32 +1,11 @@
-"""registration URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.9/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Import the include() function: from django.conf.urls import url, include
-    3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
-"""
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
 from django.contrib.auth import urls as auth_urls
 
-from registration import urls as registration_urls
-from minishop import urls as minishop_urls
-from mollie_webhook import urls as mollie_webhook_urls
-
-
 urlpatterns = [
-    url(r'^', include(registration_urls, namespace="registration")),
-    url(r'^admin/', admin.site.urls),
-    url(r'^auth/', include(auth_urls)),
-    url(r'^mollie/', include(mollie_webhook_urls, namespace="mollie_webhook")),
-    url(r'^shop/', include(minishop_urls, namespace="minishop")),
+    path("admin/", admin.site.urls),
+    path("auth/", include(auth_urls)),
+    path("/", include("registration.urls", namespace="registration")),
+    path("mollie/", include("mollie_webhook.urls", namespace="mollie_webhook")),
+    path("shop/", include("minishop.urls", namespace="minishop")),
 ]
