@@ -1,6 +1,7 @@
 Django
 django-anymail
 django-countries
+environs
 html2text
 mollie-api-python
 psycopg2
