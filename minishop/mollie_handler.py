@@ -18,16 +18,15 @@ def on_payment_change(mollie_payment):
     try:
         order = Order.objects.get(pk=order_id)
     except Order.DoesNotExist:
-        logger.warning(
-                "Order (%s) does not exist; Mollie status dropped", order_id)
+        logger.warning("Order (%s) does not exist; Mollie status dropped", order_id)
         return
 
     if mollie_payment.isPaid():
         # Record the payment with the order
         try:
             order.payments.create(
-                mollie_payment_id=mollie_payment["id"],
-                amount=mollie_payment["amount"])
+                mollie_payment_id=mollie_payment["id"], amount=mollie_payment["amount"]
+            )
         except IntegrityError as err:
             logger.error("Order payment already exists: %s", str(err))
 

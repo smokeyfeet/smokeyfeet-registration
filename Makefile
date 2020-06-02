@@ -2,7 +2,8 @@ COVERAGE=coverage
 PYTHON=python
 
 clean:
-	@echo "---> Cleaning"
+	@echo "---> Cleaning project"
+	find $(CURDIR) -name "*.pyc" -type f -delete
 	find $(CURDIR) -type d -name __pycache__ -delete
 	find $(CURDIR) -type f -name django-smokeyfeet.log -delete
 	$(COVERAGE) erase

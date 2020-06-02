@@ -4,7 +4,6 @@ from django.urls import reverse
 
 
 class TestMollieNotif(TestCase):
-
     def setUp(self):
         self.client = HttpClient()
         self.path = reverse("mollie_webhook:mollie_notif")

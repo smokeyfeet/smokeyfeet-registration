@@ -6,21 +6,30 @@ from .models import PassType, Registration
 class SignupForm(forms.ModelForm):
 
     pass_type = forms.ModelChoiceField(
-            queryset=PassType.objects.filter(active=True),
-            widget=forms.widgets.RadioSelect())
+        queryset=PassType.objects.filter(active=True),
+        widget=forms.widgets.RadioSelect(),
+    )
 
     class Meta:
         model = Registration
         fields = (
-                'first_name', 'last_name', 'email', 'residing_country',
-                'dance_role', 'pass_type', 'workshop_partner_name',
-                'workshop_partner_email', 'lunch')
+            "first_name",
+            "last_name",
+            "email",
+            "residing_country",
+            "dance_role",
+            "pass_type",
+            "workshop_partner_name",
+            "workshop_partner_email",
+            "lunch",
+        )
         widgets = {
-                'dance_role': forms.widgets.RadioSelect(),
-                'lunch': forms.widgets.RadioSelect()}
+            "dance_role": forms.widgets.RadioSelect(),
+            "lunch": forms.widgets.RadioSelect(),
+        }
 
     class Media:
-        css = {'all': ('css/forms.css',)}
+        css = {"all": ("css/forms.css",)}
 
     email_repeat = forms.EmailField()
 
@@ -28,8 +37,8 @@ class SignupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
-        self.fields['pass_type'].empty_label = None
-        self.fields['lunch'].empty_label = None
+        self.fields["pass_type"].empty_label = None
+        self.fields["lunch"].empty_label = None
 
     def clean_workshop_partner_email(self):
         """
@@ -43,7 +52,7 @@ class SignupForm(forms.ModelForm):
         return email
 
     def clean_agree_to_terms(self):
-        data = self.cleaned_data['agree_to_terms']
+        data = self.cleaned_data["agree_to_terms"]
         if data is False:
             raise forms.ValidationError("You must agree to the terms.")
         return data

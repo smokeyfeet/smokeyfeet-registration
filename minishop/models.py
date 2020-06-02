@@ -2,9 +2,9 @@ from datetime import timedelta
 import re
 import uuid
 
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
+from django.urls import reverse
 from django.utils import timezone
 
 from .exceptions import CartFullError, StockOutError
@@ -17,7 +17,6 @@ PARTNER_RE = re.compile(r"couple|partner", re.IGNORECASE)
 
 
 class ProductManager(models.Manager):
-
     def in_stock(self):
         return self.filter(num_in_stock__gt=0)
 
@@ -29,8 +28,7 @@ class Product(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
     num_in_stock = models.IntegerField(default=0)
-    unit_price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     allow_backorder = models.BooleanField(default=False)
 
     class Meta:
@@ -72,7 +70,6 @@ class Product(models.Model):
 
 
 class CartManager(models.Manager):
-
     def from_request(self, request):
         # Get or create cart for request
         cart_id = request.session.get("cart_id", None)
@@ -140,9 +137,12 @@ class Cart(models.Model):
             qty = quantity
 
         CartItem.objects.create(
-                cart=self, product_id=product.id,
-                price=product.unit_price, quantity=qty,
-                quantity_backorder=qty_backorder)
+            cart=self,
+            product_id=product.id,
+            price=product.unit_price,
+            quantity=qty,
+            quantity_backorder=qty_backorder,
+        )
 
         self.save()  # Update "updated_at" timestamp
 
@@ -180,7 +180,6 @@ class Cart(models.Model):
 
 
 class CartItemManager(models.Manager):
-
     def _expiry_time(self):
         """
         An item may be kept in the cart for a limited duration.
@@ -198,14 +197,12 @@ class CartItem(models.Model):
 
     objects = CartItemManager()
 
-    cart = models.ForeignKey(
-            Cart, on_delete=models.CASCADE, related_name="items")
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
     quantity_backorder = models.PositiveIntegerField()
-    price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -252,11 +249,12 @@ class Order(models.Model):
     def add_items_from_cart(self, cart):
         for cart_item in cart.items.active():
             order_item = self.items.create(
-                    product=cart_item.product,
-                    product_name=cart_item.product.name,
-                    quantity=cart_item.quantity,
-                    quantity_backorder=cart_item.quantity_backorder,
-                    price=cart_item.price)
+                product=cart_item.product,
+                product_name=cart_item.product.name,
+                quantity=cart_item.quantity,
+                quantity_backorder=cart_item.quantity_backorder,
+                price=cart_item.price,
+            )
 
             # Reduce product stock
             order_item.product.num_in_stock -= order_item.quantity
@@ -277,16 +275,15 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(
-            Order, on_delete=models.CASCADE, related_name="items")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(
-            Product, on_delete=models.SET_NULL, blank=True, null=True)
+        Product, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     product_name = models.CharField(max_length=128, default="{unknown}")
     quantity = models.PositiveIntegerField()
     quantity_backorder = models.PositiveIntegerField(default=0)
-    price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -300,13 +297,11 @@ class OrderItem(models.Model):
 
 
 class Payment(models.Model):
-    order = models.ForeignKey(
-            Order, on_delete=models.CASCADE, related_name="payments")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="payments")
 
     mollie_payment_id = models.CharField(max_length=64, unique=True)
 
-    amount = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -17,15 +17,14 @@ def _make_mollie_client():
 
 def create_payment(request, registration):
     redirect_url = request.build_absolute_uri(
-            (reverse("registration:status", args=[registration.id])))
+        (reverse("registration:status", args=[registration.id]))
+    )
 
     params = {
         "amount": float(registration.amount_due),
         "description": "Smokey Feet 2017",
         "redirectUrl": redirect_url,
-        "metadata": {
-            "registration_id": str(registration.pk)
-        }
+        "metadata": {"registration_id": str(registration.pk)},
     }
 
     client = _make_mollie_client()

@@ -17,15 +17,14 @@ def _make_mollie_client():
 
 def create_payment(request, order):
     redirect_url = request.build_absolute_uri(
-            reverse("minishop:order", args=[order.id]))
+        reverse("minishop:order", args=[order.id])
+    )
 
     params = {
         "amount": float(order.get_subtotal()),
         "description": "Smokey Feet 2017 PP",
         "redirectUrl": redirect_url,
-        "metadata": {
-            "order_id": str(order.id)
-        }
+        "metadata": {"order_id": str(order.id)},
     }
 
     client = _make_mollie_client()
@@ -38,8 +37,11 @@ def create_payment(request, order):
         return None
     else:
         logger.info(
-                "Order (%s) - New Mollie payment %s @ %s",
-                order.id, payment["id"], payment["amount"])
+            "Order (%s) - New Mollie payment %s @ %s",
+            order.id,
+            payment["id"],
+            payment["amount"],
+        )
 
         return payment
 

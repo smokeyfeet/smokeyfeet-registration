@@ -10,7 +10,6 @@ from .models import Registration, PassType, LunchType
 
 
 class SignupTestCase(TestCase):
-
     def setUp(self):
         self.client = HttpClient()
         self.path = reverse("registration:signup")
@@ -25,7 +24,6 @@ class SignupTestCase(TestCase):
 
 
 class ThanksTestCase(TestCase):
-
     def setUp(self):
         self.client = HttpClient()
         self.path = reverse("registration:thanks")
@@ -43,8 +41,7 @@ class StatusTestCase(TestCase):
     def setUpTestData(cls):
         lunch = LunchType.objects.first()
         pass_type = PassType.objects.first()
-        cls.registration = Registration.objects.create(
-                lunch=lunch, pass_type=pass_type)
+        cls.registration = Registration.objects.create(lunch=lunch, pass_type=pass_type)
 
     def setUp(self):
         self.client = HttpClient()
@@ -58,11 +55,11 @@ class StatusTestCase(TestCase):
     def test_status_post_success(self, mock_create):
         mollie_payment_id = "tr_XXX"
         mock_create.return_value = MolliePayment(
-                id=mollie_payment_id,
-                metadata={"registration_id": self.registration.id},
-                status="cancelled",
-                links={"paymentUrl": "https://x/{}".format(mollie_payment_id)}
-                )
+            id=mollie_payment_id,
+            metadata={"registration_id": self.registration.id},
+            status="cancelled",
+            links={"paymentUrl": "https://x/{}".format(mollie_payment_id)},
+        )
         path = reverse("registration:status", args=[self.registration.id])
         response = self.client.post(path, data={"make_payment": ""})
         self.assertEqual(response.status_code, 302)
@@ -86,8 +83,7 @@ class MollieNotifTestCase(TestCase):
     def setUpTestData(cls):
         lunch = LunchType.objects.first()
         pass_type = PassType.objects.first()
-        cls.registration = Registration.objects.create(
-                lunch=lunch, pass_type=pass_type)
+        cls.registration = Registration.objects.create(lunch=lunch, pass_type=pass_type)
 
     def setUp(self):
         self.client = HttpClient()
@@ -116,12 +112,12 @@ class MollieNotifTestCase(TestCase):
     def test_paid(self, mock_get):
         mollie_payment_id = "tr_XXX"
         mock_get.return_value = MolliePayment(
-                id=mollie_payment_id,
-                metadata={"registration_id": self.registration.id},
-                status="paid",
-                paidDatetime="foo",
-                amount=100.0,
-                )
+            id=mollie_payment_id,
+            metadata={"registration_id": self.registration.id},
+            status="paid",
+            paidDatetime="foo",
+            amount=100.0,
+        )
         response = self.client.post(self.path, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
         self.assertEqual(response.status_code, 200)
@@ -134,10 +130,10 @@ class MollieNotifTestCase(TestCase):
     def test_cancelled(self, mock_get):
         mollie_payment_id = "tr_XXX"
         mock_get.return_value = MolliePayment(
-                id=mollie_payment_id,
-                metadata={"registration_id": self.registration.id},
-                status="cancelled",
-                )
+            id=mollie_payment_id,
+            metadata={"registration_id": self.registration.id},
+            status="cancelled",
+        )
         response = self.client.post(self.path, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
         self.assertEqual(response.status_code, 200)

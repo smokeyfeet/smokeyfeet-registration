@@ -8,7 +8,6 @@ from .mollie_handler import on_payment_change
 
 
 class TestProduct(TestCase):
-
     def test_str(self):
         p = Product.objects.create(name="quux")
         self.assertEqual(str(p), "quux")
@@ -22,7 +21,6 @@ class TestProduct(TestCase):
 
 
 class TestProductManager(TestCase):
-
     def test_in_stock(self):
         Product.objects.create(num_in_stock=0)
         Product.objects.create(num_in_stock=10)
@@ -33,7 +31,6 @@ class TestProductManager(TestCase):
 
 
 class TestCart(TestCase):
-
     def test_str(self):
         pass
 
@@ -80,7 +77,6 @@ class TestCart(TestCase):
 
 
 class TestOrder(TestCase):
-
     def setUp(self):
         self.product = Product.objects.create(num_in_stock=10, unit_price=20)
 
@@ -117,7 +113,6 @@ class TestOrder(TestCase):
 
 
 class TestMollieHandler(TestCase):
-
     def setUp(self):
         pass
 

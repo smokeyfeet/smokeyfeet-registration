@@ -55,8 +55,6 @@ def mollie_notif(request):
     elif "registration_id" in metadata:
         registration_mollie.on_payment_change(mollie_payment)
     else:
-        logger.error(
-                "Missing identifier in Mollie payment: %s",
-                str(mollie_payment))
+        logger.error("Missing identifier in Mollie payment: %s", str(mollie_payment))
 
     return HttpResponse(status=200)

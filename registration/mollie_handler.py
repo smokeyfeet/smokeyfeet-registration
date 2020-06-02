@@ -17,11 +17,11 @@ def on_payment_change(mollie_payment):
         registration = Registration.objects.get(pk=registration_id)
     except Registration.DoesNotExist:
         logger.warning(
-                "Registration (%s) does not exist; Mollie status dropped",
-                registration_id)
+            "Registration (%s) does not exist; Mollie status dropped", registration_id
+        )
     else:
         if mollie_payment.isPaid():
             registration.payment_set.create(
-                mollie_payment_id=mollie_payment["id"],
-                amount=mollie_payment["amount"])
+                mollie_payment_id=mollie_payment["id"], amount=mollie_payment["amount"]
+            )
             mailing.send_payment_received(registration)

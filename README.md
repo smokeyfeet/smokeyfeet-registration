@@ -1,5 +1,5 @@
 ## Smokey Feet Registration
 
-[![Build Status](https://travis-ci.org/smokeyfeet/smokeyfeet-registration.svg?branch=master)](https://travis-ci.org/smokeyfeet/smokeyfeet-registration)
+![Django CI](https://github.com/smokeyfeet/smokeyfeet-registration/workflows/Django%20CI/badge.svg)
 
 Wicked!

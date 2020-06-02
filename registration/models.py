@@ -9,19 +9,16 @@ from django_countries.fields import CountryField
 
 class PassType(models.Model):
 
-    PASS_PARTY = 'party'
-    PASS_FULL = 'full'
-    PASS_TYPES = [
-            (PASS_PARTY, 'Party Pass'),
-            (PASS_FULL, 'Full Pass')]
+    PASS_PARTY = "party"
+    PASS_FULL = "full"
+    PASS_TYPES = [(PASS_PARTY, "Party Pass"), (PASS_FULL, "Full Pass")]
 
     type = models.CharField(max_length=32, choices=PASS_TYPES)
     name = models.CharField(max_length=64)
     active = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField()
     quantity_in_stock = models.PositiveIntegerField(default=0)
-    unit_price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     data = JSONField(blank=True)
 
@@ -36,21 +33,20 @@ class PassType(models.Model):
         return self.data.get("video_audition_required", False)
 
     class Meta:
-        ordering = ['sort_order']
+        ordering = ["sort_order"]
 
 
 class LunchType(models.Model):
 
     name = models.CharField(max_length=64)
     sort_order = models.PositiveIntegerField()
-    unit_price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
         return "{} - €{}".format(self.name, self.unit_price)
 
     class Meta:
-        ordering = ['sort_order']
+        ordering = ["sort_order"]
 
 
 class Registration(models.Model):
@@ -61,14 +57,13 @@ class Registration(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(unique=True)
 
-    ROLE_LEADER = 'leader'
-    ROLE_FOLLOWER = 'follower'
-    DANCE_ROLES = [
-            (ROLE_LEADER, 'Leader'),
-            (ROLE_FOLLOWER, 'Follower')]
+    ROLE_LEADER = "leader"
+    ROLE_FOLLOWER = "follower"
+    DANCE_ROLES = [(ROLE_LEADER, "Leader"), (ROLE_FOLLOWER, "Follower")]
 
     dance_role = models.CharField(
-            max_length=32, choices=DANCE_ROLES, default=ROLE_LEADER)
+        max_length=32, choices=DANCE_ROLES, default=ROLE_LEADER
+    )
 
     residing_country = CountryField()
 
@@ -80,8 +75,7 @@ class Registration(models.Model):
 
     crew_remarks = models.TextField(max_length=4096, blank=True)
 
-    total_price = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     audition_url = models.URLField(blank=True)
 
@@ -91,8 +85,7 @@ class Registration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "{}, {} ({})".format(
-                self.last_name, self.first_name, self.email)
+        return "{}, {} ({})".format(self.last_name, self.first_name, self.email)
 
     @property
     def is_accepted(self):
@@ -121,7 +114,8 @@ class Registration(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('registration:status', args=[self.id])
+
+        return reverse("registration:status", args=[self.id])
 
     def fixate_price(self):
         self.total_price = self.pass_type.unit_price + self.lunch.unit_price
@@ -134,10 +128,10 @@ class Payment(models.Model):
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
 
     mollie_payment_id = models.CharField(
-            max_length=64, unique=True, null=True, blank=True)
+        max_length=64, unique=True, null=True, blank=True
+    )
 
-    amount = models.DecimalField(
-            max_digits=12, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
