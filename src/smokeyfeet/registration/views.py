@@ -3,7 +3,8 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
+from django.template.response import TemplateResponse
 from django.views.decorators.http import require_http_methods, require_GET
 
 from . import mailing
@@ -23,7 +24,7 @@ def signup_is_closed():
 def signup(request):
 
     if signup_is_closed():
-        return render(request, "closed.html")
+        return TemplateResponse(request, "closed.html")
 
     if request.method == "POST":
         form = SignupForm(request.POST)
@@ -36,12 +37,12 @@ def signup(request):
     else:
         form = SignupForm()
 
-    return render(request, "signup.html", {"form": form})
+    return TemplateResponse(request, "signup.html", {"form": form})
 
 
 @require_GET
 def thanks(request):
-    return render(request, "thanks.html")
+    return TemplateResponse(request, "thanks.html")
 
 
 @require_http_methods(["GET", "POST"])
@@ -56,16 +57,16 @@ def status(request, registration_id):
         else:
             messages.error(request, "Could not create payment; try again later")
 
-    return render(request, "status.html", {"registration": registration})
+    return TemplateResponse(request, "status.html", {"registration": registration})
 
 
 @login_required
 def registrations(request):
     registrations = Registration.objects.all()
-    return render(request, "list.html", {"registrations": registrations})
+    return TemplateResponse(request, "list.html", {"registrations": registrations})
 
 
 @login_required
 def registration(request, registration_id):
     registration = get_object_or_404(Registration.objects, pk=registration_id)
-    return render(request, "detail.html", {"registration": registration})
+    return TemplateResponse(request, "detail.html", {"registration": registration})
