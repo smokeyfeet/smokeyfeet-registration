@@ -1,5 +1,5 @@
 *.py[cod]
-.coverage
-.env
+src/.coverage
+src/.env
 __pycache__/
 venv/
