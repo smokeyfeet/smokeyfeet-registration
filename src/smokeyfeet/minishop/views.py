@@ -3,7 +3,8 @@ import logging
 
 from django.contrib import messages
 from django.db import transaction
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
+from django.template.response import TemplateResponse
 from django.views.decorators.http import require_http_methods
 
 from . import mailing
@@ -24,7 +25,7 @@ def shop_is_closed():
 def catalog(request):
 
     if shop_is_closed():
-        return render(request, "shop_closed.html")
+        return TemplateResponse(request, "shop_closed.html")
 
     products = Product.objects.all()
 
@@ -43,7 +44,7 @@ def catalog(request):
             else:
                 return redirect("minishop:cart")
 
-    return render(request, "catalog.html", {"products": products})
+    return TemplateResponse(request, "catalog.html", {"products": products})
 
 
 @require_http_methods(["GET", "POST"])
@@ -57,7 +58,7 @@ def cart(request):
             cart.remove_item_by_id(item_id)
 
     if cart.is_empty():
-        return render(request, "cart_empty.html")
+        return TemplateResponse(request, "cart_empty.html")
 
     if request.method == "POST":
         form = OrderForm(request.POST)
@@ -74,7 +75,7 @@ def cart(request):
     else:
         form = OrderForm()
 
-    return render(request, "cart.html", {"cart": cart, "form": form})
+    return TemplateResponse(request, "cart.html", {"cart": cart, "form": form})
 
 
 @require_http_methods(["GET", "POST"])
@@ -88,4 +89,4 @@ def order(request, order_id):
             return redirect(payment.getPaymentUrl())
         else:
             messages.error(request, "Could not create payment; try again later")
-    return render(request, "order.html", {"order": order})
+    return TemplateResponse(request, "order.html", {"order": order})
