@@ -7,8 +7,8 @@ from django.views.decorators.http import require_POST
 import Mollie
 
 
-from minishop import mollie_handler as minishop_mollie
-from registration import mollie_handler as registration_mollie
+from smokeyfeet.minishop import mollie_handler as minishop_mollie
+from smokeyfeet.registration import mollie_handler as registration_mollie
 
 logger = logging.getLogger(__name__)
 

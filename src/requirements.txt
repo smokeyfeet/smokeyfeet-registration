@@ -1,6 +1,7 @@
 Django==2.2.13
 certifi==2020.4.5.1
 chardet==3.0.4
+dj-database-url==0.5.0
 django-anymail==6.1.0
 django-countries==6.1.2
 environs==8.0.0

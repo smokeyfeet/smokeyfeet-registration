@@ -26,8 +26,9 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "anymail",
     "django_countries",
-    "minishop",
-    "registration",
+    "smokeyfeet.minishop",
+    "smokeyfeet.mollie_webhook",
+    "smokeyfeet.registration",
 ]
 
 MIDDLEWARE = [
@@ -60,16 +61,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "smokeyfeet.wsgi.application"
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env.str('SF_DB_NAME', 'smokeyfeet'),
-        'USER': env.str('SF_DB_USER', 'smokeyfeet'),
-        'PASSWORD': env.str('SF_DB_PASSWORD', ''),
-        'HOST': env.str('SF_DB_HOST', '127.0.0.1'),
-        'PORT': env.str('SF_DB_PORT', '5432'),
-    }
-}
+DATABASES = {"default": env.dj_db_url("SF_DB_URL")}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -116,8 +108,8 @@ LOGGING = {
     },
     "loggers": {
         "django": {"handlers": ["file"], "level": "INFO", "propagate": True},
-        "registration": {"handlers": ["file"], "level": "INFO", "propagate": True},
-        "minishop": {"handlers": ["file"], "level": "INFO", "propagate": True},
+        "smokeyfeet.registration": {"handlers": ["file"], "level": "INFO", "propagate": True},
+        "smokeyfeet.minishop": {"handlers": ["file"], "level": "INFO", "propagate": True},
     },
 }
 

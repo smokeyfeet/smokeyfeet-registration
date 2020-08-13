@@ -1,6 +1,9 @@
 COVERAGE=coverage
 PYTHON=python
 
+serve:
+	$(PYTHON) $(CURDIR)/manage.py runserver
+
 clean:
 	@echo "---> Cleaning project"
 	find $(CURDIR) -name "*.pyc" -type f -delete
@@ -17,7 +20,4 @@ coverage:
 	$(COVERAGE) html
 
 lint:
-	flake8 $(CURDIR)/registration
-
-serve:
-	$(PYTHON) $(CURDIR)/manage.py runserver
+	flake8 $(CURDIR)/smokeyfeet
