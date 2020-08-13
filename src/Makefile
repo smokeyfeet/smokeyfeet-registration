@@ -34,5 +34,6 @@ clobber:
 	$(MANAGE) migrate
 	$(MANAGE) loaddata $(SRC)/smokeyfeet/registration/fixtures/lunch_types.json
 	$(MANAGE) loaddata $(SRC)/smokeyfeet/registration/fixtures/pass_types.json
+	$(MANAGE) loaddata $(SRC)/smokeyfeet/minishop/fixtures/products.json
 	DJANGO_SUPERUSER_PASSWORD=admin $(MANAGE) createsuperuser \
 		--username admin --email noreply@example.tld # --noinput

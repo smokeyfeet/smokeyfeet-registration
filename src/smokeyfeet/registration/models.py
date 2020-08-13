@@ -1,7 +1,6 @@
 import datetime
 import uuid
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Sum
 from django_countries.fields import CountryField
@@ -20,7 +19,7 @@ class PassType(models.Model):
     quantity_in_stock = models.PositiveIntegerField(default=0)
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
-    data = JSONField(blank=True)
+    data = models.JSONField(blank=True)
 
     def __str__(self):
         s = "{} - €{}".format(self.name, self.unit_price)
