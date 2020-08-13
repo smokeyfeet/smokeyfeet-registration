@@ -108,8 +108,16 @@ LOGGING = {
     },
     "loggers": {
         "django": {"handlers": ["file"], "level": "INFO", "propagate": True},
-        "smokeyfeet.registration": {"handlers": ["file"], "level": "INFO", "propagate": True},
-        "smokeyfeet.minishop": {"handlers": ["file"], "level": "INFO", "propagate": True},
+        "smokeyfeet.registration": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "smokeyfeet.minishop": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }
 

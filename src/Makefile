@@ -24,7 +24,7 @@ coverage:
 	$(COVERAGE) html
 
 lint:
-	flake8 $(SRC)/smokeyfeet
+	flake8 --config $(SRC)/setup.cfg $(SRC)/smokeyfeet $(SRC)/tests
 
 clobber:
 	dropdb --if-exists $(DB_NAME)
