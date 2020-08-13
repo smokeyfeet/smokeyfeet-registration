@@ -84,7 +84,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
+EMAIL_BACKEND = env.str("SF_EMAIL_BACKEND")
 DEFAULT_FROM_EMAIL = env.str("SF_DEFAULT_FROM_EMAIL")
 
 LOGGING = {
