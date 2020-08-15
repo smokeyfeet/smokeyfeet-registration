@@ -3,8 +3,9 @@ import unittest
 
 from django.test import Client as HttpClient, TestCase
 from django.urls import reverse
-import Mollie.API.Error
-from Mollie.API.Object.Payment import Payment as MolliePayment
+
+from mollie.api.error import Error as MollieError
+from mollie.api.objects.payment import Payment as MolliePayment
 
 from .models import Registration, PassType, LunchType
 
@@ -51,27 +52,29 @@ class StatusTestCase(TestCase):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch("Mollie.API.Resource.Payments.create")
+    @mock.patch("mollie.api.resources.payments.Payments.create")
     def test_status_post_success(self, mock_create):
         mollie_payment_id = "tr_XXX"
         mock_create.return_value = MolliePayment(
-            id=mollie_payment_id,
-            metadata={"registration_id": self.registration.id},
-            status="cancelled",
-            links={"paymentUrl": "https://x/{}".format(mollie_payment_id)},
+            {
+                "id": mollie_payment_id,
+                "metadata": {"registration_id": self.registration.id},
+                "status": MolliePayment.STATUS_CANCELED,
+                "_links": {"checkout": {"href": f"https://x/{mollie_payment_id}"}},
+            }
         )
         path = reverse("registration:status", args=[self.registration.id])
         response = self.client.post(path, data={"make_payment": ""})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "https://x/tr_XXX")
 
-    @mock.patch("Mollie.API.Resource.Payments.create")
+    @mock.patch("mollie.api.resources.payments.Payments.create")
     def test_status_post_fail(self, mock_create):
         mock_create.return_value = None
         path = reverse("registration:status", args=[self.registration.id])
         response = self.client.post(path, data={"make_payment": ""})
         self.assertEqual(response.status_code, 200)
-        self.assertIn(u"Could not create payment", str(response.content))
+        self.assertIn("Could not create payment", str(response.content))
 
 
 @unittest.skip
@@ -93,30 +96,31 @@ class MollieNotifTestCase(TestCase):
         response = self.client.post(self.path, data={})
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch("Mollie.API.Resource.Payments.get")
+    @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_missing_payment(self, mock_get):
-        mock_get.side_effect = Mollie.API.Error()
+        mock_get.side_effect = MollieError()
         mock_get.return_value = None
         response = self.client.post(self.path, data={"id": "XXX"})
         mock_get.assert_called_once_with("XXX")
         self.assertEqual(response.status_code, 500)
 
-    @mock.patch("Mollie.API.Resource.Payments.get")
+    @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_missing_meta_registration_id(self, mock_get):
         mock_get.return_value = dict(status="paid", metadata={})
         response = self.client.post(self.path, data={"id": "XXX"})
         mock_get.assert_called_once_with("XXX")
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch("Mollie.API.Resource.Payments.get")
+    @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_paid(self, mock_get):
         mollie_payment_id = "tr_XXX"
         mock_get.return_value = MolliePayment(
-            id=mollie_payment_id,
-            metadata={"registration_id": self.registration.id},
-            status="paid",
-            paidDatetime="foo",
-            amount=100.0,
+            {
+                "id": mollie_payment_id,
+                "metadata": {"registration_id": self.registration.id},
+                "status": MolliePayment.STATUS_PAID,
+                "amount": {"currency": "EUR", "value": 100.0},
+            }
         )
         response = self.client.post(self.path, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
@@ -126,13 +130,15 @@ class MollieNotifTestCase(TestCase):
         self.assertEqual(payment.mollie_payment_id, mollie_payment_id)
         self.assertEqual(payment.amount, 100.0)
 
-    @mock.patch("Mollie.API.Resource.Payments.get")
+    @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_cancelled(self, mock_get):
         mollie_payment_id = "tr_XXX"
         mock_get.return_value = MolliePayment(
-            id=mollie_payment_id,
-            metadata={"registration_id": self.registration.id},
-            status="cancelled",
+            {
+                "id": mollie_payment_id,
+                "metadata": {"registration_id": self.registration.id},
+                "status": MolliePayment.STATUS_CANCELED,
+            }
         )
         response = self.client.post(self.path, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
