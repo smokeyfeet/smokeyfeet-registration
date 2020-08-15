@@ -1,4 +1,5 @@
 SRC=$(CURDIR)
+TESTS_DIR=$(SRC)/tests
 
 COVERAGE=coverage
 DB_NAME=smokeyfeet
@@ -14,13 +15,14 @@ clean:
 	find $(SRC) -type d -name __pycache__ -delete
 	find $(SRC) -type f -name django-smokeyfeet.log -delete
 	$(COVERAGE) erase
+	rm -rf $(SRC)/htmlcov
 
 test:
 	@echo "---> Testing"
 	$(MANAGE) test
 
-coverage:
-	$(COVERAGE) run $(SRC)/manage.py test
+test-coverage:
+	$(COVERAGE) run --source=$(SRC)/smokeyfeet $(MANAGE) test
 	$(COVERAGE) html
 
 lint:
@@ -36,4 +38,4 @@ clobber:
 	$(MANAGE) loaddata $(SRC)/smokeyfeet/registration/fixtures/pass_types.json
 	$(MANAGE) loaddata $(SRC)/smokeyfeet/minishop/fixtures/products.json
 	DJANGO_SUPERUSER_PASSWORD=admin $(MANAGE) createsuperuser \
-		--username admin --email noreply@example.tld # --noinput
+		--username admin --email noreply@example.tld --noinput

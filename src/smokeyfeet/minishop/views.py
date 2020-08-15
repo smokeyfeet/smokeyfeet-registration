@@ -33,14 +33,13 @@ def catalog(request):
         form = AddProductForm(request.POST)
         if form.is_valid():
             product_id = form.cleaned_data["product_id"]
-            product = get_object_or_404(Product, pk=product_id)
+            product = get_object_or_404(Product.objects.all(), pk=product_id)
             cart = Cart.objects.from_request(request)
 
             try:
                 cart.add_product(product)
             except MinishopException as err:
-                msg = "Could not add product to cart: {}".format(err)
-                messages.error(request, msg)
+                messages.error(request, f"Could not add product to cart: {err}")
             else:
                 return redirect("minishop:cart")
 
@@ -81,7 +80,7 @@ def cart(request):
 @require_http_methods(["GET", "POST"])
 @transaction.atomic
 def order(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
+    order = get_object_or_404(Order.objects.all(), pk=order_id)
 
     if request.method == "POST" and "make_payment" in request.POST:
         payment = mollie.create_payment(request, order)

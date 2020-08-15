@@ -19,7 +19,7 @@ class PassType(models.Model):
     data = models.JSONField(blank=True)
 
     def __str__(self):
-        s = "{} - €{}".format(self.name, self.unit_price)
+        s = f"{self.name} - €{self.unit_price}"
         if self.video_audition_required:
             s += " - video audition"
         return s

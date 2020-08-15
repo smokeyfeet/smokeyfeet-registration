@@ -15,7 +15,7 @@ class OrderForm(forms.ModelForm):
     email_repeat = forms.EmailField()
 
     def clean(self):
-        cleaned_data = super(OrderForm, self).clean()
+        cleaned_data = super().clean()
 
         email = cleaned_data.get("email")
         email_repeat = cleaned_data.get("email_repeat")
