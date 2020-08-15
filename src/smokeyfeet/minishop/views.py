@@ -85,7 +85,7 @@ def order(request, order_id):
     if request.method == "POST" and "make_payment" in request.POST:
         payment = mollie.create_payment(request, order)
         if payment is not None:
-            return redirect(payment.getPaymentUrl())
+            return redirect(payment.checkout_url)
         else:
             messages.error(request, "Could not create payment; try again later")
     return TemplateResponse(request, "order.html", {"order": order})

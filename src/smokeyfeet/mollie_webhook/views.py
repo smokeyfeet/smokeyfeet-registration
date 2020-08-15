@@ -4,7 +4,9 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-import Mollie
+
+from mollie.api.client import Client as MollieClient
+from mollie.api.error import Error as MollieError
 
 
 from smokeyfeet.minishop import mollie_handler as minishop_mollie
@@ -13,13 +15,18 @@ from smokeyfeet.registration import mollie_handler as registration_mollie
 logger = logging.getLogger(__name__)
 
 
+def _make_mollie_client():
+    mollie_client = MollieClient()
+    mollie_client.set_api_key(settings.MOLLIE_API_KEY)
+    return mollie_client
+
+
 def retrieve_payment(payment_id):
-    client = Mollie.API.Client()
-    client.setApiKey(settings.MOLLIE_API_KEY)
+    mollie_client = _make_mollie_client()
 
     try:
-        payment = client.payments.get(payment_id)
-    except Mollie.API.Error as err:
+        payment = mollie_client.payments.get(payment_id)
+    except MollieError as err:
         logger.error("Mollie API call failed: %s", str(err))
         return None
     else:

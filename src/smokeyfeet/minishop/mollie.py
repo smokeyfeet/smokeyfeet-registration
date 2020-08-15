@@ -3,16 +3,17 @@ import logging
 from django.conf import settings
 from django.urls import reverse
 
-import Mollie
+from mollie.api.client import Client
+from mollie.api.error import Error as MollieError
 
 
 logger = logging.getLogger(__name__)
 
 
 def _make_mollie_client():
-    mollie = Mollie.API.Client()
-    mollie.setApiKey(settings.MOLLIE_API_KEY)
-    return mollie
+    mollie_client = Client()
+    mollie_client.set_api_key(settings.MOLLIE_API_KEY)
+    return mollie_client
 
 
 def create_payment(request, order):
@@ -21,18 +22,18 @@ def create_payment(request, order):
     )
 
     params = {
-        "amount": float(order.get_subtotal()),
+        "amount": {"currency": "EUR", "value": float(order.get_subtotal())},
         "description": "Smokey Feet 2017 PP",
         "redirectUrl": redirect_url,
         "metadata": {"order_id": str(order.id)},
     }
 
-    client = _make_mollie_client()
+    mollie_client = _make_mollie_client()
 
     logger.info("Creating mollie payment: %s", params)
     try:
-        payment = client.payments.create(params)
-    except Mollie.API.Error as err:
+        payment = mollie_client.payments.create(params)
+    except MollieError as err:
         logger.error("Mollie API call failed: %s", str(err))
         return None
     else:
@@ -51,7 +52,7 @@ def retrieve_payment(payment_id):
 
     try:
         payment = client.payments.get(payment_id)
-    except Mollie.API.Error as err:
+    except MollieError as err:
         logger.error("Mollie API call failed: %s", str(err))
         return None
     else:
