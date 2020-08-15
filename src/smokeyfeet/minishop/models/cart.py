@@ -31,13 +31,13 @@ class CartManager(models.Manager):
 
     def active(self):
         """
-        carts which have not expired
+        Carts which have not expired
         """
         return self.filter(updated_at__gte=self._expiry_time())
 
     def inactive(self):
         """
-        carts which have expired
+        Carts which have expired
         """
         return self.filter(updated_at__lt=self._expiry_time())
 
@@ -112,11 +112,14 @@ class Cart(models.Model):
         CartItem.objects.filter(cart=self, id=item_id).delete()
 
     def clear(self):
+        """
+        Remove all items from cart
+        """
         CartItem.objects.filter(cart=self).delete()
 
     def is_partner_required(self):
         """
-        HACK
+        HACK XXX(emiel)
         """
         for item in self.items.active():
             match = PARTNER_RE.search(item.product.name)
@@ -125,7 +128,7 @@ class Cart(models.Model):
         return False
 
 
-class CartItemManager(models.Manager):
+class CartItemQuerySet(models.QuerySet):
     def _expiry_time(self):
         """
         An item may be kept in the cart for a limited duration.
@@ -141,10 +144,13 @@ class CartItemManager(models.Manager):
 
 class CartItem(models.Model):
 
-    objects = CartItemManager()
+    objects = CartItemQuerySet.as_manager()
 
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey("minishop.Product", on_delete=models.CASCADE)
+
+    product = models.ForeignKey(
+        "minishop.Product", on_delete=models.CASCADE, related_name="+"
+    )
 
     quantity = models.PositiveIntegerField()
     quantity_backorder = models.PositiveIntegerField()

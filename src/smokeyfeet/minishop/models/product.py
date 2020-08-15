@@ -5,23 +5,26 @@ from smokeyfeet.minishop.exceptions import StockOutError
 from .cart import CartItem
 
 
-class ProductManager(models.Manager):
+class ProductQuerySet(models.QuerySet):
     def in_stock(self):
         return self.filter(num_in_stock__gt=0)
 
 
 class Product(models.Model):
-
-    objects = ProductManager()
-
-    name = models.CharField(max_length=128)
-    description = models.TextField()
-    num_in_stock = models.IntegerField(default=0)
-    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    allow_backorder = models.BooleanField(default=False)
-
     class Meta:
         ordering = ["name"]
+
+    objects = ProductQuerySet.as_manager()
+
+    name = models.CharField(max_length=128)
+
+    description = models.TextField()
+
+    num_in_stock = models.IntegerField(default=0)
+
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    allow_backorder = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

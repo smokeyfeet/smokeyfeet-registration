@@ -58,7 +58,7 @@ class SignupForm(forms.ModelForm):
         return data
 
     def clean(self):
-        cleaned_data = super(SignupForm, self).clean()
+        cleaned_data = super().clean()
         email = cleaned_data.get("email")
         email_repeat = cleaned_data.get("email_repeat")
         ws_partner_email = cleaned_data.get("workshop_partner_email")

@@ -109,7 +109,7 @@ class RegistrationAuditionFilter(admin.SimpleListFilter):
 
 
 def _workshop_partner(obj):
-    return "{} {}".format(obj.workshop_partner_name, obj.workshop_partner_email)
+    return f"{obj.workshop_partner_name} {obj.workshop_partner_email}"
 
 
 _workshop_partner.short_description = "Workshop partner"
