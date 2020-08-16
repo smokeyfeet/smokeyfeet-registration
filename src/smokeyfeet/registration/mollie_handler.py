@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def on_payment_change(mollie_payment):
-    registration_id = mollie_payment.get("metadata", {}).get("registration_id", None)
+    registration_id = mollie_payment.metadata.get("registration_id", None)
     if registration_id is None:
         logger.error("Mollie payment missing registration_id")
         return
@@ -20,8 +20,9 @@ def on_payment_change(mollie_payment):
             "Registration (%s) does not exist; Mollie status dropped", registration_id
         )
     else:
-        if mollie_payment.isPaid():
+        if mollie_payment.is_paid():
             registration.payment_set.create(
-                mollie_payment_id=mollie_payment["id"], amount=mollie_payment["amount"]
+                mollie_payment_id=mollie_payment.id,
+                amount=mollie_payment.amount["value"],
             )
             mailing.send_payment_received(registration)

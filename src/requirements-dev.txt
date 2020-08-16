@@ -1,3 +1,8 @@
+-r requirements.txt
 coverage==5.2.1
 flake8==3.8.3
+pytest-cov
+pytest-django
+pytest-factoryboy
+pytest-mock
 python-language-server
