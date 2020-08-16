@@ -22,7 +22,7 @@ def create_payment(request, registration):
     )
 
     params = {
-        "amount": {"currency": "EUR", "value": float(registration.amount_due)},
+        "amount": {"currency": "EUR", "value": str(registration.amount_due)},
         "description": "Smokey Feet 2017",
         "redirectUrl": redirect_url,
         "metadata": {"registration_id": str(registration.pk)},

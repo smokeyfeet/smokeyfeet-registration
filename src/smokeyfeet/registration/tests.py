@@ -119,7 +119,7 @@ class MollieNotifTestCase(TestCase):
                 "id": mollie_payment_id,
                 "metadata": {"registration_id": self.registration.id},
                 "status": MolliePayment.STATUS_PAID,
-                "amount": {"currency": "EUR", "value": 100.0},
+                "amount": {"currency": "EUR", "value": "100.0"},
             }
         )
         response = self.client.post(self.path, data={"id": mollie_payment_id})

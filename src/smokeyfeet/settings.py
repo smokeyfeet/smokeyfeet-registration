@@ -130,4 +130,4 @@ ANYMAIL = {
 
 EMAIL_BASE_URI = "http://localhost:8000"
 
-MOLLIE_API_KEY = env.str("SF_MOLLIE_API_KEY", "test_foobar")
+MOLLIE_API_KEY = env.str("SF_MOLLIE_API_KEY")
