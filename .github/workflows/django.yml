@@ -48,6 +48,7 @@ jobs:
           SF_DB_URL: postgres://smokeyfeet:smokeyfeet@localhost:5432/smokeyfeet
           SF_DEFAULT_FROM_EMAIL: foo@example.com
           SF_EMAIL_BACKEND: django.core.mail.backends.dummy.EmailBackend
+          SF_MOLLIE_API_KEY: test_XYZ
           SF_SECRET_KEY: my-ci-secret-key
         run: |
           make test
