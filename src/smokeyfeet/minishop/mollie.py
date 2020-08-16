@@ -22,7 +22,7 @@ def create_payment(request, order):
     )
 
     params = {
-        "amount": {"currency": "EUR", "value": float(order.get_subtotal())},
+        "amount": {"currency": "EUR", "value": str(order.get_subtotal())},
         "description": "Smokey Feet 2017 PP",
         "redirectUrl": redirect_url,
         "metadata": {"order_id": str(order.id)},
