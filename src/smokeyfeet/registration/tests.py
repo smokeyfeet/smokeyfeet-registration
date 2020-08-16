@@ -1,7 +1,7 @@
 from unittest import mock
 import unittest
 
-from django.test import Client as HttpClient, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from mollie.api.error import Error as MollieError
@@ -12,25 +12,23 @@ from .models import Registration, PassType, LunchType
 
 class SignupTestCase(TestCase):
     def setUp(self):
-        self.client = HttpClient()
-        self.path = reverse("registration:signup")
+        self.url = reverse("registration:signup")
 
     def test_signup_get(self):
-        response = self.client.get(self.path)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_signup_post(self):
-        response = self.client.post(self.path, data={})
+        response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, 200)
 
 
 class ThanksTestCase(TestCase):
     def setUp(self):
-        self.client = HttpClient()
-        self.path = reverse("registration:thanks")
+        self.url = reverse("registration:thanks")
 
     def test_thanks(self):
-        response = self.client.get(self.path)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
 
@@ -44,12 +42,9 @@ class StatusTestCase(TestCase):
         pass_type = PassType.objects.first()
         cls.registration = Registration.objects.create(lunch=lunch, pass_type=pass_type)
 
-    def setUp(self):
-        self.client = HttpClient()
-
     def test_status_get(self):
-        path = reverse("registration:status", args=[self.registration.id])
-        response = self.client.get(path)
+        url = reverse("registration:status", args=[self.registration.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     @mock.patch("mollie.api.resources.payments.Payments.create")
@@ -63,16 +58,16 @@ class StatusTestCase(TestCase):
                 "_links": {"checkout": {"href": f"https://x/{mollie_payment_id}"}},
             }
         )
-        path = reverse("registration:status", args=[self.registration.id])
-        response = self.client.post(path, data={"make_payment": ""})
+        url = reverse("registration:status", args=[self.registration.id])
+        response = self.client.post(url, data={"make_payment": ""})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "https://x/tr_XXX")
 
     @mock.patch("mollie.api.resources.payments.Payments.create")
     def test_status_post_fail(self, mock_create):
         mock_create.return_value = None
-        path = reverse("registration:status", args=[self.registration.id])
-        response = self.client.post(path, data={"make_payment": ""})
+        url = reverse("registration:status", args=[self.registration.id])
+        response = self.client.post(url, data={"make_payment": ""})
         self.assertEqual(response.status_code, 200)
         self.assertIn("Could not create payment", str(response.content))
 
@@ -89,25 +84,24 @@ class MollieNotifTestCase(TestCase):
         cls.registration = Registration.objects.create(lunch=lunch, pass_type=pass_type)
 
     def setUp(self):
-        self.client = HttpClient()
-        self.path = reverse("registration:mollie_notif")
+        self.url = reverse("registration:mollie_notif")
 
     def test_missing_id(self):
-        response = self.client.post(self.path, data={})
+        response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, 200)
 
     @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_missing_payment(self, mock_get):
         mock_get.side_effect = MollieError()
         mock_get.return_value = None
-        response = self.client.post(self.path, data={"id": "XXX"})
+        response = self.client.post(self.url, data={"id": "XXX"})
         mock_get.assert_called_once_with("XXX")
         self.assertEqual(response.status_code, 500)
 
     @mock.patch("mollie.api.resources.payments.Payments.get")
     def test_missing_meta_registration_id(self, mock_get):
         mock_get.return_value = dict(status="paid", metadata={})
-        response = self.client.post(self.path, data={"id": "XXX"})
+        response = self.client.post(self.url, data={"id": "XXX"})
         mock_get.assert_called_once_with("XXX")
         self.assertEqual(response.status_code, 200)
 
@@ -122,7 +116,7 @@ class MollieNotifTestCase(TestCase):
                 "amount": {"currency": "EUR", "value": "100.0"},
             }
         )
-        response = self.client.post(self.path, data={"id": mollie_payment_id})
+        response = self.client.post(self.url, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
         self.assertEqual(response.status_code, 200)
         payment = self.registration.payment_set.first()
@@ -140,6 +134,6 @@ class MollieNotifTestCase(TestCase):
                 "status": MolliePayment.STATUS_CANCELED,
             }
         )
-        response = self.client.post(self.path, data={"id": mollie_payment_id})
+        response = self.client.post(self.url, data={"id": mollie_payment_id})
         mock_get.assert_called_once_with(mollie_payment_id)
         self.assertEqual(response.status_code, 200)
