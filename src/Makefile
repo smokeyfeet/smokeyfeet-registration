@@ -2,9 +2,10 @@ SRC=$(CURDIR)
 TESTS_DIR=$(SRC)/tests
 
 COVERAGE=coverage
-DB_NAME=smokeyfeet
-PYTHON=python
 MANAGE=$(SRC)/manage.py
+PYTEST=pytest
+
+DB_NAME=smokeyfeet
 
 serve:
 	$(MANAGE) runserver
@@ -18,11 +19,13 @@ clean:
 	rm -rf $(SRC)/htmlcov
 
 test:
-	@echo "---> Testing"
-	$(MANAGE) test
+	@echo "---> Unit testing"
+	$(PYTEST) -v $(TESTS_DIR)
 
 test-coverage:
-	$(COVERAGE) run --source=$(SRC)/smokeyfeet $(MANAGE) test
+	@echo "---> Unit testing with coverage"
+	$(COVERAGE) erase
+	$(COVERAGE) run --source=$(SRC)/smokeyfeet -m $(PYTEST) -v $(TESTS_DIR)
 	$(COVERAGE) html
 
 lint:
