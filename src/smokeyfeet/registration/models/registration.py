@@ -44,7 +44,7 @@ class Registration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "{}, {} ({})".format(self.last_name, self.first_name, self.email)
+        return f"{self.last_name}, {self.first_name} ({self.email})"
 
     @property
     def is_accepted(self):

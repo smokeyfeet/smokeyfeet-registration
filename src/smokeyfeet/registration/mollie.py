@@ -18,7 +18,7 @@ def _make_mollie_client():
 
 def create_payment(request, registration):
     redirect_url = request.build_absolute_uri(
-        (reverse("registration:status", args=[registration.id]))
+        reverse("registration:status", args=[registration.id])
     )
 
     params = {

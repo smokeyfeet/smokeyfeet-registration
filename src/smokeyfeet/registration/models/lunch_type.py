@@ -10,4 +10,4 @@ class LunchType(models.Model):
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
-        return "{} - €{}".format(self.name, self.unit_price)
+        return f"{self.name} - €{self.unit_price}"

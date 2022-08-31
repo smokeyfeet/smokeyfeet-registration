@@ -27,7 +27,7 @@ def send_registration_mail(subject, template_name, registration):
     )
 
     registration.log_interaction(
-        "Mailed {} with subject: {}".format(registration.email, subject)
+        f"Mailed {registration.email} with subject: {subject}"
     )
 
 
@@ -48,7 +48,7 @@ def send_signup_received(registration):
     )
 
     registration.log_interaction(
-        "Mailed {} with subject: {}".format(registration.email, subject)
+        f"Mailed {registration.email} with subject: {subject}"
     )
 
 
@@ -73,5 +73,5 @@ def send_payment_received(registration):
     )
 
     registration.log_interaction(
-        "Mailed {} with subject: {}".format(registration.email, subject)
+        f"Mailed {registration.email} with subject: {subject}"
     )

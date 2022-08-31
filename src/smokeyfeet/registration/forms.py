@@ -36,7 +36,7 @@ class SignupForm(forms.ModelForm):
     agree_to_terms = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
-        super(SignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["pass_type"].empty_label = None
         self.fields["lunch"].empty_label = None
 
