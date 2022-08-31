@@ -42,3 +42,8 @@ clobber:
 	$(MANAGE) loaddata $(SRC)/smokeyfeet/minishop/fixtures/products.json
 	DJANGO_SUPERUSER_PASSWORD=admin $(MANAGE) createsuperuser \
 		--username admin --email noreply@example.tld --noinput
+
+upgrade_deps:
+	pip-compile --upgrade --generate-hashes ./requirements.in
+	pip-compile --upgrade --generate-hashes ./requirements-dev.in
+	pip-sync requirements.txt requirements-dev.txt
