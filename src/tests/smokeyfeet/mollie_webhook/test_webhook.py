@@ -14,7 +14,7 @@ def test_missing_id(client):
 
 
 def test_missing_payment(client, mocker):
-    mock = mocker.patch(
+    mocker.patch(
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=None,
@@ -28,7 +28,7 @@ def test_missing_payment(client, mocker):
 
 
 def test_missing_meta_registration_id(client, mocker):
-    mock = mocker.patch(
+    mocker.patch(
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=dict(status="paid", metadata={}),
@@ -43,7 +43,7 @@ def test_missing_meta_registration_id(client, mocker):
 def test_paid(client, mocker, registration):
     mollie_payment_id = "tr_XXX"
 
-    mock = mocker.patch(
+    mocker.patch(
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=MolliePayment(
@@ -72,7 +72,7 @@ def test_paid(client, mocker, registration):
 def test_cancelled(client, mocker, registration):
     mollie_payment_id = "tr_XXX"
 
-    mock = mocker.patch(
+    mocker.patch(
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=MolliePayment(

@@ -45,7 +45,12 @@ jobs:
         run: |
           pip-sync requirements.txt requirements-dev.txt
 
-      - name: Run Tests
+      - name: Run linters
+        continue-on-error: true
+        run: |
+          make lint
+
+      - name: Run tests
         env:
           SF_DB_URL: postgres://smokeyfeet:smokeyfeet@localhost:5432/smokeyfeet
           SF_DEFAULT_FROM_EMAIL: foo@example.com
