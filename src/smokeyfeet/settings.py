@@ -82,6 +82,8 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 EMAIL_BACKEND = env.str("SF_EMAIL_BACKEND")
 DEFAULT_FROM_EMAIL = env.str("SF_DEFAULT_FROM_EMAIL")
 

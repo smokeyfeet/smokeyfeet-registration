@@ -3,3 +3,4 @@ src/.coverage
 src/.env
 __pycache__/
 venv/
+.DS_Store
