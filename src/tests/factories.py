@@ -1,22 +1,18 @@
 import factory
 
-from faker import Factory as FakerFactory
-
-faker = FakerFactory.create()
-
 
 class LunchTypeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "registration.LunchType"
 
-    sort_order = faker.random_int()
+    sort_order = factory.Faker("random_int")
 
 
 class PassTypeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "registration.PassType"
 
-    sort_order = faker.random_int()
+    sort_order = factory.Faker("random_int")
     data = {}
 
 
