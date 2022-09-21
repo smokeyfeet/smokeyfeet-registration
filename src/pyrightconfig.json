@@ -1,0 +1,10 @@
+{
+  "include": [
+    "smokeyfeet/**",
+    "tests/**"
+  ],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "typeCheckingMode": "basic",
+  "verboseOutput": true
+}
