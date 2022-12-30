@@ -24,7 +24,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "{} {} <{}>".format(self.first_name, self.last_name, self.email)
+        return f"{self.first_name} {self.last_name} <{self.email}>"
 
     def get_absolute_url(self):
         return reverse("minishop:order", args=[str(self.id)])
