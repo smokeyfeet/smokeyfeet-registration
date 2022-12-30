@@ -47,6 +47,6 @@ clobber:
 		--username admin --email noreply@example.tld --noinput
 
 upgrade_deps:
-	pip-compile --upgrade --generate-hashes ./requirements.in
-	pip-compile --upgrade --generate-hashes ./requirements-dev.in
+	pip-compile --upgrade --generate-hashes --resolver=backtracking ./requirements.in
+	pip-compile --upgrade --generate-hashes --resolver=backtracking ./requirements-dev.in
 	pip-sync requirements.txt requirements-dev.txt
