@@ -19,30 +19,30 @@ charset-normalizer==2.1.1 \
 dj-database-url==1.2.0 \
     --hash=sha256:5c2993b91801c0f78a8b19e642b497b90831124cbade0c265900d4c1037b4730 \
     --hash=sha256:b23b15046cb38180e0c95207bcc90fe5e9dbde8eef16065907dd85cf4ca7036c
-    # via -r ./requirements.in
-django==4.1.4 \
-    --hash=sha256:0b223bfa55511f950ff741983d408d78d772351284c75e9f77d2b830b6b4d148 \
-    --hash=sha256:d38a4e108d2386cb9637da66a82dc8d0733caede4c83c4afdbda78af4214211b
+    # via -r requirements.in
+django==4.1.6 \
+    --hash=sha256:bceb0fe1a386781af0788cae4108622756cd05e7775448deec04a71ddf87685d \
+    --hash=sha256:c6fe7ebe7c017fe59f1029821dae0acb5a2ddcd6c9a0138fd20a8bfefac914bc
     # via
-    #   -r ./requirements.in
+    #   -r requirements.in
     #   dj-database-url
     #   django-anymail
 django-anymail==9.0 \
     --hash=sha256:4239f7c61fb77b6eb8c8591a317a84a2a78f6bce1f8f42847921de74194b5d8a \
     --hash=sha256:c21d94ffdbada613a85c22a7bf32e37447d2811e1688cd001d3cad3c7f1ff289
-    # via -r ./requirements.in
+    # via -r requirements.in
 django-countries==7.5 \
     --hash=sha256:5097d9c16eb5f8a8c195f55e647a1cf1ce8a88fdeb27b104de089424013845a6 \
     --hash=sha256:979676b1147ebbc10e8cdd67857ffffbcba8d7a92abf7ca70696ecd57d8f3d4f
-    # via -r ./requirements.in
+    # via -r requirements.in
 environs==9.5.0 \
     --hash=sha256:1e549569a3de49c05f856f40bce86979e7d5ffbbc4398e7f338574c220189124 \
     --hash=sha256:a76307b36fbe856bdca7ee9161e6c466fd7fcffc297109a118c59b54e27e30c9
-    # via -r ./requirements.in
+    # via -r requirements.in
 html2text==2020.1.16 \
     --hash=sha256:c7c629882da0cf377d66f073329ccf34a12ed2adf0169b9285ae4e63ef54c82b \
     --hash=sha256:e296318e16b059ddb97f7a8a1d6a5c1d7af4544049a01e261731d2d5cc277bbb
-    # via -r ./requirements.in
+    # via -r requirements.in
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
@@ -54,7 +54,7 @@ marshmallow==3.19.0 \
 mollie-api-python==3.0.1 \
     --hash=sha256:4c067b67e66e454a3eb91106c187d5128a90d87cb0248dffcf89469d7fc1e990 \
     --hash=sha256:624dbbc8f04f02c8d320e72f74f178523ef6ca78e197278f037f5a03bb2baeb5
-    # via -r ./requirements.in
+    # via -r requirements.in
 oauthlib==3.2.2 \
     --hash=sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca \
     --hash=sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918
@@ -77,7 +77,7 @@ psycopg2==2.9.5 \
     --hash=sha256:d3ef67e630b0de0779c42912fe2cbae3805ebaba30cda27fea2a3de650a9414f \
     --hash=sha256:f5b6320dbc3cf6cfb9f25308286f9f7ab464e65cfb105b64cc9c52831748ced2 \
     --hash=sha256:fc04dd5189b90d825509caa510f20d1d504761e78b8dfb95a0ede180f71d50e5
-    # via -r ./requirements.in
+    # via -r requirements.in
 python-dotenv==0.21.0 \
     --hash=sha256:1684eb44636dd462b66c3ee016599815514527ad99965de77f43e0944634a7e5 \
     --hash=sha256:b77d08274639e3d34145dfa6c7008e66df0f04b7be7a75fd0d5292c191d79045
@@ -85,7 +85,7 @@ python-dotenv==0.21.0 \
 pytz==2022.7 \
     --hash=sha256:7ccfae7b4b2c067464a6733c6261673fdb8fd1be905460396b97a073e9fa683a \
     --hash=sha256:93007def75ae22f7cd991c84e02d434876818661f8df9ad5df9e950ff4e52cfd
-    # via -r ./requirements.in
+    # via -r requirements.in
 requests==2.28.1 \
     --hash=sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983 \
     --hash=sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349
