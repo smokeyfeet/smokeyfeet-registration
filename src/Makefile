@@ -46,7 +46,7 @@ clobber:
 	DJANGO_SUPERUSER_PASSWORD=admin $(MANAGE) createsuperuser \
 		--username admin --email noreply@example.tld --noinput
 
-upgrade_deps:
+upgrade-deps:
 	pip-compile --upgrade --generate-hashes --resolver=backtracking ./requirements.in
 	pip-compile --upgrade --generate-hashes --resolver=backtracking ./requirements-dev.in
 	pip-sync requirements.txt requirements-dev.txt
