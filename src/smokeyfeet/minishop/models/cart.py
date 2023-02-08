@@ -143,7 +143,6 @@ class CartItemQuerySet(models.QuerySet):
 
 
 class CartItem(models.Model):
-
     objects = CartItemQuerySet.as_manager()
 
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")

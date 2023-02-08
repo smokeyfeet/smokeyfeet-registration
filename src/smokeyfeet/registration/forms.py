@@ -4,7 +4,6 @@ from .models import PassType, Registration
 
 
 class SignupForm(forms.ModelForm):
-
     pass_type = forms.ModelChoiceField(
         queryset=PassType.objects.filter(active=True),
         widget=forms.widgets.RadioSelect(),

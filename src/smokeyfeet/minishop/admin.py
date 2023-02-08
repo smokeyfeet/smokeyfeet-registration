@@ -5,7 +5,6 @@ from .models import Cart, CartItem, Order, OrderItem, Payment, Product
 
 
 class OrderPaidFilter(admin.SimpleListFilter):
-
     title = _("has paid")
 
     parameter_name = "has_paid"
@@ -24,7 +23,6 @@ class OrderPaidFilter(admin.SimpleListFilter):
 
 
 class OrderBackorderFilter(admin.SimpleListFilter):
-
     title = _("on backorder")
 
     parameter_name = "on_backorder"

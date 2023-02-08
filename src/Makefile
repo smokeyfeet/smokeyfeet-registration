@@ -34,6 +34,9 @@ lint:
 	$(BLACK) --quiet --check --diff --exclude=/migrations/ $(SRC)/smokeyfeet $(TESTS_DIR)
 	$(FLAKE8) --config $(SRC)/setup.cfg $(SRC)/smokeyfeet $(TESTS_DIR)
 
+lint-fix:
+	$(BLACK) --quiet --exclude=/migrations/ $(SRC)/smokeyfeet $(TESTS_DIR)
+
 clobber:
 	dropdb --if-exists $(DB_NAME)
 	createdb $(DB_NAME)

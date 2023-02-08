@@ -22,7 +22,6 @@ def signup_is_closed():
 
 @require_http_methods(["GET", "POST"])
 def signup(request):
-
     if signup_is_closed():
         return TemplateResponse(request, "closed.html")
 
@@ -47,7 +46,6 @@ def thanks(request):
 
 @require_http_methods(["GET", "POST"])
 def status(request, registration_id):
-
     registration = get_object_or_404(Registration.objects.all(), pk=registration_id)
 
     if request.method == "POST" and "make_payment" in request.POST:

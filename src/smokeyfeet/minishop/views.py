@@ -23,7 +23,6 @@ def shop_is_closed():
 
 @require_http_methods(["GET", "POST"])
 def catalog(request):
-
     if shop_is_closed():
         return TemplateResponse(request, "shop_closed.html")
 

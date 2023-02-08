@@ -10,7 +10,6 @@ UNPAID_ORDER_EXPIRY_SECS = 60 * 15  # 15 minutes
 
 
 class Order(models.Model):
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     first_name = models.CharField(max_length=64)

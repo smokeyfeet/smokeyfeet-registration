@@ -40,7 +40,6 @@ class RegistrationStatusFilter(admin.SimpleListFilter):
 
 
 class RegistrationPaidFilter(admin.SimpleListFilter):
-
     title = _("has paid")
 
     parameter_name = "has_paid"
@@ -162,7 +161,6 @@ class RegistrationAdmin(admin.ModelAdmin):
 
     def action_accept(self, request, queryset):
         for registration in queryset:
-
             if registration.accepted_at is None:
                 registration.accepted_at = timezone.now()
                 registration.save()
