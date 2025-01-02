@@ -1,10 +1,9 @@
-from datetime import timedelta
 import uuid
+from datetime import timedelta
 
 from django.db import models
 from django.db.models import Sum
 from django.urls import reverse
-
 
 UNPAID_ORDER_EXPIRY_SECS = 60 * 15  # 15 minutes
 

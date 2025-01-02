@@ -1,14 +1,12 @@
 import pytest
 from pytest_factoryboy import register
 
-from tests.factories import (
-    RegistrationFactory,
-    LunchTypeFactory,
-    PassTypeFactory,
-    CartFactory,
-    OrderFactory,
-    ProductFactory,
-)
+from tests.factories import CartFactory
+from tests.factories import LunchTypeFactory
+from tests.factories import OrderFactory
+from tests.factories import PassTypeFactory
+from tests.factories import ProductFactory
+from tests.factories import RegistrationFactory
 
 # registration
 register(RegistrationFactory)

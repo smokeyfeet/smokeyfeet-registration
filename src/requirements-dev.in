@@ -1,10 +1,7 @@
 -c requirements.txt
-black
 coverage
-flake8
 pytest-cov
 pytest-django
 pytest-factoryboy
 pytest-mock
-pyupgrade
-reorder-python-imports
+ruff

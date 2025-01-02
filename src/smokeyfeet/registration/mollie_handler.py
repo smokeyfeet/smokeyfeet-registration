@@ -3,7 +3,6 @@ import logging
 from . import mailing
 from .models import Registration
 
-
 logger = logging.getLogger(__name__)
 
 

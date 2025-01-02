@@ -1,10 +1,15 @@
 from datetime import timedelta
+
 from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import Interaction, LunchType, PassType, Payment, Registration
 from . import mailing
+from .models import Interaction
+from .models import LunchType
+from .models import PassType
+from .models import Payment
+from .models import Registration
 
 
 class LunchTypeAdmin(admin.ModelAdmin):

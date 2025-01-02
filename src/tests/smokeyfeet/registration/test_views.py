@@ -1,6 +1,5 @@
-from django.urls import reverse
 import pytest
-
+from django.urls import reverse
 from mollie.api.objects.payment import Payment as MolliePayment
 
 
@@ -51,12 +50,13 @@ def test_status_post_success(client, registration, mocker):
         "mollie.api.resources.payments.Payments.create",
         autospec=True,
         return_value=MolliePayment(
-            {
+            data={
                 "id": mollie_payment_id,
                 "metadata": {"registration_id": registration.id},
                 "status": MolliePayment.STATUS_CANCELED,
                 "_links": {"checkout": {"href": f"https://x/{mollie_payment_id}"}},
-            }
+            },
+            client=None,
         ),
     )
 

@@ -1,10 +1,11 @@
-from datetime import timedelta
 import re
+from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
 
-from smokeyfeet.minishop.exceptions import CartFullError, StockOutError
+from smokeyfeet.minishop.exceptions import CartFullError
+from smokeyfeet.minishop.exceptions import StockOutError
 
 CART_ITEM_EXPIRY_SECS = 60 * 5  # 5 minutes
 

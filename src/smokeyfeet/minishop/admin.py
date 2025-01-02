@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import Cart, CartItem, Order, OrderItem, Payment, Product
+from .models import Cart
+from .models import CartItem
+from .models import Order
+from .models import OrderItem
+from .models import Payment
+from .models import Product
 
 
 class OrderPaidFilter(admin.SimpleListFilter):

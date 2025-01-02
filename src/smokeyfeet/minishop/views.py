@@ -1,18 +1,21 @@
-from pathlib import Path
 import logging
+from pathlib import Path
 
 from django.contrib import messages
 from django.db import transaction
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_http_methods
 
 from . import mailing
 from . import mollie
 from .exceptions import MinishopException
-from .forms import AddProductForm, OrderForm
-from .models import Cart, Order, Product
-
+from .forms import AddProductForm
+from .forms import OrderForm
+from .models import Cart
+from .models import Order
+from .models import Product
 
 logger = logging.getLogger(__name__)
 

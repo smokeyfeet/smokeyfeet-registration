@@ -1,0 +1,33 @@
+[tool.pip-tools]
+# --strip-extras and --allow-unsafe are becoming the default in version 8.0.0.
+# TODO: remove --strip-extras, --allow-unsafe on the upgrade to version >=8.0.0
+allow-unsafe = true
+# generate-hashes = true
+newline = "LF"
+strip-extras = true
+verbose = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = ["**/migrations/*.py"]
+
+[tool.ruff.format]
+# Ruff formats like black but with some deviations. See
+# https://docs.astral.sh/ruff/formatter/black/ for details.
+
+[tool.ruff.lint]
+# Selected linting rules (check `ruff linter`). The default is ["E4", "E7",
+# "E9", "F"].
+select = [
+  "E4", # pycodestyle
+  "E7", # pycodestyle
+  "E9", # pycodestyle
+  "F",  # pycodestyle
+  "I",  # isort
+  "UP", # pypugrade
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+single-line-exclusions = ["typing"]

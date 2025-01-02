@@ -1,6 +1,7 @@
 from django import forms
 
-from .models import PassType, Registration
+from .models import PassType
+from .models import Registration
 
 
 class SignupForm(forms.ModelForm):

@@ -2,10 +2,8 @@ import logging
 
 from django.conf import settings
 from django.urls import reverse
-
 from mollie.api.client import Client
 from mollie.api.error import Error as MollieError
-
 
 logger = logging.getLogger(__name__)
 

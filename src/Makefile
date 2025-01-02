@@ -4,8 +4,7 @@ TESTS_DIR=$(SRC)/tests
 COVERAGE=coverage
 MANAGE=$(SRC)/manage.py
 PYTEST=pytest
-BLACK=black
-FLAKE8=flake8
+RUFF=ruff
 
 DB_NAME=smokeyfeet
 
@@ -31,11 +30,12 @@ test-coverage:
 	$(COVERAGE) html
 
 lint:
-	$(BLACK) --quiet --check --diff --exclude=/migrations/ $(SRC)/smokeyfeet $(TESTS_DIR)
-	$(FLAKE8) --config $(SRC)/setup.cfg $(SRC)/smokeyfeet $(TESTS_DIR)
+	$(RUFF) check $(SRC)
+	$(RUFF) format --diff $(SRC)
 
 lint-fix:
-	$(BLACK) --quiet --exclude=/migrations/ $(SRC)/smokeyfeet $(TESTS_DIR)
+	$(RUFF) check --fix $(SRC)
+	$(RUFF) format $(SRC)
 
 clobber:
 	dropdb --if-exists $(DB_NAME)

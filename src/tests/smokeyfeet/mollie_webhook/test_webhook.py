@@ -1,9 +1,7 @@
-from django.urls import reverse
 import pytest
-
+from django.urls import reverse
 from mollie.api.error import Error as MollieError
 from mollie.api.objects.payment import Payment as MolliePayment
-
 
 URL = reverse("mollie_webhook:mollie_notif")
 
@@ -47,13 +45,14 @@ def test_paid(client, mocker, registration):
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=MolliePayment(
-            {
+            data={
                 "id": mollie_payment_id,
                 "metadata": {"registration_id": registration.id},
                 "status": MolliePayment.STATUS_PAID,
                 "paidAt": "2018-03-20T13:28:37+00:00",
                 "amount": {"currency": "EUR", "value": "100.0"},
-            }
+            },
+            client=None,
         ),
     )
     response = client.post(URL, data={"id": mollie_payment_id})
@@ -76,11 +75,12 @@ def test_cancelled(client, mocker, registration):
         "mollie.api.resources.payments.Payments.get",
         autospec=True,
         return_value=MolliePayment(
-            {
+            data={
                 "id": mollie_payment_id,
                 "metadata": {"registration_id": registration.id},
                 "status": MolliePayment.STATUS_CANCELED,
-            }
+            },
+            client=None,
         ),
     )
     response = client.post(URL, data={"id": mollie_payment_id})

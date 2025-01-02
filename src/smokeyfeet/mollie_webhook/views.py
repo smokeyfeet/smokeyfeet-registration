@@ -1,13 +1,12 @@
 import logging
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse
+from django.http import HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
 from mollie.api.client import Client as MollieClient
 from mollie.api.error import Error as MollieError
-
 
 from smokeyfeet.minishop import mollie_handler as minishop_mollie
 from smokeyfeet.registration import mollie_handler as registration_mollie

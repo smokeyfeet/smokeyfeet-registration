@@ -1,6 +1,7 @@
 import pytest
 
-from smokeyfeet.minishop.exceptions import CartFullError, StockOutError
+from smokeyfeet.minishop.exceptions import CartFullError
+from smokeyfeet.minishop.exceptions import StockOutError
 
 
 @pytest.mark.django_db

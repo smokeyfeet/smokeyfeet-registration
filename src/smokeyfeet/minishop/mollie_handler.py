@@ -5,7 +5,6 @@ from django.db import IntegrityError
 from . import mailing
 from .models import Order
 
-
 logger = logging.getLogger(__name__)
 
 
